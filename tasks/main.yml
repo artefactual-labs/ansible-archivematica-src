@@ -57,7 +57,6 @@
   git: repo=https://github.com/artefactual/archivematica.git
        dest=/srv/archivematica 
        version={{ amdev_version }} 
-       depth=1
   tags: 
     - amsrc-am-common
     - amsrc-am-dashboard
@@ -105,7 +104,6 @@
   git: repo=https://github.com/artefactual/archivematica-storage-service.git
        dest=/srv/archivematica-storage-service 
        version={{ ssdev_version }} 
-       depth=1
   tags: 
     - amsrc-am-ss
 
