@@ -208,6 +208,18 @@
 
 ## (ref. debian/postinst)
 
+- name: create user archivematica
+  sudo: yes
+  user: name=archivematica uid=333 system=yes home=/var/lib/archivematica/
+  tags: amsrc-am-ss
+
+- name: create storage-service log directories
+  sudo: yes
+  file: dest={{ item }} state=directory owner=archivematica group=archivematica
+  with_items:
+    - /var/log/archivematica/storage-service
+  tags: amsrc-am-ss
+
 - name: call the debian/postinst script for archivematica-storage-service
   sudo: yes
   command: chdir=/srv/archivematica-storage-service/debian/ executable=/bin/bash source postinst
@@ -370,6 +382,18 @@
 
 ## (ref. debian/postinst )
 
+- name: create user archivematica
+  sudo: yes
+  user: name=archivematica uid=333 system=yes home=/var/lib/archivematica/
+  tags: amsrc-am-mcp-server
+
+- name: create mcp-server log directories
+  sudo: yes
+  file: dest={{ item }} state=directory owner=archivematica group=archivematica mode=g+s
+  with_items:
+    - /var/log/archivematica/MCPServer
+  tags: amsrc-am-mcp-server
+
 - name: create /var/archivematica/sharedDirectory
   sudo: yes
   file: dest=/var/archivematica/sharedDirectory state=directory 
@@ -503,7 +527,14 @@
 
 - name: create user archivematica
   sudo: yes
-  user: name=archivematica uid=333 group=archivematica system=yes home=/var/lib/archivematica/
+  user: name=archivematica uid=333 system=yes home=/var/lib/archivematica/
+  tags: amsrc-am-mcp-client
+
+- name: create mcp-client log directories
+  sudo: yes
+  file: dest={{ item }} state=directory owner=archivematica group=archivematica mode=g+s
+  with_items:
+    - /var/log/archivematica/MCPClient
   tags: amsrc-am-mcp-client
 
 
@@ -568,6 +599,18 @@
 
 - name: set MCP database charset
   command: mysql -u archivematica -pdemo MCP -e 'alter database MCP CHARACTER SET utf8 COLLATE utf8_unicode_ci'
+  tags: amsrc-am-dashboard
+
+- name: create user archivematica
+  sudo: yes
+  user: name=archivematica uid=333 system=yes home=/var/lib/archivematica/
+  tags: amsrc-am-dashboard
+
+- name: create dashboard log directories
+  sudo: yes
+  file: dest={{ item }} state=directory owner=archivematica group=archivematica mode=g+s
+  with_items:
+    - /var/log/archivematica/dashboard
   tags: amsrc-am-dashboard
 
 - name: django syncdb
