@@ -507,7 +507,6 @@
     - python-lxml
     - python-mysqldb
     - python-pyicu
-    - python-rfc6266
     - python-unidecode
     - readpst
     - rsync
