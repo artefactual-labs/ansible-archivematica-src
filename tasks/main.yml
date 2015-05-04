@@ -633,7 +633,7 @@
 
 
 - name: copy apache config file  
-  copy: src=apache.default dest=/etc/apache2/sites-available/default  owner=root group=root mode=644
+  copy: src=apache.default dest=/etc/apache2/sites-available/default.conf  owner=root group=root mode=644
   sudo: yes
   notify: restart apache2
 
