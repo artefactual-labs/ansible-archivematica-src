@@ -33,6 +33,17 @@
     - amsrc-am-mcp-client
     - amsrc-am-ss
 
+- name: Add Universe repository
+  sudo: yes
+  apt_repository: repo='{{ item }}' state=present
+  with_items:
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }} main restricted universe multiverse"
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-security main restricted universe"
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-updates main restricted universe multiverse"
+  tags:
+    - amsrc-am-common
+    - amsrc-am-mcp-client
+
   
 
 #########################################################
