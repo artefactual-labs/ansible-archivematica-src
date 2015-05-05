@@ -408,7 +408,7 @@
 
 - name: create user archivematica
   sudo: yes
-  user: name=archivematica uid=333 group=archivematica system=yes home=/var/lib/archivematica/
+  user: name=archivematica uid=333 system=yes home=/var/lib/archivematica/
   tags: amsrc-am-mcp-client
 
 
