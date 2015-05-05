@@ -615,6 +615,9 @@
 - name: django syncdb
   command: /usr/share/archivematica/dashboard/manage.py syncdb --settings='settings.common'
   tags: amsrc-am-dashboard
+
+- name: call mysql_dev script
+  command: chdir=/srv/archivematica/src/MCPServer/share/ ./mysql_dev.sh MCP
   
 - name: create archivematicaDashboard.log
   file: name=/tmp/archivematicaDashboard.log mode=666 state=touch
