@@ -635,17 +635,18 @@
   sudo: yes
   notify: restart apache2
 
+- name: remove default Apache config symlink
+  file: path=/etc/apache2/sites-enabled/000-default.conf state=absent
+
 - name: enable apache sites
   command: a2ensite default
   args:
-    creates: /etc/apache2/sites-enabled/default
+    creates: /etc/apache2/sites-enabled/default.conf
   sudo: yes
   notify: restart apache2
 
 
-
 # (ref. role: archivematica configure-archivematica.yml)
-
 
 - name: Get archivematica-dashboard configuration
   sudo: yes
