@@ -258,7 +258,6 @@
   tags: amsrc-am-ss
 
 
-
 #########################################################
 
 ### archivematica-common
@@ -274,7 +273,6 @@
     - /usr/share/archivematica/archivematicaCommon
   tags: amsrc-am-common
 
-
 - name: copy archivematica-common source files
   sudo: yes
   command: rsync -a /srv/archivematica/{{ item.src }}
@@ -285,7 +283,6 @@
     - { src: 'src/archivematicaCommon/requirements.txt', dest: '/usr/share/archivematica/archivematicaCommon/' }
     - { src: 'src/archivematicaCommon/requirements', dest: '/usr/share/archivematica/archivematicaCommon/' }
   tags: amsrc-am-common
-
 
 
 ## Install package dependencies (ref. debian/control )
@@ -338,8 +335,6 @@
     - { src: 'src/MCPServer/lib/', dest: '/usr/lib/archivematica/MCPServer/' }
     - { src: 'src/MCPServer/share/', dest: '/usr/share/archivematica/MCPServer/' }
     - { src: 'src/MCPServer/share/mysql', dest: '/usr/share/dbconfig-common/data/archivematica-mcp-server/install/' }
-    - { src: 'src/MCPServer/share/1.1.0', dest: '/usr/share/dbconfig-common/data/archivematica-mcp-server/upgrade/mysql/' }
-    - { src: 'src/MCPServer/share/1.2.0', dest: '/usr/share/dbconfig-common/data/archivematica-mcp-server/upgrade/mysql/' }
     - { src: 'src/MCPServer/init/archivematica-mcp-server.conf', dest: '/etc/init/' }
   tags: amsrc-am-mcp-server
 # NOTE: /src/MCPServer/share location is not as in the debian install scripts
