@@ -225,11 +225,16 @@
   tags: amsrc-am-ss
 
 
-
 ## ref. configure-storage-service.yml (ansible role that installs from packages)
 - name: remove nginx default
   sudo: yes
   file: path=/etc/nginx/sites-enabled/default state=absent
+  tags: amsrc-am-ss
+
+## default file is sometimes called default.conf
+- name: remove nginx default
+  sudo: yes
+  file: path=/etc/nginx/sites-enabled/default.conf state=absent
   tags: amsrc-am-ss
 
 - name: setup nginx sites available
