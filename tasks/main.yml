@@ -44,9 +44,7 @@
     - amsrc-am-common
     - amsrc-am-mcp-client
 
-
-
-#########################################################
+########################################################
 ### Get the source (from a specified branch etc)
 
 - name: install git
@@ -162,7 +160,7 @@
     - python-dev
     - libxml2-dev
     - libxslt1-dev
-    - libssl-dev
+    - libz-dev
 
 # (create virtualenv and pip install ref. dh-virtualenv )
 - name: create virtualenv for archivematica-storage-service
