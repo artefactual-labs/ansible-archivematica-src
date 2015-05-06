@@ -339,7 +339,6 @@
   tags: amsrc-am-mcp-server
 # NOTE: /src/MCPServer/share location is not as in the debian install scripts
 
-
 ## Install package dependencies (ref. debian/control )
 
 - name: Install archivematica-mcp-server package dependencies
@@ -348,12 +347,10 @@
   with_items:
     - dbconfig-common
     - logapp
-    - mysql-server
     - python-pyinotify
     - python-gearman
     - python-mysqldb
     - python-lxml
-    - gearman
     - uuid
   tags: amsrc-am-mcp-server
 
