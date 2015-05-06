@@ -623,21 +623,12 @@
   args:
     creates: /srv/archivematica/src/MCPServer/share/mysql_dev.complete
 
-- name: create archivematicaDashboard.log
-  file: name=/tmp/archivematicaDashboard.log mode=666 state=touch
-  tags: amsrc-am-dashboard
-
 - name: create user archivematicadashboard
   sudo: yes
   user: name=archivematicadashboard uid=334 system=yes home=/var/lib/archivematica-django/
   tags: amsrc-am-dashboard
 
-
-
-
-
 #########################################################
-
 
 - name: copy apache config file
   copy: src=apache.default dest=/etc/apache2/sites-available/default.conf  owner=root group=root mode=644
