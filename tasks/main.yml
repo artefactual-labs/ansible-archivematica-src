@@ -619,6 +619,7 @@
 
 - name: call mysql_dev script
   command: chdir=/srv/archivematica/src/MCPServer/share/ ./mysql_dev.sh MCP
+  creates: /srv/archivematica/src/MCPServer/share/mysql_dev.complete
   
 - name: create archivematicaDashboard.log
   file: name=/tmp/archivematicaDashboard.log mode=666 state=touch
