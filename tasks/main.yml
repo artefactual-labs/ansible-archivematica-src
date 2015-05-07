@@ -510,6 +510,7 @@
     - python-unidecode
     - readpst
     - rsync
+    - siegfried
     - sleuthkit
     - tesseract-ocr
     - tika
