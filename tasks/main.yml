@@ -3,18 +3,18 @@
 
 - name: run the equivalent of apt-get update
   apt: update_cache=yes
-  tags: 
+  tags:
     - amsrc-am-common
     - amsrc-am-dashboard
     - amsrc-am-mcp-server
     - amsrc-am-mcp-client
     - amsrc-am-ss
 
-  
+
 - name: Install python-curl
   sudo: yes
   apt: pkg='python-pycurl' state=latest
-  tags: 
+  tags:
     - amsrc-am-common
     - amsrc-am-dashboard
     - amsrc-am-mcp-server
@@ -44,15 +44,15 @@
     - amsrc-am-common
     - amsrc-am-mcp-client
 
-  
+
 
 #########################################################
-### Get the source (from a specified branch etc) 
+### Get the source (from a specified branch etc)
 
 - name: install git
   sudo: yes
   apt: pkg='git' state=latest update_cache=yes
-  tags: 
+  tags:
     - amsrc-am-common
     - amsrc-am-dashboard
     - amsrc-am-mcp-server
@@ -62,13 +62,13 @@
 
 ## for archivematica.git
 
-  
+
 - name: checkout archivematica code
   sudo: yes
   git: repo=https://github.com/artefactual/archivematica.git
-       dest=/srv/archivematica 
-       version={{ amdev_version }} 
-  tags: 
+       dest=/srv/archivematica
+       version={{ amdev_version }}
+  tags:
     - amsrc-am-common
     - amsrc-am-dashboard
     - amsrc-am-mcp-server
@@ -78,25 +78,25 @@
 
 - name: git submodule init
   command: chdir=/srv/archivematica git submodule init
-  tags: 
-    - amsrc-am-common
-    - amsrc-am-dashboard
-    - amsrc-am-mcp-server
-    - amsrc-am-mcp-client
-  
-- name: git submodule update
-  command: chdir=/srv/archivematica git submodule update
-  tags: 
+  tags:
     - amsrc-am-common
     - amsrc-am-dashboard
     - amsrc-am-mcp-server
     - amsrc-am-mcp-client
 
-  
+- name: git submodule update
+  command: chdir=/srv/archivematica git submodule update
+  tags:
+    - amsrc-am-common
+    - amsrc-am-dashboard
+    - amsrc-am-mcp-server
+    - amsrc-am-mcp-client
+
+
 - name: get archivematica latest commit hash
   command: chdir=/srv/archivematica git rev-parse HEAD
   register: latest_commit
-  tags: 
+  tags:
     - amsrc-am-common
     - amsrc-am-dashboard
     - amsrc-am-mcp-server
@@ -113,15 +113,15 @@
 - name: checkout archivematica-storage-service code
   sudo: yes
   git: repo=https://github.com/artefactual/archivematica-storage-service.git
-       dest=/srv/archivematica-storage-service 
-       version={{ ssdev_version }} 
-  tags: 
+       dest=/srv/archivematica-storage-service
+       version={{ ssdev_version }}
+  tags:
     - amsrc-am-ss
 
 - name: get archivematica-storage-service latest commit hash
   command: chdir=/srv/archivematica-storage-service git rev-parse HEAD
   register: latest_commit_ss
-  tags: 
+  tags:
     - amsrc-am-ss
 
 
@@ -130,7 +130,7 @@
   shell: echo {{ latest_commit_ss.stdout }} > /srv/archivematica-storage-service-commit.txt
 
 
-## TODO: only perform the installation steps below if version has changed 
+## TODO: only perform the installation steps below if version has changed
 
 
 
@@ -147,7 +147,7 @@
   with_items:
     - python-lxml
     - nginx
-    - unar 
+    - unar
     - uwsgi
     - uwsgi-plugin-python
   tags: amsrc-am-ss
@@ -160,14 +160,14 @@
   with_items:
     - python-virtualenv
     - python-dev
-    - libxml2-dev 
+    - libxml2-dev
     - libxslt1-dev
-    
+
 # (create virtualenv and pip install ref. dh-virtualenv )
 - name: create virtualenv for archivematica-storage-service
   sudo: yes
   pip: chdir=/srv/archivematica-storage-service
-       requirements=requirements.txt 
+       requirements=requirements.txt
        virtualenv=/usr/share/python/archivematica-storage-service
        extra_args='--find-links lib'
   tags: amsrc-am-ss
@@ -175,17 +175,17 @@
 # dh-virtualenv also seems to copy the storage_service dir to the virtualenv above (?)
 - name: copy storage_service folder to archivematica-storage-service virtualenv site-packages
   sudo: yes
-  command: rsync -a /srv/archivematica-storage-service/storage_service 
+  command: rsync -a /srv/archivematica-storage-service/storage_service
                 /usr/share/python/archivematica-storage-service/lib/python2.7/site-packages
   tags: amsrc-am-ss
- 
+
 
 ## copy (link) source files (ref. debian/archivematica-storage-service.install )
 
 - name: create subdirectories for archivematica-storage-service source files
   sudo: yes
-  file: dest={{ item }} state=directory 
-  with_items: 
+  file: dest={{ item }} state=directory
+  with_items:
     - /var/archivematica/storage-service
     - /usr/lib/archivematica
   tags: amsrc-am-ss
@@ -193,14 +193,14 @@
 
 - name: copy archivematica-storage-service source files
   sudo: yes
-  command: rsync -a /srv/archivematica-storage-service/{{ item.src }} 
-                    {{ item.dest }} 
+  command: rsync -a /srv/archivematica-storage-service/{{ item.src }}
+                    {{ item.dest }}
   with_items:
-    - { src: 'install/storage.ini', dest: '/etc/uwsgi/apps-available/' } 
-    - { src: 'install/storage', dest: '/etc/nginx/sites-available/' } 
-    - { src: 'install/.storage-service', dest: '/var/archivematica/' } 
-    - { src: 'install/make_key.py', dest: '/var/archivematica/storage-service/' } 
-    - { src: 'lib', dest: '/var/archivematica/storage-service/' } 
+    - { src: 'install/storage.ini', dest: '/etc/uwsgi/apps-available/' }
+    - { src: 'install/storage', dest: '/etc/nginx/sites-available/' }
+    - { src: 'install/.storage-service', dest: '/var/archivematica/' }
+    - { src: 'install/make_key.py', dest: '/var/archivematica/storage-service/' }
+    - { src: 'lib', dest: '/var/archivematica/storage-service/' }
     - { src: 'storage_service/static', dest: '/var/archivematica/storage-service/' }
     - { src: 'storage_service/templates', dest: '/var/archivematica/storage-service/' }
   tags: amsrc-am-ss
@@ -243,7 +243,7 @@
   command: ln -s /etc/uwsgi/apps-available/storage.ini /etc/uwsgi/apps-enabled/storage.ini creates=/etc/uwsgi/apps-enabled/storage.ini
   tags: amsrc-am-ss
 
-- name: restart nginx 
+- name: restart nginx
   sudo: yes
   service: name=nginx state=reloaded
   tags: amsrc-am-ss
@@ -263,8 +263,8 @@
 
 - name: create subdirectories for archivematica-common source files
   sudo: yes
-  file: dest={{ item }} state=directory 
-  with_items: 
+  file: dest={{ item }} state=directory
+  with_items:
     - /usr/lib/archivematica
     - /etc/archivematica
     - /usr/share/archivematica/archivematicaCommon
@@ -273,10 +273,10 @@
 
 - name: copy archivematica-common source files
   sudo: yes
-  command: rsync -a /srv/archivematica/{{ item.src }} 
-                    {{ item.dest }} 
+  command: rsync -a /srv/archivematica/{{ item.src }}
+                    {{ item.dest }}
   with_items:
-    - { src: 'src/archivematicaCommon/etc/', dest: '/etc/archivematica/archivematicaCommon/' } 
+    - { src: 'src/archivematicaCommon/etc/', dest: '/etc/archivematica/archivematicaCommon/' }
     - { src: 'src/archivematicaCommon/lib/', dest: '/usr/lib/archivematica/archivematicaCommon/' }
     - { src: 'src/archivematicaCommon/requirements.txt', dest: '/usr/share/archivematica/archivematicaCommon/' }
     - { src: 'src/archivematicaCommon/requirements', dest: '/usr/share/archivematica/archivematicaCommon/' }
@@ -314,8 +314,8 @@
 
 - name: create subdirectories for archivematica-mcp-server source files
   sudo: yes
-  file: dest={{ item }} state=directory 
-  with_items: 
+  file: dest={{ item }} state=directory
+  with_items:
     - /etc/archivematica
     - /usr/lib/archivematica
     - /usr/share/archivematica
@@ -327,10 +327,10 @@
 
 - name: copy archivematica-mcp-server source files
   sudo: yes
-  command: rsync -a /srv/archivematica/{{ item.src }} 
-                    {{ item.dest }} 
+  command: rsync -a /srv/archivematica/{{ item.src }}
+                    {{ item.dest }}
   with_items:
-    - { src: 'src/MCPServer/etc/', dest: '/etc/archivematica/MCPServer/' } 
+    - { src: 'src/MCPServer/etc/', dest: '/etc/archivematica/MCPServer/' }
     - { src: 'src/MCPServer/lib/', dest: '/usr/lib/archivematica/MCPServer/' }
     - { src: 'src/MCPServer/share/', dest: '/usr/share/archivematica/MCPServer/' }
     - { src: 'src/MCPServer/share/mysql', dest: '/usr/share/dbconfig-common/data/archivematica-mcp-server/install/' }
@@ -361,21 +361,21 @@
 
 # (ref. debian/config)
 
-- name: Create mysql database for MCP 
+- name: Create mysql database for MCP
   mysql_db: name=MCP state=present encoding=utf8 collation=utf8_unicode_ci
   register: createdb_result
   tags: amsrc-am-mcp-server
 
-- name: initialize database MCP 
-  mysql_db: name=MCP 
-            state=import 
+- name: initialize database MCP
+  mysql_db: name=MCP
+            state=import
             target=/srv/archivematica/src/MCPServer/share/mysql
   when: createdb_result|changed
 
-- name: create mysql user 
-  mysql_user: name=archivematica 
+- name: create mysql user
+  mysql_user: name=archivematica
               password=demo
-              priv=MCP.*:ALL 
+              priv=MCP.*:ALL
               state=present
   tags: amsrc-am-mcp-server
 
@@ -396,36 +396,36 @@
 
 - name: create /var/archivematica/sharedDirectory
   sudo: yes
-  file: dest=/var/archivematica/sharedDirectory state=directory 
+  file: dest=/var/archivematica/sharedDirectory state=directory
 
 - name: create /var/archivematica/sharedDirectory structure
   sudo: yes
   command: rsync -a /usr/share/archivematica/MCPServer/sharedDirectoryStructure/ /var/archivematica/sharedDirectory/
 # TODO: note that the location of sharedDirectory structure differs from the debian installer location
-  
+
 
 
 - name: add archivematica user to audio group
   user: name=archivematica groups=audio
- 
+
 - name: set owner, group of /var/archivematica recursively
   sudo: yes
-  file: dest=/var/archivematica state=directory recurse=yes owner=archivematica group=archivematica 
+  file: dest=/var/archivematica state=directory recurse=yes owner=archivematica group=archivematica
 
 - name: set owner, group of /var/archivematica/sharedDirectory recursively
   sudo: yes
-  file: dest=/var/archivematica/sharedDirectory state=directory recurse=yes owner=archivematica group=archivematica 
+  file: dest=/var/archivematica/sharedDirectory state=directory recurse=yes owner=archivematica group=archivematica
 
-  
-- name: set permissions for /var/archivematica  
+
+- name: set permissions for /var/archivematica
   sudo: yes
   command: chmod -R g+s "/var/archivematica/"
-  
+
 - name: set permissions for /var/archivematica/sharedDirectory
   sudo: yes
-  command: chmod -R 664 "/var/archivematica/sharedDirectory" 
+  command: chmod -R 664 "/var/archivematica/sharedDirectory"
 
-- name: set more permissions for /var/archivematica  
+- name: set more permissions for /var/archivematica
   sudo: yes
   shell: find -L /var/archivematica/ -type d  | sudo xargs -IF chmod u+rwx,g+rwxt,o-rwx F
 
@@ -438,10 +438,10 @@
 
 
 - name: add archivematica user permissions in visudo file
-  lineinfile: dest=/etc/sudoers 
-              state=present 
-              regexp='^archivematica ALL\=' 
-              line='archivematica ALL=NOPASSWD:/bin/mv,/bin/chown,/bin/chmod,/usr/bin/find,/usr/bin/gs,/usr/bin/inkscape' 
+  lineinfile: dest=/etc/sudoers
+              state=present
+              regexp='^archivematica ALL\='
+              line='archivematica ALL=NOPASSWD:/bin/mv,/bin/chown,/bin/chmod,/usr/bin/find,/usr/bin/gs,/usr/bin/inkscape'
               validate='/usr/sbin/visudo -cf %s'
 
 
@@ -455,8 +455,8 @@
 
 - name: create subdirectories for archivematica-mcp-client source files
   sudo: yes
-  file: dest={{ item }} state=directory 
-  with_items: 
+  file: dest={{ item }} state=directory
+  with_items:
     - /etc/archivematica
     - /usr/lib/archivematica
   tags: amsrc-am-mcp-client
@@ -465,11 +465,11 @@
 
 - name: copy(symlink) archivematica-mcp-client source files
   sudo: yes
-  command: rsync -a /srv/archivematica/{{ item.src }} 
-                    {{ item.dest }} 
+  command: rsync -a /srv/archivematica/{{ item.src }}
+                    {{ item.dest }}
   with_items:
-    - { src: 'src/MCPClient/etc/', dest: '/etc/archivematica/MCPClient' }   
-    - { src: 'src/MCPClient/lib/', dest: '/usr/lib/archivematica/MCPClient' }     
+    - { src: 'src/MCPClient/etc/', dest: '/etc/archivematica/MCPClient' }
+    - { src: 'src/MCPClient/lib/', dest: '/usr/lib/archivematica/MCPClient' }
     - { src: 'src/MCPClient/init/archivematica-mcp-client.conf', dest: '/etc/init/' }
   tags: amsrc-am-mcp-client
 
@@ -486,7 +486,7 @@
     - bulk-extractor
     - clamav
     - clamav-daemon
-    - ffmpeg 
+    - ffmpeg
     - fits
     - gearman
     - imagemagick
@@ -517,7 +517,7 @@
     - tree
     - ufraw
     - unrar-free
-    - uuid  
+    - uuid
   tags: amsrc-am-mcp-client
 
 
@@ -553,16 +553,16 @@
 
 - name: create subdirectories for archivematica-dashboard source files
   sudo: yes
-  file: dest={{ item }} state=directory 
-  with_items: 
+  file: dest={{ item }} state=directory
+  with_items:
     - /usr/share/archivematica/archivematicaCommon
   tags: amsrc-am-dashboard
 
 
 - name: copy archivematica-dashboard source files
   sudo: yes
-  command: rsync -a /srv/archivematica/{{ item.src }} 
-                    {{ item.dest }} 
+  command: rsync -a /srv/archivematica/{{ item.src }}
+                    {{ item.dest }}
   with_items:
     - { src: 'src/dashboard/src/', dest: '/usr/share/archivematica/dashboard/' }
   tags: amsrc-am-dashboard
@@ -619,8 +619,9 @@
 
 - name: call mysql_dev script
   command: chdir=/srv/archivematica/src/MCPServer/share/ ./mysql_dev.sh MCP
-  creates: /srv/archivematica/src/MCPServer/share/mysql_dev.complete
-  
+  args:
+    creates: /srv/archivematica/src/MCPServer/share/mysql_dev.complete
+
 - name: create archivematicaDashboard.log
   file: name=/tmp/archivematicaDashboard.log mode=666 state=touch
   tags: amsrc-am-dashboard
@@ -637,7 +638,7 @@
 #########################################################
 
 
-- name: copy apache config file  
+- name: copy apache config file
   copy: src=apache.default dest=/etc/apache2/sites-available/default.conf  owner=root group=root mode=644
   sudo: yes
   notify: restart apache2
@@ -682,12 +683,11 @@
   sudo: yes
   service: name=fits state=started
 
- 
+
 - name: create user artefactual
   sudo: yes
-  user: name=artefactual 
- 
+  user: name=artefactual
+
 - name: checkout out Archivematica sample data
   sudo: yes
   git: repo=https://github.com/artefactual/archivematica-sampledata.git dest=/home/artefactual/archivematica-sampledata update=no
-
