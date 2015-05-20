@@ -162,6 +162,7 @@
     - python-dev
     - libxml2-dev
     - libxslt1-dev
+    - libssl-dev
 
 # (create virtualenv and pip install ref. dh-virtualenv )
 - name: create virtualenv for archivematica-storage-service
