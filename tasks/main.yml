@@ -33,20 +33,18 @@
     - amsrc-am-mcp-client
     - amsrc-am-ss
 
-- name: Add Universe repository
+- name: Add Multiverse repository
   sudo: yes
   apt_repository: repo='{{ item }}' state=present
   with_items:
-    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }} main restricted universe multiverse"
-    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-security main restricted universe"
-    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-updates main restricted universe multiverse"
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }} multiverse"
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-security universe"
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-updates multiverse"
   tags:
     - amsrc-am-common
     - amsrc-am-mcp-client
 
-
-
-#########################################################
+########################################################
 ### Get the source (from a specified branch etc)
 
 - name: install git
@@ -162,7 +160,7 @@
     - python-dev
     - libxml2-dev
     - libxslt1-dev
-    - libssl-dev
+    - libz-dev
 
 # (create virtualenv and pip install ref. dh-virtualenv )
 - name: create virtualenv for archivematica-storage-service
@@ -227,11 +225,16 @@
   tags: amsrc-am-ss
 
 
-
 ## ref. configure-storage-service.yml (ansible role that installs from packages)
 - name: remove nginx default
   sudo: yes
   file: path=/etc/nginx/sites-enabled/default state=absent
+  tags: amsrc-am-ss
+
+## default file is sometimes called default.conf
+- name: remove nginx default
+  sudo: yes
+  file: path=/etc/nginx/sites-enabled/default.conf state=absent
   tags: amsrc-am-ss
 
 - name: setup nginx sites available
@@ -255,7 +258,6 @@
   tags: amsrc-am-ss
 
 
-
 #########################################################
 
 ### archivematica-common
@@ -271,7 +273,6 @@
     - /usr/share/archivematica/archivematicaCommon
   tags: amsrc-am-common
 
-
 - name: copy archivematica-common source files
   sudo: yes
   command: rsync -a /srv/archivematica/{{ item.src }}
@@ -282,7 +283,6 @@
     - { src: 'src/archivematicaCommon/requirements.txt', dest: '/usr/share/archivematica/archivematicaCommon/' }
     - { src: 'src/archivematicaCommon/requirements', dest: '/usr/share/archivematica/archivematicaCommon/' }
   tags: amsrc-am-common
-
 
 
 ## Install package dependencies (ref. debian/control )
@@ -335,12 +335,9 @@
     - { src: 'src/MCPServer/lib/', dest: '/usr/lib/archivematica/MCPServer/' }
     - { src: 'src/MCPServer/share/', dest: '/usr/share/archivematica/MCPServer/' }
     - { src: 'src/MCPServer/share/mysql', dest: '/usr/share/dbconfig-common/data/archivematica-mcp-server/install/' }
-    - { src: 'src/MCPServer/share/1.1.0', dest: '/usr/share/dbconfig-common/data/archivematica-mcp-server/upgrade/mysql/' }
-    - { src: 'src/MCPServer/share/1.2.0', dest: '/usr/share/dbconfig-common/data/archivematica-mcp-server/upgrade/mysql/' }
     - { src: 'src/MCPServer/init/archivematica-mcp-server.conf', dest: '/etc/init/' }
   tags: amsrc-am-mcp-server
 # NOTE: /src/MCPServer/share location is not as in the debian install scripts
-
 
 ## Install package dependencies (ref. debian/control )
 
@@ -350,12 +347,10 @@
   with_items:
     - dbconfig-common
     - logapp
-    - mysql-server
     - python-pyinotify
     - python-gearman
     - python-mysqldb
     - python-lxml
-    - gearman
     - uuid
   tags: amsrc-am-mcp-server
 
@@ -623,38 +618,30 @@
   args:
     creates: /srv/archivematica/src/MCPServer/share/mysql_dev.complete
 
-- name: create archivematicaDashboard.log
-  file: name=/tmp/archivematicaDashboard.log mode=666 state=touch
-  tags: amsrc-am-dashboard
-
 - name: create user archivematicadashboard
   sudo: yes
   user: name=archivematicadashboard uid=334 system=yes home=/var/lib/archivematica-django/
   tags: amsrc-am-dashboard
 
-
-
-
-
 #########################################################
-
 
 - name: copy apache config file
   copy: src=apache.default dest=/etc/apache2/sites-available/default.conf  owner=root group=root mode=644
   sudo: yes
   notify: restart apache2
 
+- name: remove default Apache config symlink
+  file: path=/etc/apache2/sites-enabled/000-default.conf state=absent
+
 - name: enable apache sites
   command: a2ensite default
   args:
-    creates: /etc/apache2/sites-enabled/default
+    creates: /etc/apache2/sites-enabled/default.conf
   sudo: yes
   notify: restart apache2
 
 
-
 # (ref. role: archivematica configure-archivematica.yml)
-
 
 - name: Get archivematica-dashboard configuration
   sudo: yes
