@@ -610,7 +610,7 @@
   tags: amsrc-am-dashboard
 
 - name: django syncdb
-  command: /usr/share/archivematica/dashboard/manage.py syncdb --settings='settings.common'
+  command: /usr/share/archivematica/dashboard/manage.py syncdb --settings='settings.common' --noinput
   tags: amsrc-am-dashboard
 
 - name: call mysql_dev script
