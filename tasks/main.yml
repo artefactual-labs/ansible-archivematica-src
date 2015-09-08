@@ -161,6 +161,9 @@
     - libxml2-dev
     - libxslt1-dev
     - libz-dev
+    - libffi-dev
+    - libssl-dev
+  tags: amsrc-am-ss
 
 # (create virtualenv and pip install ref. dh-virtualenv )
 - name: create virtualenv for archivematica-storage-service
@@ -174,8 +177,9 @@
 # dh-virtualenv also seems to copy the storage_service dir to the virtualenv above (?)
 - name: copy storage_service folder to archivematica-storage-service virtualenv site-packages
   sudo: yes
-  command: rsync -a /srv/archivematica-storage-service/storage_service
-                /usr/share/python/archivematica-storage-service/lib/python2.7/site-packages
+  file: src=/srv/archivematica-storage-service/storage_service
+        dest=/usr/share/python/archivematica-storage-service/lib/python2.7/site-packages/storage_service
+        state=link
   tags: amsrc-am-ss
 
 
@@ -192,16 +196,26 @@
 
 - name: copy archivematica-storage-service source files
   sudo: yes
-  command: rsync -a /srv/archivematica-storage-service/{{ item.src }}
-                    {{ item.dest }}
+  command: rsync -a /srv/archivematica-storage-service/{{ item.src }} {{ item.dest }}
   with_items:
-    - { src: 'install/storage.ini', dest: '/etc/uwsgi/apps-available/' }
-    - { src: 'install/storage', dest: '/etc/nginx/sites-available/' }
     - { src: 'install/.storage-service', dest: '/var/archivematica/' }
     - { src: 'install/make_key.py', dest: '/var/archivematica/storage-service/' }
-    - { src: 'lib', dest: '/var/archivematica/storage-service/' }
-    - { src: 'storage_service/static', dest: '/var/archivematica/storage-service/' }
-    - { src: 'storage_service/templates', dest: '/var/archivematica/storage-service/' }
+  tags: amsrc-am-ss
+
+- name: copy archivematica-storage-service source files
+  sudo: yes
+  file: src={{ item.src }} dest={{ item.dest }} state=link
+  with_items:
+    - src: '/srv/archivematica-storage-service/install/storage.ini'
+      dest: '/etc/uwsgi/apps-available/storage.ini'
+    - src: '/srv/archivematica-storage-service/install/storage'
+      dest: '/etc/nginx/sites-available/storage'
+    - src: '/srv/archivematica-storage-service/lib'
+      dest: '/var/archivematica/storage-service/lib'
+    - src: '/srv/archivematica-storage-service/storage_service/static'
+      dest: '/var/archivematica/storage-service/static'
+    - src: '/srv/archivematica-storage-service/storage_service/templates'
+      dest: '/var/archivematica/storage-service/templates'
   tags: amsrc-am-ss
 
 
@@ -239,12 +253,12 @@
 
 - name: setup nginx sites available
   sudo: yes
-  command: ln -s /etc/nginx/sites-available/storage /etc/nginx/sites-enabled/storage creates=/etc/nginx/sites-enabled/storage
+  file: src=/etc/nginx/sites-available/storage dest=/etc/nginx/sites-enabled/storage state=link
   tags: amsrc-am-ss
 
 - name: setup uwsgi apps avaiable
   sudo: yes
-  command: ln -s /etc/uwsgi/apps-available/storage.ini /etc/uwsgi/apps-enabled/storage.ini creates=/etc/uwsgi/apps-enabled/storage.ini
+  file: src=/etc/uwsgi/apps-available/storage.ini dest=/etc/uwsgi/apps-enabled/storage.ini state=link
   tags: amsrc-am-ss
 
 - name: restart nginx
@@ -275,13 +289,16 @@
 
 - name: copy archivematica-common source files
   sudo: yes
-  command: rsync -a /srv/archivematica/{{ item.src }}
-                    {{ item.dest }}
+  file: src={{ item.src }} dest={{ item.dest }} state=link
   with_items:
-    - { src: 'src/archivematicaCommon/etc/', dest: '/etc/archivematica/archivematicaCommon/' }
-    - { src: 'src/archivematicaCommon/lib/', dest: '/usr/lib/archivematica/archivematicaCommon/' }
-    - { src: 'src/archivematicaCommon/requirements.txt', dest: '/usr/share/archivematica/archivematicaCommon/' }
-    - { src: 'src/archivematicaCommon/requirements', dest: '/usr/share/archivematica/archivematicaCommon/' }
+    - src: '/srv/archivematica/src/archivematicaCommon/etc'
+      dest: '/etc/archivematica/archivematicaCommon'
+    - src: '/srv/archivematica/src/archivematicaCommon/lib'
+      dest: '/usr/lib/archivematica/archivematicaCommon'
+    - src: '/srv/archivematica/src/archivematicaCommon/requirements.txt'
+      dest: '/usr/share/archivematica/archivematicaCommon/requirements.txt'
+    - src: '/srv/archivematica/src/archivematicaCommon/requirements'
+      dest: '/usr/share/archivematica/archivematicaCommon/requirements'
   tags: amsrc-am-common
 
 
@@ -324,19 +341,26 @@
     - /usr/share/dbconfig-common/data/archivematica-mcp-server/upgrade/mysql/
   tags: amsrc-am-mcp-server
 
-
-
 - name: copy archivematica-mcp-server source files
   sudo: yes
-  command: rsync -a /srv/archivematica/{{ item.src }}
-                    {{ item.dest }}
+  file: src={{ item.src }} dest={{ item.dest }} state=link
   with_items:
-    - { src: 'src/MCPServer/etc/', dest: '/etc/archivematica/MCPServer/' }
-    - { src: 'src/MCPServer/lib/', dest: '/usr/lib/archivematica/MCPServer/' }
-    - { src: 'src/MCPServer/share/', dest: '/usr/share/archivematica/MCPServer/' }
-    - { src: 'src/MCPServer/share/mysql', dest: '/usr/share/dbconfig-common/data/archivematica-mcp-server/install/' }
-    - { src: 'src/MCPServer/init/archivematica-mcp-server.conf', dest: '/etc/init/' }
+    - src: '/srv/archivematica/src/MCPServer/etc'
+      dest: '/etc/archivematica/MCPServer'
+    - src: '/srv/archivematica/src/MCPServer/lib'
+      dest: '/usr/lib/archivematica/MCPServer'
+    - src: '/srv/archivematica/src/MCPServer/share'
+      dest: '/usr/share/archivematica/MCPServer'
+    - src: '/srv/archivematica/src/MCPServer/share/mysql'
+      dest: '/usr/share/dbconfig-common/data/archivematica-mcp-server/install/mysql'
+    - src: '/srv/archivematica/src/MCPServer/init/archivematica-mcp-server.conf'
+      dest: '/etc/init/archivematica-mcp-server.conf'
   tags: amsrc-am-mcp-server
+
+- name: Ask Upstart to reload the configuration (to detect symlink'ed init files)
+  sudo: yes
+  command: initctl reload-configuration
+
 # NOTE: /src/MCPServer/share location is not as in the debian install scripts
 
 ## Install package dependencies (ref. debian/control )
@@ -461,15 +485,19 @@
 
 - name: copy(symlink) archivematica-mcp-client source files
   sudo: yes
-  command: rsync -a /srv/archivematica/{{ item.src }}
-                    {{ item.dest }}
+  file: src={{ item.src }} dest={{ item.dest }} state=link
   with_items:
-    - { src: 'src/MCPClient/etc/', dest: '/etc/archivematica/MCPClient' }
-    - { src: 'src/MCPClient/lib/', dest: '/usr/lib/archivematica/MCPClient' }
-    - { src: 'src/MCPClient/init/archivematica-mcp-client.conf', dest: '/etc/init/' }
+    - src: '/srv/archivematica/src/MCPClient/etc'
+      dest: '/etc/archivematica/MCPClient'
+    - src: '/srv/archivematica/src/MCPClient/lib/'
+      dest: '/usr/lib/archivematica/MCPClient'
+    - src: '/srv/archivematica/src/MCPClient/init/archivematica-mcp-client.conf'
+      dest: '/etc/init/archivematica-mcp-client.conf'
   tags: amsrc-am-mcp-client
 
-
+- name: Ask Upstart to reload the configuration (to detect symlink'ed init files)
+  sudo: yes
+  command: initctl reload-configuration
 
 ## Install package dependencies (ref. debian/control )
 
@@ -557,10 +585,10 @@
 
 - name: copy archivematica-dashboard source files
   sudo: yes
-  command: rsync -a /srv/archivematica/{{ item.src }}
-                    {{ item.dest }}
+  file: src={{ item.src }} dest={{ item.dest }} state=link
   with_items:
-    - { src: 'src/dashboard/src/', dest: '/usr/share/archivematica/dashboard/' }
+    - src: '/srv/archivematica/src/dashboard/src'
+      dest: '/usr/share/archivematica/dashboard'
   tags: amsrc-am-dashboard
 
 
