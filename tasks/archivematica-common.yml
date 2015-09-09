@@ -1,0 +1,78 @@
+---
+
+- name: "Checkout Archivematica code"
+  git:
+    repo: "https://github.com/artefactual/archivematica.git"
+    dest: "{{ archivematica_src_dir }}/archivematica"
+    version: "{{ amdev_version }}"
+  sudo: "no"
+
+# Not required?
+# - name: git submodule init/update
+#   command: "{{ item }}"
+#   args:
+#     chdir: "{{ archivematica_src_dir }}"
+#   with_items:
+#     - "git submodule init"
+#     - "git submodule update"
+#   sudo: "yes"
+
+- name: "Get Archivematica latest commit hash"
+  command: "git rev-parse HEAD"
+  args:
+    chdir: "{{ archivematica_src_dir }}/archivematica"
+  register: "latest_commit"
+  sudo: "no"
+
+- name: "Save Archivematica last commit hash"
+  shell: "echo {{ latest_commit.stdout }} > {{ archivematica_src_dir }}/archivematica-commit.txt"
+  sudo: "no"
+
+# TODO: Make use of latest_commit_ss
+
+- name: "Add multiverse repositories"
+  sudo: "yes"
+  apt_repository: "repo='{{ item }}' state=present"
+  with_items:
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }} multiverse"
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-security universe"
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-updates multiverse"
+
+- name: "Create subdirectories for archivematica-common source files"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+  with_items:
+    - "/usr/lib/archivematica"
+    - "/etc/archivematica"
+    - "/usr/share/archivematica/archivematicaCommon"
+
+- name: "Copy archivematica-common source files"
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: "link"
+  with_items:
+    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/etc"
+      dest: "/etc/archivematica/archivematicaCommon"
+    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/lib"
+      dest: "/usr/lib/archivematica/archivematicaCommon"
+    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements.txt"
+      dest: "/usr/share/archivematica/archivematicaCommon/requirements.txt"
+    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements"
+      dest: "/usr/share/archivematica/archivematicaCommon/requirements"
+
+- name: "Install archivematica-common package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items:
+    - "python"
+    - "python-pip"
+    - "python2.7-elementtree"
+    - "python-mimeparse"
+    - "python-dateutil"
+
+- name: "Install archivematica-common pip dependencies"
+  pip:
+    requirements: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements.txt"

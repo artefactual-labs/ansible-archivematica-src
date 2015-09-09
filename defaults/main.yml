@@ -1,2 +1,15 @@
 ---
-# defaults file for ansible-role-archivematica-src
+
+# TODO: comments
+archivematica_src_dir: "{{ ansible_env.HOME }}"
+
+# The sampledata repository is big and not always necessary.
+archivematica_src_install_sample_data: "yes"
+
+# Define the type of environment: "production" or "development". The latter
+# will deploy some extra stuff to make the development workflow easier.
+archivematica_src_environment_type: "production"
+
+# Branches, TODO: canonize keys ala "archivematica_src_..."
+amdev_branch: "remotes/origin/qa/1.x"
+ssdev_version: "remotes/origin/qa/0.x"

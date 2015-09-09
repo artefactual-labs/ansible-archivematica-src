@@ -1,0 +1,107 @@
+---
+
+- name: "Add multiverse repositories"
+  sudo: "yes"
+  apt_repository: "repo='{{ item }}' state=present"
+  with_items:
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }} multiverse"
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-security universe"
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-updates multiverse"
+
+- name: "Create subdirectories for archivematica-mcp-client source files"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+  with_items:
+    - "/etc/archivematica"
+    - "/usr/lib/archivematica"
+
+- name: "Copy archivematica-mcp-client source files"
+  file: src={{ item.src }} dest={{ item.dest }} state=link
+  with_items:
+    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/etc"
+      dest: "/etc/archivematica/MCPClient"
+    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/lib/"
+      dest: "/usr/lib/archivematica/MCPClient"
+    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/init/archivematica-mcp-client.conf"
+      dest: "/etc/init/archivematica-mcp-client.conf"
+
+- name: "Copy archivematica-mcp-client init service"
+  file: src={{ item.src }} dest={{ item.dest }} state=link
+  with_items:
+    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/init/archivematica-mcp-client.conf"
+      dest: "/etc/init/archivematica-mcp-client.conf"
+
+- name: "Reload Upstart configuration"
+  command: "initctl reload-configuration"
+
+- name: "Install archivematica-mcp-client package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items:
+    - "atool"
+    - "bagit"
+    - "bulk-extractor"
+    - "clamav"
+    - "clamav-daemon"
+    - "ffmpeg"
+    - "fits"
+    - "gearman"
+    - "imagemagick"
+    - "inkscape"
+    - "jhove"
+    - "libimage-exiftool-perl"
+    - "libxml2-utils"
+    - "logapp"
+    - "md5deep"
+    - "mediainfo"
+    - "nfs-common"
+    - "openjdk-7-jre-headless"
+    - "p7zip-full"
+    - "pbzip2"
+    - "postfix"
+    - "python-fido"
+    - "python-gearman"
+    - "python-lxml"
+    - "python-mysqldb"
+    - "python-pyicu"
+    - "python-unidecode"
+    - "readpst"
+    - "rsync"
+    - "siegfried"
+    - "sleuthkit"
+    - "tesseract-ocr"
+    - "tika"
+    - "tree"
+    - "ufraw"
+    - "unrar-free"
+    - "uuid"
+
+- name: "Create archivematica-mcp-client log directories"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+    owner: "archivematica"
+    group: "archivematica"
+    mode: "g+s"
+  with_items:
+    - "/var/log/archivematica/MCPClient"
+
+- name: "Daily clamav database update"
+  cron:
+    name: "Daily clamav database update"
+    hour: "2"
+    minute: "0"
+    job: "/usr/bin/freshclam"
+    state: "present"
+
+- name: "Enable services"
+  service:
+    name: "{{ item }}"
+    state: "started"
+    enabled: "yes"
+  with_items:
+    - "fits"
+    - "clamav-daemon"
+    - "archivematica-mcp-client"
