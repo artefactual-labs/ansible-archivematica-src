@@ -7,7 +7,8 @@ archivematica_src_dir: "{{ ansible_env.HOME }}"
 archivematica_src_install_sample_data: "yes"
 
 # Define the type of environment: "production" or "development". The latter
-# will deploy some extra stuff to make the development workflow easier.
+# will deploy some extra stuff to make the development workflow easier like
+# environment variables or different dependencies, tools, etc...
 archivematica_src_environment_type: "production"
 
 # Branches, TODO: canonize keys ala "archivematica_src_..."
