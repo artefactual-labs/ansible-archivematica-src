@@ -96,6 +96,9 @@
     job: "/usr/bin/freshclam"
     state: "present"
 
+- name: "Download clamav signatures"
+  command: "freshclam"
+
 - name: "Enable services"
   service:
     name: "{{ item }}"
