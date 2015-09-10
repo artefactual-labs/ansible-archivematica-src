@@ -200,14 +200,13 @@
   with_items:
     - { src: 'install/.storage-service', dest: '/var/archivematica/' }
     - { src: 'install/make_key.py', dest: '/var/archivematica/storage-service/' }
+    - { src: 'install/storage.ini', dest: '/etc/uwsgi/apps-available/storage.ini' }
   tags: amsrc-am-ss
 
 - name: copy archivematica-storage-service source files
   sudo: yes
   file: src={{ item.src }} dest={{ item.dest }} state=link
   with_items:
-    - src: '/srv/archivematica-storage-service/install/storage.ini'
-      dest: '/etc/uwsgi/apps-available/storage.ini'
     - src: '/srv/archivematica-storage-service/install/storage'
       dest: '/etc/nginx/sites-available/storage'
     - src: '/srv/archivematica-storage-service/lib'
