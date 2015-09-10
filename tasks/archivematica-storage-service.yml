@@ -64,12 +64,14 @@
     - "/usr/lib/archivematica"
 
 - name: "Copy archivematica-storage-service source files"
-  command: "rsync -a {{ archivematica_src_dir }}/archivematica-storage-service/{{ item.src }} {{ item.dest }}"
+  command: "rsync -a {{ item.src }} {{ item.dest }}"
   with_items:
-    - src: "install/.storage-service"
+    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/.storage-service"
       dest: "/var/archivematica/"
-    - src: "install/make_key.py"
+    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/make_key.py"
       dest: "/var/archivematica/storage-service/"
+    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/storage.ini"
+      dest: "/etc/uwsgi/apps-available/storage.ini"
 
 - name: "Copy archivematica-storage-service source files"
   file:
@@ -77,8 +79,6 @@
     dest: "{{ item.dest }}"
     state: "link"
   with_items:
-    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/storage.ini"
-      dest: "/etc/uwsgi/apps-available/storage.ini"
     - src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/storage"
       dest: "/etc/nginx/sites-available/storage"
     - src: "{{ archivematica_src_dir }}/archivematica-storage-service/lib"
@@ -97,6 +97,7 @@
   with_items:
     - "/var/log/archivematica/storage-service"
 
+# TODO: this is doing a bunch of things that we have already done in our playbook
 - name: "Call the debian/postinst script for archivematica-storage-service"
   command: "source postinst"
   args:
