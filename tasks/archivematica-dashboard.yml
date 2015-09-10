@@ -92,3 +92,4 @@
   with_items:
     - "elasticsearch"
     - "apache2"
+    - "archivematica-mcp-server"

@@ -2,8 +2,15 @@
 
 #
 #
-# REMINDER: This role must be executed with sudo. We are going to be explicit
-# when we DO NOT WANT to use sudo.
+# REMINDERS:
+#
+# - This role needs root privileges but it is preferred to run it as a
+#   regular user that can sudo.
+# - At the moment, archivematica-mcp-server.yml will not be able to start the
+#   service archivematica-mcp-server until the dashboard is installed later
+#   via archivematica-dashboard.yml due to internal dependency issues. Our
+#   temporary hack is to restart archivematica-mcp-server from
+#   archivematica-dashboard.yml.
 #
 #
 
@@ -55,4 +62,5 @@
 
 - include: "archivematica-dashboard.yml"
   tags:
+    - "amsrc-am-mcp-server"
     - "amsrc-am-dashboard"
