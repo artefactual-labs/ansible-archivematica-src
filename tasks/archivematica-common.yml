@@ -7,16 +7,6 @@
     version: "{{ amdev_version }}"
   sudo: "no"
 
-# Not required?
-# - name: git submodule init/update
-#   command: "{{ item }}"
-#   args:
-#     chdir: "{{ archivematica_src_dir }}"
-#   with_items:
-#     - "git submodule init"
-#     - "git submodule update"
-#   sudo: "yes"
-
 - name: "Get Archivematica latest commit hash"
   command: "git rev-parse HEAD"
   args:
