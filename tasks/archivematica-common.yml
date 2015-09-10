@@ -32,7 +32,9 @@
 
 - name: "Add multiverse repositories"
   sudo: "yes"
-  apt_repository: "repo='{{ item }}' state=present"
+  apt_repository:
+    repo: "{{ item }}"
+    state: "present"
   with_items:
     - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }} multiverse"
     - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-security universe"
