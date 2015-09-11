@@ -87,7 +87,7 @@
 - name: "Enable services"
   service:
     name: "{{ item }}"
-    state: "reloaded"
+    state: "restarted"
     enabled: "yes"
   with_items:
     - "elasticsearch"
