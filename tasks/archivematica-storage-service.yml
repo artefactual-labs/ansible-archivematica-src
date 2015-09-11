@@ -5,6 +5,18 @@
     repo: "https://github.com/artefactual/archivematica-storage-service.git"
     dest: "{{ archivematica_src_dir }}/archivematica-storage-service"
     version: "{{ ssdev_version }}"
+    force: "yes"
+
+# For some reason, some dirs in the cloned source code
+# are not sometimes readable by all. Add a task to fix it
+# For some other reason this task does not always work
+# blame ansible  :-/
+- name: "Ensure the source code is readable by all"
+  file:
+    path: "{{ archivematica_src_dir }}/archivematica-storage-service"
+    mode: "o+rX"
+    recurse: "yes"
+  sudo: "yes"
 
 - name: "Get archivematica-storage-service latest commit hash"
   command: "git rev-parse HEAD"
