@@ -124,10 +124,5 @@
 - name: "Set more permissions for /var/archivematica"
   shell: "find -L /var/archivematica/ -type d  | sudo xargs -IF chmod u+rwx,g+rwxt,o-rwx F"
 
-- name: "Enable services"
-  service:
-    name: "{{ item }}"
-    state: "started"
-    enabled: "yes"
-  with_items:
-    - "archivematica-mcp-server"
+# do not start MCP server here but after dashboard is installed
+# due to dependency in the MCP Server code

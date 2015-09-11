@@ -107,4 +107,3 @@
   with_items:
     - "fits"
     - "clamav-daemon"
-    - "archivematica-mcp-client"
