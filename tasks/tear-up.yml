@@ -11,6 +11,7 @@
   with_items:
     - "python-pycurl"
     - "git"
+    - "fish"
 
 - name: "Add required PPAs"
   apt_repository:
