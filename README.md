@@ -27,7 +27,7 @@ Example Playbook
   roles:
      - role: "archivematica-src"
        archivematica_src_dir: "/opt/archivematica"
-       amdev_branch: "remotes/origin/qa/1.x"
+       amdev_version: "remotes/origin/qa/1.x"
        ssdev_version: "remotes/origin/qa/0.x"
   sudo: "yes"
 ```

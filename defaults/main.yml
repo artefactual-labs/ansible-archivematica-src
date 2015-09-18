@@ -11,5 +11,5 @@ archivematica_src_install_sample_data: "yes"
 archivematica_src_environment_type: "production"
 
 # Branches, TODO: canonize keys ala "archivematica_src_..."
-amdev_branch: "remotes/origin/qa/1.x"
+amdev_version: "remotes/origin/qa/1.x"
 ssdev_version: "remotes/origin/qa/0.x"
