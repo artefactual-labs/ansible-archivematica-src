@@ -12,11 +12,9 @@
   args:
     chdir: "{{ archivematica_src_dir }}/archivematica"
   register: "latest_commit"
-  sudo: "no"
 
 - name: "Save Archivematica last commit hash"
   shell: "echo {{ latest_commit.stdout }} > {{ archivematica_src_dir }}/archivematica-commit.txt"
-  sudo: "no"
 
 # TODO: Make use of latest_commit_ss
 
