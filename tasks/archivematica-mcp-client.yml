@@ -96,8 +96,30 @@
     job: "/usr/bin/freshclam"
     state: "present"
 
-- name: "Download clamav signatures"
-  command: "freshclam"
+# Have found that installation often stalls in freshclam
+# Will download signatures from our repo to try to avoid this
+#- name: "Download clamav signatures"
+#  command: "freshclam"
+
+- name: "Get clamav signatures from github repo"
+  git:
+    repo=https://github.com/artefactual-labs/clamav-files.git
+    dest=/tmp/clamav-files
+- name: "Copy clamav signatures to /var/lib/clamav"
+  command: cp /tmp/clamav-files/{{ item }} /var/lib/clamav/
+  sudo: yes
+  with_items:
+    - bytecode.cvd
+    - daily.cvd
+    - main.cvd
+    - mirrors.dat
+- name: "Set user permissions for clamav files"
+  file:
+    path=/var/lib/clamav
+    owner=clamav
+    group=clamav
+    state=directory
+    recurse=yes
 
 - name: "Enable services"
   service:
