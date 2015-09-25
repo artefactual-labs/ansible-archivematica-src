@@ -26,6 +26,10 @@
     - "python-pip"
     - "python-gearman"
     - "python-simplejson"
+    - "npm"
+
+- name: "Fix install path of node vs nodejs via symlink"
+  file: src=/usr/bin/nodejs dest=/usr/bin/node state=link
 
 - name: "Install archivematica-dashboard pip dependencies"
   pip:
@@ -59,6 +63,13 @@
   args:
     chdir: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/"
     creates: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.complete"
+
+- name: "Install bower"
+  npm: name=bower global=yes
+
+- name: "Install bower dependencies"
+  bower: path="{{ archivematica_src_dir }}/archivematica/src/dashboard/src/external/appraisal-tab/"
+  sudo: no
 
 - name: "Remove default Apache server"
   command: "a2dissite 000-default"
