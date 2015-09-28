@@ -13,3 +13,6 @@ archivematica_src_environment_type: "production"
 # Branches, TODO: canonize keys ala "archivematica_src_..."
 amdev_version: "remotes/origin/qa/1.x"
 ssdev_version: "remotes/origin/qa/0.x"
+
+# SS django secret key
+archivematica_src_ss_django_secret_key: "CHANGE_ME_WITH_A_SECRET_KEY"

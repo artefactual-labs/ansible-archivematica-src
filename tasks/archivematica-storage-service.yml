@@ -60,12 +60,13 @@
     virtualenv: "/usr/share/python/archivematica-storage-service"
     extra_args: "--find-links lib"
 
-# TODO - What is this for again?
-- name: "Copy storage_service folder to archivematica-storage-service virtualenv site-packages (dh-virtualenv also seems to copy the storage_service?)"
-  file:
-    src: "{{ archivematica_src_dir }}/archivematica-storage-service/storage_service"
-    dest: "/usr/share/python/archivematica-storage-service/lib/python2.7/site-packages/storage_service"
-    state: "link"
+
+#### TODO - What is this for again?
+###- name: "Copy storage_service folder to archivematica-storage-service virtualenv site-packages (dh-virtualenv also seems to copy the storage_service?)"
+###  file:
+###    src: "{{ archivematica_src_dir }}/archivematica-storage-service/storage_service"
+###    dest: "/usr/share/python/archivematica-storage-service/lib/python2.7/site-packages/storage_service"
+###    state: "link"
 
 - name: "Create subdirectories for archivematica-storage-service source files (ref. debian/archivematica-storage-service.install)"
   file:
@@ -75,15 +76,41 @@
     - "/var/archivematica/storage-service"
     - "/usr/lib/archivematica"
 
-- name: "Copy archivematica-storage-service source files"
-  command: "rsync -a {{ item.src }} {{ item.dest }}"
-  with_items:
-    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/.storage-service"
-      dest: "/var/archivematica/"
-    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/make_key.py"
-      dest: "/var/archivematica/storage-service/"
-    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/storage.ini"
-      dest: "/etc/uwsgi/apps-available/storage.ini"
+
+# TODO: Deprecate the nginx and uwsgi configuration files in the
+# archivematica-storage-service repo, putting these files on this role instead
+
+- name: "set nginx sites-available config file"
+  template:
+    src: "etc_nginx_sites_storage.conf.j2"
+    dest: "/etc/nginx/sites-available/storage.conf"
+
+- name: "set uwsgi apps-available config file"
+  template:
+    src: "etc_uwsgi_apps_storage.ini.j2"
+    dest: "/etc/uwsgi/apps-available/storage.ini"
+
+
+
+
+# TODO: directory cleanup
+# We only need:
+# storage service base dir:  /usr/lib/archivematica/storage-service
+#                           link repo's storega_service dir to it
+# virtualenv dir:          /usr/share/python/archivematica-storage-service
+#
+
+###- name: "Copy archivematica-storage-service source files"
+###  command: "rsync -a {{ item.src }} {{ item.dest }}"
+###  with_items:
+###    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/.storage-service"
+###      dest: "/var/archivematica/"
+###    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/make_key.py"
+###      dest: "/var/archivematica/storage-service/"
+###    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/storage.ini"
+###      dest: "/etc/uwsgi/apps-available/storage.ini"
+
+
 
 - name: "Copy archivematica-storage-service source files"
   file:
@@ -91,14 +118,30 @@
     dest: "{{ item.dest }}"
     state: "link"
   with_items:
-    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/storage"
-      dest: "/etc/nginx/sites-available/storage"
-    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/lib"
-      dest: "/var/archivematica/storage-service/lib"
-    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/storage_service/static"
-      dest: "/var/archivematica/storage-service/static"
-    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/storage_service/templates"
-      dest: "/var/archivematica/storage-service/templates"
+###    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/storage"
+###      dest: "/etc/nginx/sites-available/storage"
+###    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/lib"
+###      dest: "/var/archivematica/storage-service/lib"
+###    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/storage_service/static"
+###      dest: "/var/archivematica/storage-service/static"
+###    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/storage_service/templates"
+###      dest: "/var/archivematica/storage-service/templates"
+    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/storage_service"
+      dest: "/usr/lib/archivematica/storage-service"
+
+
+- name: "Run SS django database migrations"
+  django_manage:
+    command=migrate
+    app_path=/usr/lib/archivematica/storage-service
+    virtualenv=/usr/share/python/archivematica-storage-service
+
+- name: "Run SS django collectstatic"
+  django_manage:
+    command=collectstatic
+    app_path=/usr/lib/archivematica/storage-service
+    virtualenv=/usr/share/python/archivematica-storage-service
+
 
 - name: "Create archivematica-storage-service log directories"
   file:
@@ -110,11 +153,12 @@
     - "/var/log/archivematica/storage-service"
 
 # TODO: this is doing a bunch of things that we have already done in our playbook
-- name: "Call the debian/postinst script for archivematica-storage-service"
-  command: "source postinst"
-  args:
-    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service/debian/"
-    executable: "/bin/bash"
+###- name: "Call the debian/postinst script for archivematica-storage-service"
+###  command: "source postinst"
+###  args:
+###    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service/debian/"
+###    executable: "/bin/bash"
+
 
 - name: "Remove Nginx default server"
   file:
@@ -128,8 +172,8 @@
 
 - name: "Set up Nginx server"
   file:
-    src: "/etc/nginx/sites-available/storage"
-    dest: "/etc/nginx/sites-enabled/storage"
+    src: "/etc/nginx/sites-available/storage.conf"
+    dest: "/etc/nginx/sites-enabled/storage.conf"
     state: "link"
 
 - name: "Set up uWSGI server"
