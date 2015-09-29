@@ -33,14 +33,14 @@ module = storage_service.wsgi
 home = /usr/share/python/archivematica-storage-service
 
 # Environment variables
-env = DJANGO_SECRET_KEY= {{ archivematica_src_ss_django_secret_key }}
-env = DJANGO_SETTINGS_MODULE=storage_service.settings.production
-env = DJANGO_STATIC_ROOT=/usr/lib/archivematica/storage-service/assets
-env = EMAIL_HOST=localhost
-env = EMAIL_HOST_PASSWORD=
-env = EMAIL_HOST_USER=
-env = EMAIL_PORT=25
-env = SS_DB_HOST=
-env = SS_DB_NAME=/var/archivematica/storage-service/storage.db
-env = SS_DB_PASSWORD=
-env = SS_DB_USER=
+env = DJANGO_SECRET_KEY={{ archivematica_src_ss_env_django_secret_key }}
+env = DJANGO_SETTINGS_MODULE={{ archivematica_src_ss_env_django_setings_module  }}
+env = DJANGO_STATIC_ROOT={{ archivematica_src_ss_env_django_static_root }}
+env = EMAIL_HOST={{ archivematica_src_ss_env_email_host }}
+env = EMAIL_HOST_PASSWORD={{ archivematica_src_ss_env_email_host_password }}
+env = EMAIL_HOST_USER={{ archivematica_src_ss_env_email_host_user }}
+env = EMAIL_PORT={{ archivematica_src_ss_env_email_port }}
+env = SS_DB_HOST={{ archivematica_src_ss_env_ss_db_host }}
+env = SS_DB_NAME={{ archivematica_src_ss_env_ss_db_name }}
+env = SS_DB_PASSWORD={{ archivematica_src_ss_env_ss_db_password }}
+env = SS_DB_USER={{ archivematica_src_ss_env_ss_db_user }}

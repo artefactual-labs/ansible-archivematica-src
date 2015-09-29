@@ -129,28 +129,69 @@
     - src: "{{ archivematica_src_dir }}/archivematica-storage-service/storage_service"
       dest: "/usr/lib/archivematica/storage-service"
 
-
-- name: "Run SS django database migrations"
-  django_manage:
-    command=migrate
-    app_path=/usr/lib/archivematica/storage-service
-    virtualenv=/usr/share/python/archivematica-storage-service
-
-- name: "Run SS django collectstatic"
-  django_manage:
-    command=collectstatic
-    app_path=/usr/lib/archivematica/storage-service
-    virtualenv=/usr/share/python/archivematica-storage-service
-
-
 - name: "Create archivematica-storage-service log directories"
   file:
     dest: "{{ item }}"
     state: "directory"
     owner: "archivematica"
     group: "archivematica"
+    mode: "g+s"
   with_items:
     - "/var/log/archivematica/storage-service"
+
+- name: "Touch SS log files"
+  file:
+    path: "/var/log/archivematica/storage-service/{{ item }}"
+    owner: "archivematica"
+    group: "archivematica"
+    state: "touch"
+  with_items:
+    - "storage_service.log"
+    - "storage_service_debug.log"
+
+# django commands need an environment var to get the django secret key
+# secret key is not in the settings files
+# try using the environment keyword as described here
+#   https://github.com/ansible/ansible/issues/2568
+#   http://docs.ansible.com/ansible/playbooks_environment.html
+
+- name: "Run SS django database migrations"
+  django_manage:
+    command=migrate
+    app_path=/usr/lib/archivematica/storage-service
+    virtualenv=/usr/share/python/archivematica-storage-service
+  environment:
+      DJANGO_SECRET_KEY: "{{ archivematica_src_ss_django_secret_key }}"
+      DJANGO_SETTINGS_MODULE: "{{ archivematica_src_ss_env_django_setings_module }}"
+      DJANGO_STATIC_ROOT: "{{ archivematica_src_ss_env_django_static_root }}"
+      EMAIL_HOST: "{{ archivematica_src_ss_env_email_host }}"
+      EMAIL_HOST_PASSWORD: "{{ archivematica_src_ss_env_email_host_password }}"
+      EMAIL_HOST_USER: "{{ archivematica_src_ss_env_email_host_user }}"
+      EMAIL_PORT: "{{ archivematica_src_ss_env_email_port }}"
+      SS_DB_HOST: "{{ archivematica_src_ss_env_ss_db_host }}"
+      SS_DB_NAME: "{{ archivematica_src_ss_env_ss_db_name }}"
+      SS_DB_PASSWORD: "{{ archivematica_src_ss_env_ss_db_password }}"
+      SS_DB_USER: "{{ archivematica_src_ss_env_ss_db_user }}"
+
+- name: "Run SS django collectstatic"
+  django_manage:
+    command=collectstatic
+    app_path=/usr/lib/archivematica/storage-service
+    virtualenv=/usr/share/python/archivematica-storage-service
+  environment:
+      DJANGO_SECRET_KEY: "{{ archivematica_src_ss_django_secret_key }}"
+      DJANGO_SETTINGS_MODULE: "{{ archivematica_src_ss_env_django_setings_module }}"
+      DJANGO_STATIC_ROOT: "{{ archivematica_src_ss_env_django_static_root }}"
+      EMAIL_HOST: "{{ archivematica_src_ss_env_email_host }}"
+      EMAIL_HOST_PASSWORD: "{{ archivematica_src_ss_env_email_host_password }}"
+      EMAIL_HOST_USER: "{{ archivematica_src_ss_env_email_host_user }}"
+      EMAIL_PORT: "{{ archivematica_src_ss_env_email_port }}"
+      SS_DB_HOST: "{{ archivematica_src_ss_env_ss_db_host }}"
+      SS_DB_NAME: "{{ archivematica_src_ss_env_ss_db_name }}"
+      SS_DB_PASSWORD: "{{ archivematica_src_ss_env_ss_db_password }}"
+      SS_DB_USER: "{{ archivematica_src_ss_env_ss_db_user }}"
+
+
 
 # TODO: this is doing a bunch of things that we have already done in our playbook
 ###- name: "Call the debian/postinst script for archivematica-storage-service"
