@@ -13,3 +13,18 @@ archivematica_src_environment_type: "production"
 # Branches, TODO: canonize keys ala "archivematica_src_..."
 amdev_version: "remotes/origin/qa/1.x"
 ssdev_version: "remotes/origin/qa/0.x"
+
+# SS django environment variables
+# DJANGO_SECRET_KEY shall be changed for every install
+#     (override the value in the playboook, do not change here)
+archivematica_src_ss_env_django_secret_key: "CHANGE_ME_WITH_A_SECRET_KEY"
+archivematica_src_ss_env_django_setings_module: "storage_service.settings.production"
+archivematica_src_ss_env_django_static_root: "/usr/lib/archivematica/storage-service/assets"
+archivematica_src_ss_env_email_host: "localhost"
+archivematica_src_ss_env_email_host_password: ""
+archivematica_src_ss_env_email_host_user: ""
+archivematica_src_ss_env_email_port: "25"
+archivematica_src_ss_env_ss_db_host: ""
+archivematica_src_ss_env_ss_db_name: "/var/archivematica/storage-service/storage.db"
+archivematica_src_ss_env_ss_db_password: ""
+archivematica_src_ss_env_ss_db_user: ""
