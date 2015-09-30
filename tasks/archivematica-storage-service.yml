@@ -1,33 +1,55 @@
 ---
 
+# Archivematica Storage Service installer
+
+# This file is divided into the following blocks:
+#   0- Clone source repo
+#   1- OS dependencies (debian packages)
+#   2- python dependencies (pip packages)
+#   3- OS configuration (user/directory/file creation/permissions/ownership )
+#   4- SS code install
+#   5- Database config
+#   6- web server config
+
+###########################################################
+#   0- Clone source repo
+###########################################################
+
 - name: "Checkout archivematica-storage-service code"
   git:
     repo: "https://github.com/artefactual/archivematica-storage-service.git"
     dest: "{{ archivematica_src_dir }}/archivematica-storage-service"
     version: "{{ ssdev_version }}"
     force: "yes"
-
+  tags: am-src-ss-clone
 # For some reason, some dirs in the cloned source code
 # are not sometimes readable by all. Add a task to fix it
 # For some other reason this task does not always work
 # blame ansible  :-/
+# Update: this problem may have been fixed with postinst removal
 - name: "Ensure the source code is readable by all"
   file:
     path: "{{ archivematica_src_dir }}/archivematica-storage-service"
     mode: "o+rX"
     recurse: "yes"
   sudo: "yes"
+  tags: am-src-ss-clone
 
 - name: "Get archivematica-storage-service latest commit hash"
   command: "git rev-parse HEAD"
   args:
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
   register: "latest_commit_ss"
+  tags: am-src-ss-clone
 
 - name: "Save Archivematica Storage Service latest commit hash"
   shell: "echo {{ latest_commit_ss.stdout }} > {{ archivematica_src_dir }}/archivematica-storage-service-commit.txt"
-
+  tags: am-src-ss-clone
 # TODO: Make use of latest_commit_ss
+
+###########################################################
+#   1- OS dependencies (debian packages)
+###########################################################
 
 - name: "Install archivematica-storage-service package dependencies (ref. debian/control)"
   apt:
@@ -39,6 +61,7 @@
     - "unar"
     - "uwsgi"
     - "uwsgi-plugin-python"
+  tags: am-src-ss-osdep
 
 - name: "Install archivematica-storage-service additional package dependencies"
   apt:
@@ -52,6 +75,11 @@
     - "libz-dev"
     - "libffi-dev"
     - "libssl-dev"
+  tags: am-src-ss-osdep
+
+###########################################################
+#   2- python dependencies (pip packages)
+###########################################################
 
 - name: "Create virtualenv for archivematica-storage-service (ref. dh-virtualenv)"
   pip:
@@ -59,14 +87,11 @@
     requirements: "requirements.txt"
     virtualenv: "/usr/share/python/archivematica-storage-service"
     extra_args: "--find-links lib"
+  tags: am-src-ss-pydep
 
-
-#### TODO - What is this for again?
-###- name: "Copy storage_service folder to archivematica-storage-service virtualenv site-packages (dh-virtualenv also seems to copy the storage_service?)"
-###  file:
-###    src: "{{ archivematica_src_dir }}/archivematica-storage-service/storage_service"
-###    dest: "/usr/share/python/archivematica-storage-service/lib/python2.7/site-packages/storage_service"
-###    state: "link"
+###########################################################
+#   3- OS configuration (user/directory/file creation/permissions/ownership )
+###########################################################
 
 - name: "Create subdirectories for archivematica-storage-service source files (ref. debian/archivematica-storage-service.install)"
   file:
@@ -75,59 +100,7 @@
   with_items:
     - "/var/archivematica/storage-service"
     - "/usr/lib/archivematica"
-
-
-# TODO: Deprecate the nginx and uwsgi configuration files in the
-# archivematica-storage-service repo, putting these files on this role instead
-
-- name: "set nginx sites-available config file"
-  template:
-    src: "etc_nginx_sites_storage.conf.j2"
-    dest: "/etc/nginx/sites-available/storage.conf"
-
-- name: "set uwsgi apps-available config file"
-  template:
-    src: "etc_uwsgi_apps_storage.ini.j2"
-    dest: "/etc/uwsgi/apps-available/storage.ini"
-
-
-
-
-# TODO: directory cleanup
-# We only need:
-# storage service base dir:  /usr/lib/archivematica/storage-service
-#                           link repo's storega_service dir to it
-# virtualenv dir:          /usr/share/python/archivematica-storage-service
-#
-
-###- name: "Copy archivematica-storage-service source files"
-###  command: "rsync -a {{ item.src }} {{ item.dest }}"
-###  with_items:
-###    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/.storage-service"
-###      dest: "/var/archivematica/"
-###    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/make_key.py"
-###      dest: "/var/archivematica/storage-service/"
-###    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/storage.ini"
-###      dest: "/etc/uwsgi/apps-available/storage.ini"
-
-
-
-- name: "Copy archivematica-storage-service source files"
-  file:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    state: "link"
-  with_items:
-###    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/storage"
-###      dest: "/etc/nginx/sites-available/storage"
-###    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/lib"
-###      dest: "/var/archivematica/storage-service/lib"
-###    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/storage_service/static"
-###      dest: "/var/archivematica/storage-service/static"
-###    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/storage_service/templates"
-###      dest: "/var/archivematica/storage-service/templates"
-    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/storage_service"
-      dest: "/usr/lib/archivematica/storage-service"
+  tags: am-src-ss-osconf
 
 - name: "Create archivematica-storage-service log directories"
   file:
@@ -138,6 +111,7 @@
     mode: "g+s"
   with_items:
     - "/var/log/archivematica/storage-service"
+  tags: am-src-ss-osconf
 
 - name: "Touch SS log files"
   file:
@@ -148,30 +122,24 @@
   with_items:
     - "storage_service.log"
     - "storage_service_debug.log"
+  tags: am-src-ss-osconf
 
-# django commands need an environment var to get the django secret key
-# secret key is not in the settings files
-# try using the environment keyword as described here
-#   https://github.com/ansible/ansible/issues/2568
-#   http://docs.ansible.com/ansible/playbooks_environment.html
 
-- name: "Run SS django database migrations"
-  django_manage:
-    command=migrate
-    app_path=/usr/lib/archivematica/storage-service
-    virtualenv=/usr/share/python/archivematica-storage-service
-  environment:
-      DJANGO_SECRET_KEY: "{{ archivematica_src_ss_django_secret_key }}"
-      DJANGO_SETTINGS_MODULE: "{{ archivematica_src_ss_env_django_setings_module }}"
-      DJANGO_STATIC_ROOT: "{{ archivematica_src_ss_env_django_static_root }}"
-      EMAIL_HOST: "{{ archivematica_src_ss_env_email_host }}"
-      EMAIL_HOST_PASSWORD: "{{ archivematica_src_ss_env_email_host_password }}"
-      EMAIL_HOST_USER: "{{ archivematica_src_ss_env_email_host_user }}"
-      EMAIL_PORT: "{{ archivematica_src_ss_env_email_port }}"
-      SS_DB_HOST: "{{ archivematica_src_ss_env_ss_db_host }}"
-      SS_DB_NAME: "{{ archivematica_src_ss_env_ss_db_name }}"
-      SS_DB_PASSWORD: "{{ archivematica_src_ss_env_ss_db_password }}"
-      SS_DB_USER: "{{ archivematica_src_ss_env_ss_db_user }}"
+###########################################################
+#   4- SS code install
+###########################################################
+
+# storage service base dir:  /usr/lib/archivematica/storage-service
+
+- name: "Copy archivematica-storage-service source files"
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: "link"
+  with_items:
+    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/storage_service"
+      dest: "/usr/lib/archivematica/storage-service"
+  tags: am-src-ss-code
 
 - name: "Run SS django collectstatic"
   django_manage:
@@ -190,16 +158,48 @@
       SS_DB_NAME: "{{ archivematica_src_ss_env_ss_db_name }}"
       SS_DB_PASSWORD: "{{ archivematica_src_ss_env_ss_db_password }}"
       SS_DB_USER: "{{ archivematica_src_ss_env_ss_db_user }}"
+  tags: am-src-ss-code
 
 
+###########################################################
+#   5- Database config
+###########################################################
 
-# TODO: this is doing a bunch of things that we have already done in our playbook
-###- name: "Call the debian/postinst script for archivematica-storage-service"
-###  command: "source postinst"
-###  args:
-###    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service/debian/"
-###    executable: "/bin/bash"
+- name: "Run SS django database migrations"
+  django_manage:
+    command=migrate
+    app_path=/usr/lib/archivematica/storage-service
+    virtualenv=/usr/share/python/archivematica-storage-service
+  environment:
+      DJANGO_SECRET_KEY: "{{ archivematica_src_ss_django_secret_key }}"
+      DJANGO_SETTINGS_MODULE: "{{ archivematica_src_ss_env_django_setings_module }}"
+      DJANGO_STATIC_ROOT: "{{ archivematica_src_ss_env_django_static_root }}"
+      EMAIL_HOST: "{{ archivematica_src_ss_env_email_host }}"
+      EMAIL_HOST_PASSWORD: "{{ archivematica_src_ss_env_email_host_password }}"
+      EMAIL_HOST_USER: "{{ archivematica_src_ss_env_email_host_user }}"
+      EMAIL_PORT: "{{ archivematica_src_ss_env_email_port }}"
+      SS_DB_HOST: "{{ archivematica_src_ss_env_ss_db_host }}"
+      SS_DB_NAME: "{{ archivematica_src_ss_env_ss_db_name }}"
+      SS_DB_PASSWORD: "{{ archivematica_src_ss_env_ss_db_password }}"
+      SS_DB_USER: "{{ archivematica_src_ss_env_ss_db_user }}"
+  tags: am-src-ss-db
 
+
+###########################################################
+#   6- web server config
+###########################################################
+
+- name: "set nginx sites-available config file"
+  template:
+    src: "etc_nginx_sites_storage.conf.j2"
+    dest: "/etc/nginx/sites-available/storage.conf"
+  tags: am-src-ss-websrv
+
+- name: "set uwsgi apps-available config file"
+  template:
+    src: "etc_uwsgi_apps_storage.ini.j2"
+    dest: "/etc/uwsgi/apps-available/storage.ini"
+  tags: am-src-ss-websrv
 
 - name: "Remove Nginx default server"
   file:
@@ -210,18 +210,21 @@
     - "/etc/nginx/sites-available/default.conf"
     - "/etc/nginx/sites-enabled/default"
     - "/etc/nginx/sites-enabled/default.conf"
+  tags: am-src-ss-websrv
 
 - name: "Set up Nginx server"
   file:
     src: "/etc/nginx/sites-available/storage.conf"
     dest: "/etc/nginx/sites-enabled/storage.conf"
     state: "link"
+  tags: am-src-ss-websrv
 
 - name: "Set up uWSGI server"
   file:
     src: "/etc/uwsgi/apps-available/storage.ini"
     dest: "/etc/uwsgi/apps-enabled/storage.ini"
     state: "link"
+  tags: am-src-ss-websrv
 
 - name: "Enable services"
   service:
@@ -231,3 +234,6 @@
   with_items:
     - "nginx"
     - "uwsgi"
+  tags: am-src-ss-websrv
+
+  
