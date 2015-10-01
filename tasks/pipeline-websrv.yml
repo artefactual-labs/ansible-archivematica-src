@@ -9,30 +9,25 @@
   notify:
     - "Restart Apache"
 
-
-- name: "Remove default Apache server"
-  command: "a2dissite 000-default"
+- name: "Remove default Apache server sites"
+  command: "a2dissite {{ item }}"
+  with_items:
+    - "000-default"
+    - "default"
   notify:
     - "Restart Apache"
 
-- name: "Copy Apache config file"
-  copy:
-    src: "apache.default"
-    dest: "/etc/apache2/sites-available/default.conf"
-  notify:
-    - "Restart Apache"
+- name: "Template dashboard apache2 config"
+  template:
+    src: "etc_apache2_sites_dashboard.conf.j2"
+    dest: "/etc/apache2/sites-available/dashboard.conf"
 
-- name: "Enable Apache site"
-  command: "a2ensite default"
+- name: "Enable apache dashboard site"
+  command: "a2ensite dashboard"
   args:
-    creates: "/etc/apache2/sites-enabled/default.conf"
+    creates: "/etc/apache2/sites-enabled/dashboard.conf"
   notify:
     - "Restart Apache"
-
-- name: "Get archivematica-dashboard configuration"
-  get_url:
-    url: "https://raw.githubusercontent.com/artefactual/archivematica/stable/1.2.x/localDevSetup/apache/apache.default"
-    dest: "/etc/apache2/sites-available/default"
 
 - name: "Enable services"
   service:
