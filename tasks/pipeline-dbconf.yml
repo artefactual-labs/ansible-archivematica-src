@@ -1,0 +1,47 @@
+
+###########################################################
+#   5- Database config
+###########################################################
+
+
+# Note that when we are using mysql_db and mysql_user we are assuming that the
+# root user has a local ~/.my.cnf configuration file with the credentials in it
+# for the MySQL user.
+
+- name: "Create MySQL database"
+  mysql_db:
+    name: "MCP"
+    state: "present"
+    encoding: "utf8"
+    collation: "utf8_unicode_ci"
+  register: "createdb_result"
+
+- name: "Initialize database MCP"
+  mysql_db:
+    name: "MCP"
+    state: "import"
+    target: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql"
+  when: "createdb_result|changed"
+
+- name: "Create MySQL user"
+  mysql_user:
+    name: "archivematica"
+    password: "demo"
+    priv: "MCP.*:ALL"
+    state: "present"
+
+- name: "Set MCP database charset"
+  command: "mysql -u archivematica -pdemo MCP -e 'ALTER DATABASE MCP CHARACTER SET utf8 COLLATE utf8_unicode_ci'"
+  sudo: "no"
+
+
+- name: "Invoke django syncdb"
+  command: "/usr/share/archivematica/dashboard/manage.py syncdb --settings='settings.common' --noinput"
+  sudo_user: "archivematica"
+
+
+- name: "Call mysql_dev script"
+  command: "./mysql_dev.sh MCP"
+  args:
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/"
+    creates: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.complete"

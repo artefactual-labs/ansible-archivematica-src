@@ -6,11 +6,6 @@
 #
 # - This role needs root privileges but it is preferred to run it as a
 #   regular user that can sudo.
-# - At the moment, archivematica-mcp-server.yml will not be able to start the
-#   service archivematica-mcp-server until the dashboard is installed later
-#   via archivematica-dashboard.yml due to internal dependency issues. Our
-#   temporary hack is to restart archivematica-mcp-server from
-#   archivematica-dashboard.yml.
 #
 #
 
@@ -30,37 +25,45 @@
   tags:
    - "amsrc-am-ss"
 
-#
-# archivematica-common
-#
 
-- include: "archivematica-common.yml"
+#
+# archivematica pipeline install
+#    (dashboard, MCP server, client)
+#
+#   0- Clone source repo
+#   1- OS dependencies (debian packages)
+#   2- python dependencies (pip packages)
+#   3- OS configuration (user/directory/file creation/permissions/ownership )
+#   4- Code install
+#   5- Database config
+#   6- web server config
+
+- include: "pipeline-clonecode.yml"
   tags:
-    - "amsrc-am-dashboard"
-    - "amsrc-am-mcp-server"
-    - "amsrc-am-mcp-client"
+    - "amsrc-pipeline"
+    - "amsrc-pipeline-clonecode"
 
-#
-# archivematica-mcp-server
-#
-
-- include: "archivematica-mcp-server.yml"
+- include: "pipeline-deps.yml"
   tags:
-    - "amsrc-am-mcp-server"
+    - "amsrc-pipeline"
+    - "amsrc-pipeline-deps"
 
-#
-# archivematica-mcp-client
-#
-
-- include: "archivematica-mcp-client.yml"
+- include: "pipeline-osconf.yml"
   tags:
-    - "amsrc-am-mcp-client"
+    - "amsrc-pipeline"
+    - "amsrc-pipeline-osconf"
 
-#
-# archivematica-dashboard
-#
-
-- include: "archivematica-dashboard.yml"
+- include: "pipeline-instcode.yml"
   tags:
-    - "amsrc-am-mcp-server"
-    - "amsrc-am-dashboard"
+    - "amsrc-pipeline"
+    - "amsrc-pipeline-instcode"
+
+- include: "pipeline-dbconf.yml"
+  tags:
+    - "amsrc-pipeline"
+    - "amsrc-pipeline-dbconf"
+
+- include: "pipeline-websrv.yml"
+  tags:
+    - "amsrc-pipeline"
+    - "amsrc-pipeline-websrv"
