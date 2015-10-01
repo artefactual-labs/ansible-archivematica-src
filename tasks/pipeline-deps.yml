@@ -189,4 +189,4 @@
 
 - name: "Install archivematica-dashboard pip dependencies"
   pip:
-    requirements: "/usr/share/archivematica/dashboard/requirements.txt"
+    requirements: "{{ archivematica_src_dir }}/archivematica/src/dashboard/src/requirements.txt"

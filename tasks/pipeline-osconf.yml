@@ -61,10 +61,9 @@
     dest: "/var/archivematica/sharedDirectory"
     state: "directory"
 
-# TODO: note that the location of sharedDirectory structure differs from the debian installer location
 
 - name: "Create /var/archivematica/sharedDirectory structure"
-  command: "rsync -a /usr/share/archivematica/MCPServer/sharedDirectoryStructure/ /var/archivematica/sharedDirectory/"
+  command: "rsync -a {{ archivematica_src_dir }}/archivematica/src/MCPServer/share/sharedDirectoryStructure/ /var/archivematica/sharedDirectory/"
 
 - name: "Set owner, group of /var/archivematica recursively"
   file:
