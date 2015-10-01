@@ -16,13 +16,9 @@
     collation: "utf8_unicode_ci"
   register: "createdb_result"
 
-- name: "Initialize database MCP"
-  mysql_db:
-    name: "MCP"
-    state: "import"
-    target: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql"
-  when: "createdb_result|changed"
-
+# TODO: need to change the mysql password for user archivematica
+#       but not sure if currently this could break anything
+#       (i.e., not sure if the password is hardcoded in the code)
 - name: "Create MySQL user"
   mysql_user:
     name: "archivematica"
@@ -30,15 +26,19 @@
     priv: "MCP.*:ALL"
     state: "present"
 
-- name: "Set MCP database charset"
-  command: "mysql -u archivematica -pdemo MCP -e 'ALTER DATABASE MCP CHARACTER SET utf8 COLLATE utf8_unicode_ci'"
-  sudo: "no"
+- name: "Initialize database MCP"
+  mysql_db:
+    name: "MCP"
+    state: "import"
+    target: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql"
+  when: "createdb_result|changed"
 
-
+# TODO: Does this need to run as root or user archivematica ??
 - name: "Invoke django syncdb"
-  command: "/usr/share/archivematica/dashboard/manage.py syncdb --settings='settings.common' --noinput"
-  sudo_user: "archivematica"
-
+  django_manage:
+    command: "syncdb"
+    app_path: "/usr/share/archivematica/dashboard/"
+    settings: "settings.common"
 
 - name: "Call mysql_dev script"
   command: "./mysql_dev.sh MCP"
