@@ -1,39 +1,72 @@
 ---
 
+
+###########################################################
+#   1- OS dependencies (debian packages)
+###########################################################
+
 - name: "Add multiverse repositories"
   sudo: "yes"
-  apt_repository: "repo='{{ item }}' state=present"
+  apt_repository:
+    repo: "{{ item }}"
+    state: "present"
   with_items:
     - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }} multiverse"
     - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-security universe"
     - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-updates multiverse"
 
-- name: "Create subdirectories for archivematica-mcp-client source files"
-  file:
-    dest: "{{ item }}"
-    state: "directory"
-  with_items:
-    - "/etc/archivematica"
-    - "/usr/lib/archivematica"
 
-- name: "Copy archivematica-mcp-client source files"
-  file: src={{ item.src }} dest={{ item.dest }} state=link
-  with_items:
-    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/etc"
-      dest: "/etc/archivematica/MCPClient"
-    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/lib/"
-      dest: "/usr/lib/archivematica/MCPClient"
-    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/init/archivematica-mcp-client.conf"
-      dest: "/etc/init/archivematica-mcp-client.conf"
 
-- name: "Copy archivematica-mcp-client init service"
-  file: src={{ item.src }} dest={{ item.dest }} state=link
+- name: "Install archivematica-common package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
   with_items:
-    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/init/archivematica-mcp-client.conf"
-      dest: "/etc/init/archivematica-mcp-client.conf"
+    - "python"
+    - "python-pip"
+    - "python2.7-elementtree"
+    - "python-mimeparse"
+    - "python-dateutil"
 
-- name: "Reload Upstart configuration"
-  command: "initctl reload-configuration"
+
+- name: "Install archivematica-dashboard package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items:
+    - "apache2-mpm-prefork"
+    - "libapache2-mod-wsgi"
+    - "python-pip"
+    - "python-gearman"
+    - "python-simplejson"
+    - "npm"
+
+- name: "Fix install path of node vs nodejs via symlink"
+  file: src=/usr/bin/nodejs dest=/usr/bin/node state=link
+
+
+- name: "Install bower"
+  npm: name=bower global=yes
+
+- name: "Install bower dependencies"
+  bower: path="{{ archivematica_src_dir }}/archivematica/src/dashboard/src/external/appraisal-tab/"
+  sudo: no
+
+
+- name: "Install archivematica-mcp-server package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items:
+    - "dbconfig-common"
+    - "logapp"
+    - "python-pyinotify"
+    - "python-gearman"
+    - "python-mysqldb"
+    - "python-lxml"
+    - "uuid"
+
+
 
 - name: "Install archivematica-mcp-client package dependencies"
   apt:
@@ -78,26 +111,7 @@
     - "unrar-free"
     - "uuid"
 
-- name: "Create archivematica-mcp-client log directories"
-  file:
-    dest: "{{ item }}"
-    state: "directory"
-    owner: "archivematica"
-    group: "archivematica"
-    mode: "g+s"
-  with_items:
-    - "/var/log/archivematica/MCPClient"
 
-
-# crontab seems not required for freshclam updates
-# freshclam is executed hourly by default (clamav-freshclam)
-#- name: "Daily clamav database update"
-#  cron:
-#    name: "Daily clamav database update"
-#    hour: "2"
-#    minute: "0"
-#    job: "/usr/bin/freshclam"
-#    state: "present"
 
 # Have found that installation often stalls in freshclam
 # Will download signatures from our repo to try to avoid this
@@ -160,3 +174,19 @@
   with_items:
     - "fits"
     - "clamav-daemon"
+
+
+
+
+###########################################################
+#   2- python dependencies (pip packages)
+###########################################################
+
+
+- name: "Install archivematica-common pip dependencies"
+  pip:
+    requirements: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements.txt"
+
+- name: "Install archivematica-dashboard pip dependencies"
+  pip:
+    requirements: "{{ archivematica_src_dir }}/archivematica/src/dashboard/src/requirements.txt"

@@ -1,0 +1,47 @@
+
+###########################################################
+#   5- Database config
+###########################################################
+
+
+# Note that when we are using mysql_db and mysql_user we are assuming that the
+# root user has a local ~/.my.cnf configuration file with the credentials in it
+# for the MySQL user.
+
+- name: "Create MySQL database"
+  mysql_db:
+    name: "MCP"
+    state: "present"
+    encoding: "utf8"
+    collation: "utf8_unicode_ci"
+  register: "createdb_result"
+
+# TODO: need to change the mysql password for user archivematica
+#       but not sure if currently this could break anything
+#       (i.e., not sure if the password is hardcoded in the code)
+- name: "Create MySQL user"
+  mysql_user:
+    name: "archivematica"
+    password: "demo"
+    priv: "MCP.*:ALL"
+    state: "present"
+
+- name: "Initialize database MCP"
+  mysql_db:
+    name: "MCP"
+    state: "import"
+    target: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql"
+  when: "createdb_result|changed"
+
+# TODO: Does this need to run as root or user archivematica ??
+- name: "Invoke django syncdb"
+  django_manage:
+    command: "syncdb"
+    app_path: "/usr/share/archivematica/dashboard/"
+    settings: "settings.common"
+
+- name: "Call mysql_dev script"
+  command: "./mysql_dev.sh MCP"
+  args:
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/"
+    creates: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.complete"

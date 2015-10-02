@@ -1,0 +1,111 @@
+---
+
+###########################################################
+#   3- OS configuration (user/directory/file creation/permissions/ownership )
+###########################################################
+
+- name: "Create user archivematicadashboard"
+  user:
+    name: "archivematicadashboard"
+    uid: "334"
+    system: "yes"
+    home: "/var/lib/archivematica-dashboard"
+
+
+
+- name: "Create subdirectories for archivematica-common source files"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+  with_items:
+    - "/usr/lib/archivematica"
+    - "/etc/archivematica"
+    - "/usr/share/archivematica/archivematicaCommon"
+
+
+- name: "Create archivematica-dashboard log directories"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+    owner: "archivematica"
+    group: "archivematica"
+    mode: "g+s"
+  with_items:
+    - "/var/log/archivematica/dashboard"
+
+
+- name: "Create subdirectories for archivematica-mcp-server source files"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+  with_items:
+    - "/etc/archivematica"
+    - "/usr/lib/archivematica"
+    - "/usr/share/archivematica"
+    - "/usr/share/dbconfig-common/data/archivematica-mcp-server/install/"
+    - "/usr/share/dbconfig-common/data/archivematica-mcp-server/upgrade/mysql/"
+
+
+- name: "Create archivemaitca-mcp-server log directories"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+    owner: "archivematica"
+    group: "archivematica"
+    mode: "g+s"
+  with_items:
+    - "/var/log/archivematica/MCPServer"
+
+- name: "Create /var/archivematica/sharedDirectory"
+  file:
+    dest: "/var/archivematica/sharedDirectory"
+    state: "directory"
+
+
+- name: "Create /var/archivematica/sharedDirectory structure"
+  command: "rsync -a {{ archivematica_src_dir }}/archivematica/src/MCPServer/share/sharedDirectoryStructure/ /var/archivematica/sharedDirectory/"
+
+- name: "Set owner, group of /var/archivematica recursively"
+  file:
+    dest: "/var/archivematica"
+    state: "directory"
+    recurse: "yes"
+    owner: "archivematica"
+    group: "archivematica"
+
+- name: "Set owner, group of /var/archivematica/sharedDirectory recursively"
+  file:
+    dest: "/var/archivematica/sharedDirectory"
+    state: "directory"
+    recurse: "yes"
+    owner: "archivematica"
+    group: "archivematica"
+
+- name: "Set permissions for /var/archivematica"
+  command: "chmod -R g+s /var/archivematica/"
+
+- name: "Set permissions for /var/archivematica/sharedDirectory"
+  command: "chmod -R 664 /var/archivematica/sharedDirectory"
+
+- name: "Set more permissions for /var/archivematica"
+  shell: "find -L /var/archivematica/ -type d  | sudo xargs -IF chmod u+rwx,g+rwxt,o-rwx F"
+
+
+- name: "Create subdirectories for archivematica-mcp-client source files"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+  with_items:
+    - "/etc/archivematica"
+    - "/usr/lib/archivematica"
+
+
+- name: "Create archivematica-mcp-client log directories"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+    owner: "archivematica"
+    group: "archivematica"
+    mode: "g+s"
+  with_items:
+    - "/var/log/archivematica/MCPClient"
