@@ -16,6 +16,8 @@
     - "default"
   notify:
     - "Restart Apache"
+  ignore_errors: yes
+# note that yes in ignore_errors must be without quotes (ansible bug?)
 
 - name: "Template dashboard apache2 config"
   template:
