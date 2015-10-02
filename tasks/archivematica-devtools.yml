@@ -1,0 +1,27 @@
+
+
+- name: "Update vagrant user"
+  user:
+    name: "vagrant"
+    groups: "archivematica"
+
+- name: "Install am-devtools package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items:
+    - "ruby-ronn"
+
+- name: "Checkout out am-devtools repository"
+  git:
+    repo: "https://github.com/artefactual/archivematica-devtools.git"
+    dest: "~/archivematica-devtools"
+    force: "yes"
+  sudo: "no"
+
+- name: "Install am-devtools"
+  shell: "make install"
+  args:
+    # How do I make this the user that checked it out previously?
+    chdir: "~vagrant/archivematica-devtools"
+  sudo: "yes"
