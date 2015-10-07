@@ -1,8 +1,23 @@
 
 ###########################################################
-#   5- Database config
+#   5- Database reset (when archivematica_src_reset_MCPdb: "yes")
 ###########################################################
 
+- name: "Drop MCP database"
+  mysql_db:
+    name: "MCP"
+    state: "absent"
+  when: archivematica_src_reset_mcpdb
+
+- name: "Remove mysql_dev.complete file created by mysql_dev.sh"
+  file:
+    path: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.complete"
+    state: "absent"
+  when: archivematica_src_reset_mcpdb
+
+###########################################################
+#   5- Database config
+###########################################################
 
 # Note that when we are using mysql_db and mysql_user we are assuming that the
 # root user has a local ~/.my.cnf configuration file with the credentials in it
@@ -17,8 +32,7 @@
   register: "createdb_result"
 
 # TODO: need to change the mysql password for user archivematica
-#       but not sure if currently this could break anything
-#       (i.e., not sure if the password is hardcoded in the code)
+
 - name: "Create MySQL user"
   mysql_user:
     name: "archivematica"
