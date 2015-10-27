@@ -39,19 +39,31 @@
     - "python-pip"
     - "python-gearman"
     - "python-simplejson"
+
+- name: "Check if appraisal tab is present"
+  stat: path="{{ archivematica_src_dir }}/archivematica/src/dashboard/src/external/appraisal-tab/"
+  register: appraisal_tab
+
+- name: "Install appraisal tab package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  when: appraisal_tab.stat.exists == True
+  with_items:
     - "npm"
 
 - name: "Fix install path of node vs nodejs via symlink"
   file: src=/usr/bin/nodejs dest=/usr/bin/node state=link
-
+  when: appraisal_tab.stat.exists == True
 
 - name: "Install bower"
   npm: name=bower global=yes
+  when: appraisal_tab.stat.exists == True
 
 - name: "Install bower dependencies"
   bower: path="{{ archivematica_src_dir }}/archivematica/src/dashboard/src/external/appraisal-tab/"
   sudo: no
-
+  when: appraisal_tab.stat.exists == True
 
 - name: "Install archivematica-mcp-server package dependencies"
   apt:
