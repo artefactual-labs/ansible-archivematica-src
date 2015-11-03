@@ -11,7 +11,7 @@ N/A yet.
 Role Variables
 --------------
 
-N/A yet.
+`archivematica_src_reset_mcpdb`: set to true to re-create the MCP database (normally at runtime using `ansible-playbook` `--extra-vars` switch)
 
 Dependencies
 ------------
