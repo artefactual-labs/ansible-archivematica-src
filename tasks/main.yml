@@ -67,3 +67,11 @@
   tags:
     - "amsrc-pipeline"
     - "amsrc-pipeline-websrv"
+
+#
+# archivematica-devtools
+#
+
+- include: "archivematica-devtools.yml"
+  tags:
+    - "amsrc-devtools"
