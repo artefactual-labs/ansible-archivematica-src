@@ -10,7 +10,8 @@ N/A yet.
 
 Role Variables
 --------------
-
+`archivematica_src_am_version`: AM branch (tag or commit) to install
+`archivematica_src_ss_version`: SS branch (tag or commit) to install
 `archivematica_src_reset_mcpdb`: set to true to re-create the MCP database (normally at runtime using `ansible-playbook` `--extra-vars` switch)
 
 Dependencies
@@ -27,8 +28,8 @@ Example Playbook
   roles:
      - role: "archivematica-src"
        archivematica_src_dir: "/opt/archivematica"
-       amdev_version: "remotes/origin/qa/1.x"
-       ssdev_version: "remotes/origin/qa/0.x"
+       archivematica_src_am_version: "remotes/origin/qa/1.x"
+       archivematica_src_ss_version: "remotes/origin/qa/0.x"
   sudo: "yes"
 ```
 

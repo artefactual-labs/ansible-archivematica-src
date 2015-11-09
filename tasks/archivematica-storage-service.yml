@@ -19,7 +19,7 @@
   git:
     repo: "https://github.com/artefactual/archivematica-storage-service.git"
     dest: "{{ archivematica_src_dir }}/archivematica-storage-service"
-    version: "{{ ssdev_version }}"
+    version: "{{ archivematica_src_ss_version }}"
     force: "yes"
   tags: am-src-ss-clone
 # For some reason, some dirs in the cloned source code
@@ -235,5 +235,3 @@
     - "nginx"
     - "uwsgi"
   tags: am-src-ss-websrv
-
-  

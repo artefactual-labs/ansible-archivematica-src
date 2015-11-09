@@ -8,7 +8,7 @@
   git:
     repo: "https://github.com/artefactual/archivematica.git"
     dest: "{{ archivematica_src_dir }}/archivematica"
-    version: "{{ amdev_version }}"
+    version: "{{ archivematica_src_am_version }}"
   sudo: "no"
 
 - name: "Get Archivematica latest commit hash"

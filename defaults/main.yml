@@ -10,9 +10,9 @@ archivematica_src_install_sample_data: "yes"
 # will deploy some extra stuff to make the development workflow easier.
 archivematica_src_environment_type: "production"
 
-# Branches, TODO: canonize keys ala "archivematica_src_..."
-amdev_version: "remotes/origin/qa/1.x"
-ssdev_version: "remotes/origin/qa/0.x"
+# Branches,
+archivematica_src_am_version: "remotes/origin/qa/1.x"
+archivematica_src_ss_version: "remotes/origin/qa/0.x"
 
 # SS django environment variables
 # DJANGO_SECRET_KEY shall be changed for every install
