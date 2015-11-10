@@ -73,3 +73,12 @@
     - "amsrc-pipeline"
     - "amsrc-pipeline-websrv"
   when: archivematica_src_install_am == "yes"
+
+#
+# archivematica-devtools
+#
+
+- include: "am-devtools.yml"
+  tags:
+    - "amsrc-devtools"
+  when: archivematica_src_install_devtools == "yes"

@@ -1,0 +1,23 @@
+---
+
+# archivematica-devtools installer
+
+- name: "Install am-devtools package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items:
+    - "ruby-ronn"
+
+- name: "Checkout out am-devtools repository"
+  git:
+    repo: "https://github.com/artefactual/archivematica-devtools.git"
+    dest: "{{ archivematica_src_dir }}/archivematica-devtools"
+    version: "{{ archivematica_src_devtools_version }}"
+    force: "yes"
+
+- name: "Install am-devtools"
+  command: "make install"
+  args:
+    chdir: "{{ archivematica_src_dir }}/archivematica-devtools"
+  sudo: "yes"
