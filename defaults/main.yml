@@ -5,6 +5,8 @@ archivematica_src_dir: "{{ ansible_env.HOME }}"
 
 # The sampledata repository is big and not always necessary.
 archivematica_src_install_sample_data: "yes"
+archivematica_src_install_am: "yes"
+archivematica_src_install_ss: "yes"
 
 # Define the type of environment: "production" or "development". The latter
 # will deploy some extra stuff to make the development workflow easier.
