@@ -50,7 +50,6 @@
 
 - name: "Install bower dependencies"
   bower: path="{{ archivematica_src_dir }}/archivematica/src/dashboard/src/external/appraisal-tab/"
-  sudo: no
 
 
 - name: "Install archivematica-mcp-server package dependencies"
