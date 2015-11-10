@@ -102,6 +102,15 @@
     - "/usr/lib/archivematica"
   tags: am-src-ss-osconf
 
+- name: "Set owner, group, mode of /var/archivematica recursively"
+  file:
+    dest: "/var/archivematica"
+    state: "directory"
+    recurse: "yes"
+    owner: "archivematica"
+    group: "archivematica"
+    mode: "u=rwX,g=rwX,o=rX"
+
 - name: "Create archivematica-storage-service log directories"
   file:
     dest: "{{ item }}"
