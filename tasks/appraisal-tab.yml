@@ -1,0 +1,17 @@
+---
+- name: "Install appraisal tab package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items:
+     - "npm"
+
+- name: "Fix install path of node vs nodejs via symlink"
+  file: src=/usr/bin/nodejs dest=/usr/bin/node state=link
+
+- name: "Install bower"
+  npm: name=bower global=yes
+
+- name: "Install bower dependencies"
+  bower: path="{{ archivematica_src_dir }}/archivematica/src/dashboard/src/external/appraisal-tab/"
+  sudo: no

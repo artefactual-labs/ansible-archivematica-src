@@ -82,3 +82,12 @@
   tags:
     - "amsrc-devtools"
   when: archivematica_src_install_devtools == "yes"
+
+#
+# appraisal-tab
+#
+
+- include: "appraisal-tab.yml"
+  tags:
+    - "amsrc-appraisaltab"
+  when: archivematica_src_install_appraisaltab == "yes"

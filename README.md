@@ -15,6 +15,7 @@ Role Variables
 - `archivematica_src_install_ss`: install storage service (default: "yes")
 - `archivematica_src_install_sample_data`: copy sample data (default: "yes")
 - `archivematica_src_install_devtools`: install archivematica-devtools (default: "no")
+- `archivematica_src_install_appraisaltab`: install appraisal-tab (default: "no") (WIP)
 
 - `archivematica_src_dir`: location where the repos are cloned (default: ansible user home)
 
