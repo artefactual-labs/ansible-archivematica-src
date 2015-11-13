@@ -88,7 +88,7 @@
   command: "chmod -R 664 /var/archivematica/sharedDirectory"
 
 - name: "Set more permissions for /var/archivematica"
-  shell: "find -L /var/archivematica/ -type d  | sudo xargs -IF chmod u+rwx,g+rwxt,o-rwx F"
+  shell: "find -L /var/archivematica/ -print0 -type d  | sudo xargs -IF -0 chmod u+rwx,g+rwxt,o-rwx F"
 
 
 - name: "Create subdirectories for archivematica-mcp-client source files"
