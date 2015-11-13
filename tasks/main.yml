@@ -24,7 +24,7 @@
 - include: "archivematica-storage-service.yml"
   tags:
    - "amsrc-am-ss"
-
+  when: archivematica_src_install_ss == "yes"
 
 #
 # archivematica pipeline install
@@ -42,28 +42,52 @@
   tags:
     - "amsrc-pipeline"
     - "amsrc-pipeline-clonecode"
+  when: archivematica_src_install_am == "yes"
 
 - include: "pipeline-deps.yml"
   tags:
     - "amsrc-pipeline"
     - "amsrc-pipeline-deps"
+  when: archivematica_src_install_am == "yes"
 
 - include: "pipeline-osconf.yml"
   tags:
     - "amsrc-pipeline"
     - "amsrc-pipeline-osconf"
+  when: archivematica_src_install_am == "yes"
 
 - include: "pipeline-instcode.yml"
   tags:
     - "amsrc-pipeline"
     - "amsrc-pipeline-instcode"
+  when: archivematica_src_install_am == "yes"
 
 - include: "pipeline-dbconf.yml"
   tags:
     - "amsrc-pipeline"
     - "amsrc-pipeline-dbconf"
+  when: archivematica_src_install_am == "yes"
 
 - include: "pipeline-websrv.yml"
   tags:
     - "amsrc-pipeline"
     - "amsrc-pipeline-websrv"
+  when: archivematica_src_install_am == "yes"
+
+#
+# archivematica-devtools
+#
+
+- include: "am-devtools.yml"
+  tags:
+    - "amsrc-devtools"
+  when: archivematica_src_install_devtools == "yes"
+
+#
+# appraisal-tab
+#
+
+- include: "appraisal-tab.yml"
+  tags:
+    - "amsrc-appraisaltab"
+  when: archivematica_src_install_appraisaltab == "yes"

@@ -19,7 +19,7 @@
   git:
     repo: "https://github.com/artefactual/archivematica-storage-service.git"
     dest: "{{ archivematica_src_dir }}/archivematica-storage-service"
-    version: "{{ ssdev_version }}"
+    version: "{{ archivematica_src_ss_version }}"
     force: "yes"
   tags: am-src-ss-clone
 # For some reason, some dirs in the cloned source code
@@ -101,6 +101,15 @@
     - "/var/archivematica/storage-service"
     - "/usr/lib/archivematica"
   tags: am-src-ss-osconf
+
+- name: "Set owner, group, mode of /var/archivematica recursively"
+  file:
+    dest: "/var/archivematica"
+    state: "directory"
+    recurse: "yes"
+    owner: "archivematica"
+    group: "archivematica"
+    mode: "u=rwX,g=rwX,o=rX"
 
 - name: "Create archivematica-storage-service log directories"
   file:
@@ -235,5 +244,3 @@
     - "nginx"
     - "uwsgi"
   tags: am-src-ss-websrv
-
-  
