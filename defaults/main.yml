@@ -18,6 +18,7 @@ archivematica_src_environment_type: "production"
 archivematica_src_am_version: "remotes/origin/qa/1.x"
 archivematica_src_ss_version: "remotes/origin/qa/0.x"
 archivematica_src_devtools_version: "master"
+archivematica_src_automationtools_version: "master"
 
 # SS django environment variables
 # DJANGO_SECRET_KEY shall be changed for every install
