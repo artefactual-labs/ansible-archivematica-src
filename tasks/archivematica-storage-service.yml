@@ -175,6 +175,13 @@
 #   5- Database config
 ###########################################################
 
+- name: "Remove SS DB"
+  file:
+    state: "absent"
+    path: "{{ archivematica_src_ss_env_ss_db_name }}"
+  when: "archivematica_src_reset_ss_db"
+  tags: am-src-ss-db
+
 - name: "Run SS django database migrations"
   django_manage:
     command=migrate

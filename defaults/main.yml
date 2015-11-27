@@ -46,3 +46,5 @@ archivematica_src_reset_mcpdb: "false"
 archivematica_src_reset_shareddir: "false"
 # reset the MCP database and delete shared dir
 archivematica_src_reset_all: "false"
+# Reset the SS database
+archivematica_src_reset_ss_db: "false"
