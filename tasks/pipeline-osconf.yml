@@ -60,7 +60,7 @@
   file:
     dest: "/var/archivematica/sharedDirectory"
     state: "absent"
-  when: archivematica_src_reset_mcpdb
+  when: archivematica_src_reset_shareddir or archivematica_src_reset_all
 
 - name: "Create /var/archivematica/sharedDirectory"
   file:
