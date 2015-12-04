@@ -8,6 +8,10 @@
     state: "latest"
   with_items:
     - "ruby-ronn"
+    - "pkg-config"
+    - "graphviz"
+    - "libgraphviz-dev"
+    - "python-pygraphviz"
 
 - name: "Checkout out am-devtools repository"
   git:
