@@ -84,6 +84,17 @@
   when: archivematica_src_install_devtools == "yes"
 
 #
+# automation-tools
+#
+
+- include: "automation-tools.yml"
+  tags:
+    - "amsrc-automationtools"
+  when: archivematica_src_install_automationtools == "yes"
+
+
+
+#
 # appraisal-tab
 #
 
