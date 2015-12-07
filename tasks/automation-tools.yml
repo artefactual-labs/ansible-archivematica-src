@@ -13,4 +13,10 @@
   pip:
     chdir: "{{ archivematica_src_dir }}/automation-tools"
     requirements: "requirements.txt"
-    virtualenv: "{{ archivematica_src_dir }}/virtualenv/automation-tools"
+    virtualenv: "/usr/share/python/automation-tools"
+
+- name: "symlink automation-tools source to /usr/lib/archivematica"
+  file:
+    src: "{{ archivematica_src_dir }}/automation-tools"
+    dest: "/usr/lib/archivematica/automation-tools"
+    state: "link"

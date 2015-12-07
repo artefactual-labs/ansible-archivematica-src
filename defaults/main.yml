@@ -1,14 +1,19 @@
 ---
+# default values for role variables
+# playbook will use these defaults if not overriden in the playbook
+# (or host_vars, group_vars, etc)
 
-# TODO: comments
+
+# directory to install source code
 archivematica_src_dir: "{{ ansible_env.HOME }}"
 
-# The sampledata repository is big and not always necessary.
+# Components to install 
 archivematica_src_install_sample_data: "yes"
 archivematica_src_install_am: "yes"
 archivematica_src_install_ss: "yes"
 archivematica_src_install_devtools: "no"
 archivematica_src_install_appraisaltab: "no"
+archivematica_src_install_automationtools: "no"
 
 # Define the type of environment: "production" or "development". The latter
 # will deploy some extra stuff to make the development workflow easier.
