@@ -34,5 +34,9 @@ archivematica_src_ss_env_ss_db_name: "/var/archivematica/storage-service/storage
 archivematica_src_ss_env_ss_db_password: ""
 archivematica_src_ss_env_ss_db_user: ""
 
-# reset the MCP database (CAUTION: if yes, will lose existing MCP database data)
+# reset the MCP database (CAUTION: if true, will lose existing MCP database data)
 archivematica_src_reset_mcpdb: "false"
+# delete the existing shared directory
+archivematica_src_reset_shareddir: "false"
+# reset the MCP database and delete shared dir
+archivematica_src_reset_all: "false"

@@ -7,13 +7,13 @@
   mysql_db:
     name: "MCP"
     state: "absent"
-  when: archivematica_src_reset_mcpdb
+  when: archivematica_src_reset_mcpdb or archivematica_src_reset_all
 
 - name: "Remove mysql_dev.complete file created by mysql_dev.sh"
   file:
     path: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.complete"
     state: "absent"
-  when: archivematica_src_reset_mcpdb
+  when: archivematica_src_reset_mcpdb or archivematica_src_reset_all
 
 ###########################################################
 #   5- Database config

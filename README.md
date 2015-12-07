@@ -24,6 +24,8 @@ Role Variables
 - `archivematica_src_devtools_version`: archivematica-devtools branch (tag or commit) to install (default: master)
 
 - `archivematica_src_reset_mcpdb`: set to true to re-create the MCP database (normally at runtime using `ansible-playbook` `--extra-vars` switch)
+- `archivematica_src_reset_shareddir`: set to true to re-create the shared directory (normally at runtime using `ansible-playbook` `--extra-vars` switch)
+- `archivematica_src_reset_all`: set to true to re-create the MCP db and shared directory (normally at runtime using `ansible-playbook` `--extra-vars` switch)
 
 Dependencies
 ------------
