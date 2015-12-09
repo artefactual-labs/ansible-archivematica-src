@@ -20,9 +20,7 @@ archivematica_src_ss_version: "remotes/origin/qa/0.x"
 archivematica_src_devtools_version: "master"
 
 # SS django environment variables
-# DJANGO_SECRET_KEY shall be changed for every install
-#     (override the value in the playboook, do not change here)
-archivematica_src_ss_env_django_secret_key: "CHANGE_ME_WITH_A_SECRET_KEY"
+#archivematica_src_ss_env_django_secret_key is created on-the-fly
 archivematica_src_ss_env_django_setings_module: "storage_service.settings.production"
 archivematica_src_ss_env_django_static_root: "/usr/lib/archivematica/storage-service/assets"
 archivematica_src_ss_env_email_host: "localhost"

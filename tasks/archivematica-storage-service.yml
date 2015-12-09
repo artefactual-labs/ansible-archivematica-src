@@ -135,6 +135,52 @@
 
 
 ###########################################################
+#   3.5 - django secret key set up
+###########################################################
+- name: "Check if uwsgi config file exists"
+  stat: "path=/etc/uwsgi/apps-enabled/storage.ini"
+  register: uwsgi_storage_ini
+  tags: amsrc-ss-key
+
+- name: "get key value from uwsgi settings file"
+  command: "sed -n -e 's/^[^#].*DJANGO_SECRET_KEY=//p' /etc/uwsgi/apps-enabled/storage.ini"
+  register: ss_key
+  when: uwsgi_storage_ini.stat.exists == True
+  tags: amsrc-ss-key
+
+- name: "determine if SS key is valid"
+  set_fact:
+      ss_key_valid : true
+  when: (uwsgi_storage_ini.stat.exists == true) and
+        ( ss_key.stdout|trim != '' ) and
+        ( ss_key.stdout|trim != 'CHANGE_ME_WITH_A_SECRET_KEY' ) and
+        ( ss_key.stdout|trim != '<replace-with-key>' )
+  tags: amsrc-ss-key
+
+- debug: msg="key is valid value is {{ ss_key.stdout }}"
+  when: ss_key_valid is defined
+  tags: amsrc-ss-key
+
+- debug: msg="key is INVALID value is {{ ss_key.stdout }}"
+  when: ss_key_valid is not defined
+  tags: amsrc-ss-key
+
+- local_action: "command rm -f /tmp/passwordfile"
+  tags: amsrc-ss-key
+
+- name: "create value for key"
+  set_fact:
+      archivematica_src_ss_env_django_secret_key : "{{ lookup('password', '/tmp/passwordfile chars=ascii_letters,digits length=32') }}"
+  when: ss_key_valid is not defined
+  tags: amsrc-ss-key
+
+- debug: msg="generated key is {{ archivematica_src_ss_env_django_secret_key }}"
+  when: ss_key_valid is not defined
+  tags: amsrc-ss-key
+
+
+
+###########################################################
 #   4- SS code install
 ###########################################################
 
