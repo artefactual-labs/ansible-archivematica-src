@@ -1,0 +1,22 @@
+---
+
+# automation-tools installer
+
+- name: "Checkout out automation tools repository"
+  git:
+    repo: "https://github.com/artefactual/automation-tools.git"
+    dest: "{{ archivematica_src_dir }}/automation-tools"
+    version: "{{ archivematica_src_automationtools_version }}"
+    force: "yes"
+
+- name: "Install pip dependencies in virtualenv"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/automation-tools"
+    requirements: "requirements.txt"
+    virtualenv: "/usr/share/python/automation-tools"
+
+- name: "symlink automation-tools source to /usr/lib/archivematica"
+  file:
+    src: "{{ archivematica_src_dir }}/automation-tools"
+    dest: "/usr/lib/archivematica/automation-tools"
+    state: "link"
