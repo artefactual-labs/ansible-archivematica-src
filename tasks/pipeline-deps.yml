@@ -99,6 +99,15 @@
     - "uuid"
 
 
+- name: "MoMA specific dependencies"
+  apt:
+    pkg: "{{item}}"
+    state: "latest"
+  with_items:
+    - "libsasl2-dev"
+    - "python-dev"
+    - "libldap2-dev"
+    - "libssl-dev"
 
 # Have found that installation often stalls in freshclam
 # Will download signatures from our repo to try to avoid this
