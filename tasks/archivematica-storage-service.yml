@@ -87,6 +87,7 @@
     requirements: "requirements.txt"
     virtualenv: "/usr/share/python/archivematica-storage-service"
     extra_args: "--find-links lib"
+    state: latest
   tags: am-src-ss-pydep
 
 ###########################################################
