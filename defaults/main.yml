@@ -7,7 +7,7 @@
 # directory to install source code
 archivematica_src_dir: "{{ ansible_env.HOME }}"
 
-# Components to install 
+# Components to install
 archivematica_src_install_sample_data: "yes"
 archivematica_src_install_am: "yes"
 archivematica_src_install_ss: "yes"
@@ -44,7 +44,7 @@ archivematica_src_ss_env_ss_db_user: ""
 archivematica_src_reset_mcpdb: "false"
 # delete the existing shared directory
 archivematica_src_reset_shareddir: "false"
-# reset the MCP database and delete shared dir
-archivematica_src_reset_all: "false"
 # Reset the SS database
 archivematica_src_reset_ss_db: "false"
+# reset the MCP database, SS database and delete shared dir (if true, it overrides all the above reset vars)
+archivematica_src_reset_all: "false"
