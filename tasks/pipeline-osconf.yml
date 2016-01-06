@@ -56,11 +56,11 @@
   with_items:
     - "/var/log/archivematica/MCPServer"
 
-- name: "Clear /var/archivematica/sharedDirectory on DB reset"
+- name: "Clear /var/archivematica/sharedDirectory"
   file:
     dest: "/var/archivematica/sharedDirectory"
     state: "absent"
-  when: archivematica_src_reset_shareddir or archivematica_src_reset_all
+  when: archivematica_src_reset_shareddir or archivematica_src_reset_am_all
 
 - name: "Create /var/archivematica/sharedDirectory"
   file:

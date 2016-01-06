@@ -44,7 +44,8 @@ archivematica_src_ss_env_ss_db_user: ""
 archivematica_src_reset_mcpdb: "false"
 # delete the existing shared directory
 archivematica_src_reset_shareddir: "false"
+# reset the AM database (MCP), and delete AM shared dir (if true, it overrides the two reset vars above)
+archivematica_src_reset_am_all: "false"
+
 # Reset the SS database
 archivematica_src_reset_ss_db: "false"
-# reset the MCP database, SS database and delete shared dir (if true, it overrides all the above reset vars)
-archivematica_src_reset_all: "false"
