@@ -53,3 +53,9 @@ archivematica_src_reset_ss_db: "false"
 ## backwards compatibility
 # run SS manage.py syncdb before migrate (for stable/0.7.x and previous branches that use Django 1.5.x)
 archivematica_src_ss_run_syncdb: "false"
+# workaround to install missing SS pip dependencies in old SS branches
+# (some old branches of SS such as qa/0.7.2 commented out some dependencies
+#  in the requirements file and installed in the debian postinst
+#  to work around launchpad building issues)
+# this flag works around such workaround :-) by running a separate pip install for these deps
+archivematica_src_ss_pip_missing_deps: "false"

@@ -3,6 +3,10 @@ archivematica-src
 
 Full Archivematica installation from its source code repositories.
 
+Note that the role currently does not handle database migrations completely.
+Do not use to upgrade production systems with old versions of Archivematica or
+the Storage Service (unless you know what you are doing).
+
 Requirements
 ------------
 
