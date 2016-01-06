@@ -1,19 +1,19 @@
 
 ###########################################################
-#   5- Database reset (when archivematica_src_reset_MCPdb: "yes")
+#   5- Database reset (when flag enabled)
 ###########################################################
 
 - name: "Drop MCP database"
   mysql_db:
     name: "MCP"
     state: "absent"
-  when: archivematica_src_reset_mcpdb or archivematica_src_reset_all
+  when: archivematica_src_reset_mcpdb or archivematica_src_reset_am_all
 
 - name: "Remove mysql_dev.complete file created by mysql_dev.sh"
   file:
     path: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.complete"
     state: "absent"
-  when: archivematica_src_reset_mcpdb or archivematica_src_reset_all
+  when: archivematica_src_reset_mcpdb or archivematica_src_reset_am_all
 
 ###########################################################
 #   5- Database config

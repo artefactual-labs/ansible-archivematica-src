@@ -27,7 +27,9 @@ Role Variables
 
 - `archivematica_src_reset_mcpdb`: set to true to re-create the MCP database (normally at runtime using `ansible-playbook` `--extra-vars` switch)
 - `archivematica_src_reset_shareddir`: set to true to re-create the shared directory (normally at runtime using `ansible-playbook` `--extra-vars` switch)
-- `archivematica_src_reset_all`: set to true to re-create the MCP db and shared directory (normally at runtime using `ansible-playbook` `--extra-vars` switch)
+- `archivematica_src_reset_am_all`: set to true to re-create the MCP db and shared directory (normally at runtime using `ansible-playbook` `--extra-vars` switch). If true, it overrides the two vars above.
+- `archivematica_src_reset_ss_db`: set to true to re-create the SS database (normally at runtime using `ansible-playbook` `--extra-vars` switch)
+
 
 Dependencies
 ------------
