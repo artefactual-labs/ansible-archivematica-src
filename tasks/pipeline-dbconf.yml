@@ -7,13 +7,13 @@
   mysql_db:
     name: "MCP"
     state: "absent"
-  when: archivematica_src_reset_mcpdb or archivematica_src_reset_am_all
+  when: archivematica_src_reset_mcpdb|bool or archivematica_src_reset_am_all|bool
 
 - name: "Remove mysql_dev.complete file created by mysql_dev.sh"
   file:
     path: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.complete"
     state: "absent"
-  when: archivematica_src_reset_mcpdb or archivematica_src_reset_am_all
+  when: archivematica_src_reset_mcpdb|bool or archivematica_src_reset_am_all|bool
 
 ###########################################################
 #   5- Database config
@@ -40,25 +40,45 @@
     priv: "MCP.*:ALL"
     state: "present"
 
-- name: "Initialize database MCP"
+- name: "Check if mysql_dev exists"
+  stat:
+    path: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.sh"
+  register: "mysql_dev_sh_check"
+
+- name: "Set migrations path"
+  set_fact:
+    archivematica_src_am_pre_migration: "{{mysql_dev_sh_check.stat.exists}}"
+
+# mysql-dev migrations
+- name: "Load MySQL seed file"
   mysql_db:
     name: "MCP"
     state: "import"
     target: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql"
-  when: "createdb_result|changed"
+  when: "createdb_result|changed and archivematica_src_am_pre_migration|bool"
 
-# TODO: Does this need to run as root or user archivematica ??
-- name: "Invoke django syncdb"
+- name: "Run syncdb"
   django_manage:
     command: "syncdb"
     app_path: "/usr/share/archivematica/dashboard/"
     settings: "settings.common"
     pythonpath: "/usr/lib/archivematica/archivematicaCommon"
   tags: amsrc-pipeline-dbconf-syncdb
-
+  when: archivematica_src_am_pre_migration|bool
 
 - name: "Call mysql_dev script"
   command: "./mysql_dev.sh MCP"
   args:
     chdir: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/"
     creates: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.complete"
+  when: archivematica_src_am_pre_migration|bool
+
+# Django migrations
+- name: "Run migrations"
+  django_manage:
+    command: "migrate"
+    app_path: "/usr/share/archivematica/dashboard/"
+    settings: "settings.common"
+    pythonpath: "/usr/lib/archivematica/archivematicaCommon"
+  tags: amsrc-pipeline-dbconf-syncdb
+  when: not archivematica_src_am_pre_migration|bool
