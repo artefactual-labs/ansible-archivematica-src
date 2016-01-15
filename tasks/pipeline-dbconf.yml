@@ -40,17 +40,17 @@
     priv: "MCP.*:ALL"
     state: "present"
 
-- name: "Initialize database MCP"
+- name: "Load MySQL seed file"
   mysql_db:
     name: "MCP"
     state: "import"
     target: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql"
-  when: "createdb_result|changed"
+  when: "createdb_result|changed and archivematica_src_pre_migration|bool"
 
 # TODO: Does this need to run as root or user archivematica ??
-- name: "Invoke django syncdb"
+- name: "Run migrations"
   django_manage:
-    command: "syncdb"
+    command: "migrate"
     app_path: "/usr/share/archivematica/dashboard/"
     settings: "settings.common"
 
@@ -59,3 +59,4 @@
   args:
     chdir: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/"
     creates: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.complete"
+  when: "archivematica_src_pre_migration"

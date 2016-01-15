@@ -33,6 +33,7 @@ Role Variables
 - `archivematica_src_reset_shareddir`: set to true to re-create the shared directory (normally at runtime using `ansible-playbook` `--extra-vars` switch)
 - `archivematica_src_reset_am_all`: set to true to re-create the MCP db and shared directory (normally at runtime using `ansible-playbook` `--extra-vars` switch). If true, it overrides the two vars above.
 - `archivematica_src_reset_ss_db`: set to true to re-create the SS database (normally at runtime using `ansible-playbook` `--extra-vars` switch)
+- `archivematica_src_pre_migration`: set to true to load the mysql seed file and run mysql_dev scripts instead of Django migrations
 
 - `archivematica_src_ss_run_syncdb`: run SS manage.py syncdb before migrate (for stable/0.7.x and previous branches that use Django 1.5.x) (default: false)
 - `archivematica_src_ss_pip_missing_deps`:  workaround to install missing SS pip dependencies in old SS branches (default: false)
