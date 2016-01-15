@@ -3,6 +3,10 @@ archivematica-src
 
 Full Archivematica installation from its source code repositories.
 
+Note that the role currently does not handle database migrations completely.
+Do not use to upgrade production systems with old versions of Archivematica or
+the Storage Service (unless you know what you are doing).
+
 Requirements
 ------------
 
@@ -30,6 +34,8 @@ Role Variables
 - `archivematica_src_reset_am_all`: set to true to re-create the MCP db and shared directory (normally at runtime using `ansible-playbook` `--extra-vars` switch). If true, it overrides the two vars above.
 - `archivematica_src_reset_ss_db`: set to true to re-create the SS database (normally at runtime using `ansible-playbook` `--extra-vars` switch)
 
+- `archivematica_src_ss_run_syncdb`: run SS manage.py syncdb before migrate (for stable/0.7.x and previous branches that use Django 1.5.x) (default: false)
+- `archivematica_src_ss_pip_missing_deps`:  workaround to install missing SS pip dependencies in old SS branches (default: false)
 
 Dependencies
 ------------
