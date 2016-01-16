@@ -52,7 +52,7 @@
   with_items:
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql"
       dest: "/usr/share/dbconfig-common/data/archivematica-mcp-server/install/mysql"
-  when: "archivematica_src_pre_migration"
+  when: "archivematica_src_am_pre_migration"
 
 - name: "Copy archivematica-mcp-client source files"
   file: src={{ item.src }} dest={{ item.dest }} state=link

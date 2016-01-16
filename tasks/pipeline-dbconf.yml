@@ -45,7 +45,7 @@
     name: "MCP"
     state: "import"
     target: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql"
-  when: "createdb_result|changed and archivematica_src_pre_migration|bool"
+  when: "createdb_result|changed and archivematica_src_am_pre_migration|bool"
 
 # TODO: Does this need to run as root or user archivematica ??
 - name: "Run migrations"
@@ -59,4 +59,4 @@
   args:
     chdir: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/"
     creates: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.complete"
-  when: "archivematica_src_pre_migration"
+  when: "archivematica_src_am_pre_migration"
