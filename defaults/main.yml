@@ -5,7 +5,7 @@
 
 
 # directory to install source code
-archivematica_src_dir: "{{ ansible_env.HOME }}"
+archivematica_src_dir: "/opt/archivematica"
 
 # Components to install
 archivematica_src_install_sample_data: "yes"
