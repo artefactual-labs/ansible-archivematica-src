@@ -38,8 +38,6 @@
     dest: "{{ item.dest }}"
     state: "link"
   with_items:
-    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/etc"
-      dest: "/etc/archivematica/MCPServer"
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/lib"
       dest: "/usr/lib/archivematica/MCPServer"
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share"
@@ -48,6 +46,11 @@
       dest: "/usr/share/dbconfig-common/data/archivematica-mcp-server/install/mysql"
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/init/archivematica-mcp-server.conf"
       dest: "/etc/init/archivematica-mcp-server.conf"
+
+- name: "template MCPServer /etc config"
+  template:
+    src: "etc_archivematica_MCPServer_serverConfig.conf.j2"
+    dest: "/etc/archivematica/MCPServer/serverConfig.conf"
 
 
 - name: "Copy archivematica-mcp-client source files"
