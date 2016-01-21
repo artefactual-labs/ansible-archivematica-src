@@ -23,7 +23,7 @@
 
 - include: "archivematica-storage-service.yml"
   tags:
-   - "amsrc-am-ss"
+   - "amsrc-ss"
   when: archivematica_src_install_ss == "yes"
 
 #
