@@ -21,7 +21,7 @@
     dest: "{{ archivematica_src_dir }}/archivematica-storage-service"
     version: "{{ archivematica_src_ss_version }}"
     force: "yes"
-  tags: am-src-ss-clone
+  tags: amsrc-ss-clone
 # For some reason, some dirs in the cloned source code
 # are not sometimes readable by all. Add a task to fix it
 # For some other reason this task does not always work
@@ -33,18 +33,18 @@
     mode: "o+rX"
     recurse: "yes"
   become: "yes"
-  tags: am-src-ss-clone
+  tags: amsrc-ss-clone
 
 - name: "Get archivematica-storage-service latest commit hash"
   command: "git rev-parse HEAD"
   args:
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
   register: "latest_commit_ss"
-  tags: am-src-ss-clone
+  tags: amsrc-ss-clone
 
 - name: "Save Archivematica Storage Service latest commit hash"
   shell: "echo {{ latest_commit_ss.stdout }} > {{ archivematica_src_dir }}/archivematica-storage-service-commit.txt"
-  tags: am-src-ss-clone
+  tags: amsrc-ss-clone
 # TODO: Make use of latest_commit_ss
 
 ###########################################################
@@ -61,7 +61,7 @@
     - "unar"
     - "uwsgi"
     - "uwsgi-plugin-python"
-  tags: am-src-ss-osdep
+  tags: amsrc-ss-osdep
 
 - name: "Install archivematica-storage-service additional package dependencies"
   apt:
@@ -75,7 +75,7 @@
     - "libz-dev"
     - "libffi-dev"
     - "libssl-dev"
-  tags: am-src-ss-osdep
+  tags: amsrc-ss-osdep
 
 ###########################################################
 #   2- python dependencies (pip packages)
@@ -88,7 +88,7 @@
     virtualenv: "/usr/share/python/archivematica-storage-service"
     extra_args: "--find-links lib"
     state: "latest"
-  tags: "am-src-ss-pydep"
+  tags: "amsrc-ss-pydep"
 
 - name: "Work around to install pip deps commented out in old SS branches"
   pip:
@@ -105,7 +105,7 @@
     - "ndg-httpsclient"
     - "pyasn1"
   when: "archivematica_src_ss_pip_missing_deps"
-  tags: "am-src-ss-pydep"
+  tags: "amsrc-ss-pydep"
 
 
 ###########################################################
@@ -119,7 +119,7 @@
   with_items:
     - "/var/archivematica/storage-service"
     - "/usr/lib/archivematica"
-  tags: am-src-ss-osconf
+  tags: amsrc-ss-osconf
 
 - name: "Set owner, group, mode of /var/archivematica recursively"
   file:
@@ -129,6 +129,8 @@
     owner: "archivematica"
     group: "archivematica"
     mode: "u=rwX,g=rwX,o=rX"
+  tags: amsrc-ss-osconf
+
 
 - name: "Create archivematica-storage-service log directories"
   file:
@@ -139,7 +141,7 @@
     mode: "g+s"
   with_items:
     - "/var/log/archivematica/storage-service"
-  tags: am-src-ss-osconf
+  tags: amsrc-ss-osconf
 
 - name: "Touch SS log files"
   file:
@@ -150,7 +152,7 @@
   with_items:
     - "storage_service.log"
     - "storage_service_debug.log"
-  tags: am-src-ss-osconf
+  tags: amsrc-ss-osconf
 
 
 ###########################################################
@@ -167,7 +169,7 @@
   with_items:
     - src: "{{ archivematica_src_dir }}/archivematica-storage-service/storage_service"
       dest: "/usr/lib/archivematica/storage-service"
-  tags: am-src-ss-code
+  tags: amsrc-ss-code
 
 - name: "Run SS django collectstatic"
   django_manage:
@@ -186,7 +188,7 @@
       SS_DB_NAME: "{{ archivematica_src_ss_env_ss_db_name }}"
       SS_DB_PASSWORD: "{{ archivematica_src_ss_env_ss_db_password }}"
       SS_DB_USER: "{{ archivematica_src_ss_env_ss_db_user }}"
-  tags: am-src-ss-code
+  tags: amsrc-ss-code
 
 
 ###########################################################
@@ -198,7 +200,7 @@
     state: "absent"
     path: "{{ archivematica_src_ss_env_ss_db_name }}"
   when: archivematica_src_reset_ss_db
-  tags: am-src-ss-db
+  tags: amsrc-ss-db
 
 - name: "Run SS django manage syncdb"
   django_manage:
@@ -218,7 +220,7 @@
       SS_DB_PASSWORD: "{{ archivematica_src_ss_env_ss_db_password }}"
       SS_DB_USER: "{{ archivematica_src_ss_env_ss_db_user }}"
   when: archivematica_src_ss_run_syncdb
-  tags: am-src-ss-db
+  tags: amsrc-ss-db
 
 - name: "Run SS django database migrations"
   django_manage:
@@ -237,7 +239,7 @@
       SS_DB_NAME: "{{ archivematica_src_ss_env_ss_db_name }}"
       SS_DB_PASSWORD: "{{ archivematica_src_ss_env_ss_db_password }}"
       SS_DB_USER: "{{ archivematica_src_ss_env_ss_db_user }}"
-  tags: am-src-ss-db
+  tags: amsrc-ss-db
 
 
 ###########################################################
@@ -248,13 +250,13 @@
   template:
     src: "etc_nginx_sites_storage.conf.j2"
     dest: "/etc/nginx/sites-available/storage.conf"
-  tags: am-src-ss-websrv
+  tags: amsrc-ss-websrv
 
 - name: "set uwsgi apps-available config file"
   template:
     src: "etc_uwsgi_apps_storage.ini.j2"
     dest: "/etc/uwsgi/apps-available/storage.ini"
-  tags: am-src-ss-websrv
+  tags: amsrc-ss-websrv
 
 - name: "Remove Nginx default server"
   file:
@@ -265,21 +267,21 @@
     - "/etc/nginx/sites-available/default.conf"
     - "/etc/nginx/sites-enabled/default"
     - "/etc/nginx/sites-enabled/default.conf"
-  tags: am-src-ss-websrv
+  tags: amsrc-ss-websrv
 
 - name: "Set up Nginx server"
   file:
     src: "/etc/nginx/sites-available/storage.conf"
     dest: "/etc/nginx/sites-enabled/storage.conf"
     state: "link"
-  tags: am-src-ss-websrv
+  tags: amsrc-ss-websrv
 
 - name: "Set up uWSGI server"
   file:
     src: "/etc/uwsgi/apps-available/storage.ini"
     dest: "/etc/uwsgi/apps-enabled/storage.ini"
     state: "link"
-  tags: am-src-ss-websrv
+  tags: amsrc-ss-websrv
 
 - name: "Enable services"
   service:
@@ -289,4 +291,4 @@
   with_items:
     - "nginx"
     - "uwsgi"
-  tags: am-src-ss-websrv
+  tags: amsrc-ss-websrv
