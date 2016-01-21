@@ -4,20 +4,23 @@
 #   4- Code install
 ###########################################################
 
-- name: "Copy archivematica-common source files"
+- name: "symlink archivematica-common source files"
   file:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     state: "link"
   with_items:
-    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/etc"
-      dest: "/etc/archivematica/archivematicaCommon"
     - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/lib"
       dest: "/usr/lib/archivematica/archivematicaCommon"
     - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements.txt"
       dest: "/usr/share/archivematica/archivematicaCommon/requirements.txt"
     - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements"
       dest: "/usr/share/archivematica/archivematicaCommon/requirements"
+
+- name: "template archivematica-common /etc config"
+  template:
+    src: "etc_archivematica_archivematicaCommon_dbsettings.j2"
+    dest: "/etc/archivematica/archivematicaCommon/dbsettings"
 
 - name: "Copy archivematica-dashboard source files"
   file:
