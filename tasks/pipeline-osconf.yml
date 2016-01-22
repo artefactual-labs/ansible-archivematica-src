@@ -88,10 +88,14 @@
     group: "archivematica"
 
 - name: "Set permissions for /var/archivematica"
-  command: "chmod -R g+s /var/archivematica/"
+  file:
+    path: "/var/archivematica/"
+    mode: "g+s"
 
 - name: "Set permissions for /var/archivematica/sharedDirectory"
-  command: "chmod -R 664 /var/archivematica/sharedDirectory"
+  file:
+    path: "/var/archivematica/sharedDirectory"
+    mode: 0664
 
 - name: "Set more permissions for /var/archivematica"
   shell: "find -L /var/archivematica/ -print0 -type d  | sudo xargs -IF -0 chmod u+rwx,g+rwxt,o-rwx F"
