@@ -46,7 +46,7 @@
     - "/usr/share/dbconfig-common/data/archivematica-mcp-server/upgrade/mysql/"
 
 
-- name: "Create archivemaitca-mcp-server log directories"
+- name: "Create archivematica-mcp-server log directories"
   file:
     dest: "{{ item }}"
     state: "directory"
