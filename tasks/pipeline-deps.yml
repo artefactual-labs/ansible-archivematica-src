@@ -6,7 +6,7 @@
 ###########################################################
 
 - name: "Add multiverse repositories"
-  sudo: "yes"
+  become: "yes"
   apt_repository:
     repo: "{{ item }}"
     state: "present"
@@ -137,7 +137,7 @@
   when: clamav_download
 - name: "Copy clamav signatures to /var/lib/clamav"
   command: cp /tmp/clamav-files/{{ item }} /var/lib/clamav/
-  sudo: yes
+  become: yes
   with_items:
     - bytecode.cvd
     - daily.cvd

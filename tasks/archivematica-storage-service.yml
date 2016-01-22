@@ -32,7 +32,7 @@
     path: "{{ archivematica_src_dir }}/archivematica-storage-service"
     mode: "o+rX"
     recurse: "yes"
-  sudo: "yes"
+  become: "yes"
   tags: am-src-ss-clone
 
 - name: "Get archivematica-storage-service latest commit hash"

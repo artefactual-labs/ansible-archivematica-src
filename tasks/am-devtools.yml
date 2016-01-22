@@ -24,4 +24,4 @@
   command: "make install"
   args:
     chdir: "{{ archivematica_src_dir }}/archivematica-devtools"
-  sudo: "yes"
+  become: "yes"
