@@ -48,4 +48,4 @@
     dest: "~/archivematica-sampledata"
     update: "no"
   when: "archivematica_src_install_sample_data|bool"
-  sudo: "no"
+  become: "no"

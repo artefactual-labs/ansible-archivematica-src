@@ -14,4 +14,4 @@
 
 - name: "Install bower dependencies"
   bower: path="{{ archivematica_src_dir }}/archivematica/src/dashboard/src/external/appraisal-tab/"
-  sudo: no
+  become: "no"
