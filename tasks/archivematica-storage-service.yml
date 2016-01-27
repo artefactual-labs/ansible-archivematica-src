@@ -177,7 +177,7 @@
     app_path=/usr/lib/archivematica/storage-service
     virtualenv=/usr/share/python/archivematica-storage-service
   environment:
-      DJANGO_SECRET_KEY: "{{ archivematica_src_ss_django_secret_key }}"
+      DJANGO_SECRET_KEY: "{{ archivematica_src_ss_env_django_secret_key }}"
       DJANGO_SETTINGS_MODULE: "{{ archivematica_src_ss_env_django_setings_module }}"
       DJANGO_STATIC_ROOT: "{{ archivematica_src_ss_env_django_static_root }}"
       EMAIL_HOST: "{{ archivematica_src_ss_env_email_host }}"
@@ -208,7 +208,7 @@
     app_path=/usr/lib/archivematica/storage-service
     virtualenv=/usr/share/python/archivematica-storage-service
   environment:
-      DJANGO_SECRET_KEY: "{{ archivematica_src_ss_django_secret_key }}"
+      DJANGO_SECRET_KEY: "{{ archivematica_src_ss_env_django_secret_key }}"
       DJANGO_SETTINGS_MODULE: "{{ archivematica_src_ss_env_django_setings_module }}"
       DJANGO_STATIC_ROOT: "{{ archivematica_src_ss_env_django_static_root }}"
       EMAIL_HOST: "{{ archivematica_src_ss_env_email_host }}"
@@ -228,7 +228,7 @@
     app_path=/usr/lib/archivematica/storage-service
     virtualenv=/usr/share/python/archivematica-storage-service
   environment:
-      DJANGO_SECRET_KEY: "{{ archivematica_src_ss_django_secret_key }}"
+      DJANGO_SECRET_KEY: "{{ archivematica_src_ss_env_django_secret_key }}"
       DJANGO_SETTINGS_MODULE: "{{ archivematica_src_ss_env_django_setings_module }}"
       DJANGO_STATIC_ROOT: "{{ archivematica_src_ss_env_django_static_root }}"
       EMAIL_HOST: "{{ archivematica_src_ss_env_email_host }}"
