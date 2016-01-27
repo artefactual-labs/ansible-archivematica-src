@@ -51,8 +51,13 @@ archivematica_src_reset_am_all: "false"
 archivematica_src_reset_ss_db: "false"
 
 ## backwards compatibility
+
+# set to true to load the mysql seed file and run mysql_dev scripts instead of Django migrations
+archivematica_src_am_pre_migration: "true"
+
 # run SS manage.py syncdb before migrate (for stable/0.7.x and previous branches that use Django 1.5.x)
 archivematica_src_ss_run_syncdb: "false"
+
 # workaround to install missing SS pip dependencies in old SS branches
 # (some old branches of SS such as qa/0.7.2 commented out some dependencies
 #  in the requirements file and installed in the debian postinst

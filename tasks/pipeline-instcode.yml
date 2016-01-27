@@ -41,11 +41,18 @@
       dest: "/usr/lib/archivematica/MCPServer"
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share"
       dest: "/usr/share/archivematica/MCPServer"
-    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql"
-      dest: "/usr/share/dbconfig-common/data/archivematica-mcp-server/install/mysql"
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/init/archivematica-mcp-server.conf"
       dest: "/etc/init/archivematica-mcp-server.conf"
 
+- name: "Copy legacy archivematica-mcp-server source files"
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: "link"
+  with_items:
+    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql"
+      dest: "/usr/share/dbconfig-common/data/archivematica-mcp-server/install/mysql"
+  when: "archivematica_src_am_pre_migration"
 
 - name: "Copy archivematica-mcp-client source files"
   file: src={{ item.src }} dest={{ item.dest }} state=link
