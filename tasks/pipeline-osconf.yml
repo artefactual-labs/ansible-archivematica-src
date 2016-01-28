@@ -19,7 +19,7 @@
     state: "directory"
   with_items:
     - "/usr/lib/archivematica"
-    - "/etc/archivematica"
+    - "/etc/archivematica/archivematicaCommon"
     - "/usr/share/archivematica/archivematicaCommon"
 
 
@@ -39,7 +39,7 @@
     dest: "{{ item }}"
     state: "directory"
   with_items:
-    - "/etc/archivematica"
+    - "/etc/archivematica/MCPServer"
     - "/usr/lib/archivematica"
     - "/usr/share/archivematica"
     - "/usr/share/dbconfig-common/data/archivematica-mcp-server/install/"
@@ -106,7 +106,7 @@
     dest: "{{ item }}"
     state: "directory"
   with_items:
-    - "/etc/archivematica"
+    - "/etc/archivematica/MCPClient"
     - "/usr/lib/archivematica"
 
 

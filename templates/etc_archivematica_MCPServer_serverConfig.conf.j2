@@ -1,0 +1,22 @@
+#!/bin/bash
+
+[MCPServer]
+MCPArchivematicaServer  =  localhost:4730
+GearmanServerWorker = localhost:4730
+watchDirectoryPath  =  /var/archivematica/sharedDirectory/watchedDirectories/
+sharedDirectory  =  /var/archivematica/sharedDirectory/
+processingDirectory  =  /var/archivematica/sharedDirectory/currentlyProcessing/
+rejectedDirectory  =  %%sharedPath%%rejected/
+watchDirectoriesPollInterval = 1
+processingXMLFile = processingMCP.xml
+waitOnAutoApprove = 0
+
+[Protocol]
+#separates Values when transported from client to server
+delimiter = <!&\delimiter/&!>
+
+#--Gearman--
+limitGearmanConnections = 10000
+limitTaskThreads = 75
+limitTaskThreadsSleep = 0.2
+reservedAsTaskProcessingThreads = 8

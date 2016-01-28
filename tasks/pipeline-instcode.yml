@@ -4,20 +4,23 @@
 #   4- Code install
 ###########################################################
 
-- name: "Copy archivematica-common source files"
+- name: "symlink archivematica-common source files"
   file:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     state: "link"
   with_items:
-    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/etc"
-      dest: "/etc/archivematica/archivematicaCommon"
     - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/lib"
       dest: "/usr/lib/archivematica/archivematicaCommon"
     - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements.txt"
       dest: "/usr/share/archivematica/archivematicaCommon/requirements.txt"
     - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements"
       dest: "/usr/share/archivematica/archivematicaCommon/requirements"
+
+- name: "template archivematica-common /etc config"
+  template:
+    src: "etc_archivematica_archivematicaCommon_dbsettings.j2"
+    dest: "/etc/archivematica/archivematicaCommon/dbsettings"
 
 - name: "Copy archivematica-dashboard source files"
   file:
@@ -35,8 +38,6 @@
     dest: "{{ item.dest }}"
     state: "link"
   with_items:
-    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/etc"
-      dest: "/etc/archivematica/MCPServer"
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/lib"
       dest: "/usr/lib/archivematica/MCPServer"
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share"
@@ -46,18 +47,28 @@
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/init/archivematica-mcp-server.conf"
       dest: "/etc/init/archivematica-mcp-server.conf"
 
+- name: "template MCPServer /etc config"
+  template:
+    src: "etc_archivematica_MCPServer_serverConfig.conf.j2"
+    dest: "/etc/archivematica/MCPServer/serverConfig.conf"
 
 - name: "Copy archivematica-mcp-client source files"
   file: src={{ item.src }} dest={{ item.dest }} state=link
   with_items:
-    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/etc"
-      dest: "/etc/archivematica/MCPClient"
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/lib/"
       dest: "/usr/lib/archivematica/MCPClient"
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/init/archivematica-mcp-client.conf"
       dest: "/etc/init/archivematica-mcp-client.conf"
 
+- name: "template MCPClient /etc config"
+  template:
+    src: "etc_archivematica_MCPClient_clientConfig.conf.j2"
+    dest: "/etc/archivematica/MCPClient/clientConfig.conf"
 
+- name: "move archivematicaClientModules to /usr/lib/archivematica/MCPClient"
+  command: "mv {{ archivematica_src_dir }}/archivematica/src/MCPClient/etc/archivematicaClientModules /usr/lib/archivematica/MCPClient/"
+  args:
+    creates: "/usr/lib/archivematica/MCPClient/archivematicaClientModules"
 
 - name: "Copy archivematica-mcp-server init service"
   file:

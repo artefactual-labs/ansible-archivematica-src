@@ -53,6 +53,9 @@
     command: "syncdb"
     app_path: "/usr/share/archivematica/dashboard/"
     settings: "settings.common"
+    pythonpath: "/usr/lib/archivematica/archivematicaCommon"
+  tags: amsrc-pipeline-dbconf-syncdb
+
 
 - name: "Call mysql_dev script"
   command: "./mysql_dev.sh MCP"
