@@ -18,67 +18,25 @@
   apt:
     pkg: "{{ item }}"
     state: "latest"
-  with_items:
-    - "python"
-    - "python-pip"
-    - "libmysqlclient-dev"
+  with_items: "{{ archivematica_src_am_common_pkgdeps }}"
 
 - name: "Install archivematica-dashboard package dependencies"
   apt:
     pkg: "{{ item }}"
     state: "latest"
-  with_items:
-    - "apache2-mpm-prefork"
-    - "libapache2-mod-wsgi"
-    - "python-pip"
+  with_items: "{{ archivematica_src_am_dashboard_pkgdeps }}"
 
 - name: "Install archivematica-mcp-server package dependencies"
   apt:
     pkg: "{{ item }}"
     state: "latest"
-  with_items:
-    - "dbconfig-common"
-    - "logapp"
-    - "uuid"
+  with_items: "{{ archivematica_src_am_mcpserver_pkgdeps }}"
 
 - name: "Install archivematica-mcp-client package dependencies"
   apt:
     pkg: "{{ item }}"
     state: "latest"
-  with_items:
-    - "atool"
-    - "bagit"
-    - "bulk-extractor"
-    - "clamav"
-    - "clamav-daemon"
-    - "ffmpeg"
-    - "fits"
-    - "gearman"
-    - "imagemagick"
-    - "inkscape"
-    - "jhove"
-    - "libimage-exiftool-perl"
-    - "libxml2-utils"
-    - "logapp"
-    - "md5deep"
-    - "mediainfo"
-    - "nfs-common"
-    - "openjdk-7-jre-headless"
-    - "p7zip-full"
-    - "pbzip2"
-    - "postfix"
-    - "python-fido"
-    - "readpst"
-    - "rsync"
-    - "siegfried"
-    - "sleuthkit"
-    - "tesseract-ocr"
-    - "tika"
-    - "tree"
-    - "ufraw"
-    - "unrar-free"
-    - "uuid"
-
+  with_items: "{{ archivematica_src_am_mcpclient_pkgdeps }}"
 
 # Have found that installation often stalls in freshclam
 # Will download signatures from our repo to try to avoid this

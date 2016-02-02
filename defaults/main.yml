@@ -59,3 +59,9 @@ archivematica_src_ss_run_syncdb: "false"
 #  to work around launchpad building issues)
 # this flag works around such workaround :-) by running a separate pip install for these deps
 archivematica_src_ss_pip_missing_deps: "false"
+
+# dependencies (see vars files)
+archivematica_src_am_common_pkgdeps: "{{ archivematica_src_am_common_pkgdeps_v1_4 }}"
+archivematica_src_am_dashboard_pkgdeps: "{{ archivematica_src_am_dashboard_pkgdeps_v1_4 }}"
+archivematica_src_am_mcpserver_pkgdeps: "{{ archivematica_src_am_mcpserver_pkgdeps_v1_4 }}"
+archivematica_src_am_mcpclient_pkgdeps: "{{ archivematica_src_am_mcpclient_pkgdeps_v1_4 }}"
