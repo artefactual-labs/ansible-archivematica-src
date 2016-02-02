@@ -42,8 +42,6 @@
       dest: "/usr/lib/archivematica/MCPServer"
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share"
       dest: "/usr/share/archivematica/MCPServer"
-    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql"
-      dest: "/usr/share/dbconfig-common/data/archivematica-mcp-server/install/mysql"
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/init/archivematica-mcp-server.conf"
       dest: "/etc/init/archivematica-mcp-server.conf"
 
