@@ -27,6 +27,7 @@
     - "python2.7-elementtree"
     - "python-mimeparse"
     - "python-dateutil"
+    - "libmysqlclient-dev"
 
 
 - name: "Install archivematica-dashboard package dependencies"
