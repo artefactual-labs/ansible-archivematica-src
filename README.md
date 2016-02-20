@@ -51,8 +51,8 @@ Example Playbook
   roles:
      - role: "archivematica-src"
        archivematica_src_dir: "/opt/archivematica"
-       archivematica_src_am_version: "remotes/origin/qa/1.x"
-       archivematica_src_ss_version: "remotes/origin/qa/0.x"
+       archivematica_src_am_version: "qa/1.x"
+       archivematica_src_ss_version: "qa/0.x"
   sudo: "yes"
 ```
 
