@@ -1,0 +1,36 @@
+# {{ ansible_managed }}
+
+description     "Archivematica MCP Server"
+author          "Artefactual Systems"
+
+start on (started mysql)
+stop on runlevel [016]
+
+env CONF=/etc/archivematica/MCPServer
+env LOCATION=/usr/lib/archivematica/MCPServer/archivematicaMCP.py
+
+setuid archivematica
+setgid archivematica
+
+pre-start script
+
+    # Check that $CONF directory exists
+    [ -d $CONF ]
+
+    # Wait for Gearman to start - timeout eventually
+    for i in $(seq 1 10)
+    do
+        gearadmin --getpid && break
+        sleep 3
+    done
+    gearadmin --getpid || exit 1
+    exit 0
+
+end script
+
+script
+
+    # Run
+    $LOCATION
+
+end script

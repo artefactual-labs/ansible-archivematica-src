@@ -1,0 +1,24 @@
+# {{ ansible_managed }}
+
+description "Archivematica MCP Client"
+
+start on (net-device-up
+          and local-filesystems
+          and runlevel [2345])
+stop on runlevel [016]
+
+env CONF=/etc/archivematica/MCPClient
+env LOCATION=/usr/lib/archivematica/MCPClient/archivematicaClient.py
+
+setuid archivematica
+setgid archivematica
+
+script
+
+    # Is this still necessary?
+    test -f /etc/default/locale && . /etc/default/locale || true
+    test -f /etc/environment && . /etc/environment || true
+
+    LANG=$LANG $LOCATION
+
+end script
