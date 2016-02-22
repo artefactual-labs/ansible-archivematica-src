@@ -1,6 +1,9 @@
 ---
 
 # automation-tools installer
+# set archivematica_src_environment_type to development to get
+# automation-tools additionally installed in the vagrant shared
+# folder
 
 - name: "Checkout out automation tools repository"
   git:
@@ -9,7 +12,7 @@
     version: "{{ archivematica_src_automationtools_version }}"
     force: "yes"
 
-- name: "Install pip dependencies in virtualenv"
+- name: "Install pip production dependencies in virtualenv"
   pip:
     chdir: "{{ archivematica_src_dir }}/automation-tools"
     requirements: "requirements.txt"
@@ -21,3 +24,19 @@
     src: "{{ archivematica_src_dir }}/automation-tools"
     dest: "/usr/lib/archivematica/automation-tools"
     state: "link"
+
+- name: "Install pip development dependencies in virtualenv"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/automation-tools"
+    requirements: "requirements/local.txt"
+    virtualenv: "/usr/share/python/automation-tools"
+    state: latest
+  when: archivematica_src_environment_type == "development"
+
+- name: "Checkout out automation tools repository to development directory"
+  git:
+    repo: "https://github.com/artefactual/automation-tools.git"
+    dest: "/vagrant/src/automation-tools"
+    version: "{{ archivematica_src_automationtools_version }}"
+    force: "yes"
+  when: archivematica_src_environment_type == "development"
