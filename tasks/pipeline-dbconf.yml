@@ -15,6 +15,11 @@
     state: "absent"
   when: archivematica_src_reset_mcpdb|bool or archivematica_src_reset_am_all|bool
 
+# TODO where should this go?
+- name: "Reset ElasticSearch indexes"
+  command: "{{ archivematica_src_dir }}/archivematica/localDevSetup/eraseElasticSearchIndexes.py -f"
+  when: archivematica_src_reset_es|bool or archivematica_src_reset_am_all|bool
+
 ###########################################################
 #   5- Database config
 ###########################################################
