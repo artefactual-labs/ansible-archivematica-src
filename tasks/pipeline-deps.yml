@@ -126,3 +126,14 @@
   pip:
     requirements: "{{ archivematica_src_dir }}/archivematica/src/dashboard/src/requirements.txt"
     state: "latest"
+
+- name: "Check if MCPClient requirements file exists"
+  stat:
+    path: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/requirements.txt"
+    register: "requirements_file"
+
+- name: "Install archivematica-mcp-client pip dependencies"
+  pip:
+    requirements: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/requirements.txt"
+    state: "latest"
+  when: "requirements_file.stat.exists == True"
