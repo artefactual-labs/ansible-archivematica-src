@@ -23,6 +23,7 @@
   template:
     src: "etc_apache2_sites_dashboard.conf.j2"
     dest: "/etc/apache2/sites-available/dashboard.conf"
+    backup: "yes"
 
 - name: "Enable apache dashboard site"
   command: "a2ensite dashboard"

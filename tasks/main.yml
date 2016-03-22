@@ -1,21 +1,18 @@
 ---
 
 #
-#
-# REMINDERS:
-#
-# - This role needs root privileges but it is preferred to run it as a
-#   regular user that can sudo.
-#
+# Common tasks
 #
 
-#
-# Tear up
-#
 
 - include: "tear-up.yml"
   tags:
-    - "always"
+# do not use "always" tag in role, to avoid issues when incuding other roles in a playbook
+  - "amsrc-ss"
+  - "amsrc-pipeline"
+  - "amsrc-devtools"
+  - "amsrc-automationtools"
+  - "amsrc-appraisaltab"
 
 #
 # archivematica-storage-service

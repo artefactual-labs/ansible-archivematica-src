@@ -252,12 +252,14 @@
   template:
     src: "etc_nginx_sites_storage.conf.j2"
     dest: "/etc/nginx/sites-available/storage.conf"
+    backup: "yes"
   tags: "amsrc-ss-websrv"
 
 - name: "set uwsgi apps-available config file"
   template:
     src: "etc_uwsgi_apps_storage.ini.j2"
     dest: "/etc/uwsgi/apps-available/storage.ini"
+    backup: "yes"
   tags: "amsrc-ss-websrv"
 
 - name: "Remove Nginx default server"
