@@ -130,7 +130,7 @@
 - name: "Check if MCPClient requirements file exists"
   stat:
     path: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/requirements.txt"
-    register: "requirements_file"
+  register: "requirements_file"
 
 - name: "Install archivematica-mcp-client pip dependencies"
   pip:
