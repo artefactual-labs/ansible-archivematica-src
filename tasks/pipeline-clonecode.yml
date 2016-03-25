@@ -6,11 +6,12 @@
 
 - name: "Checkout Archivematica code"
   git:
-    repo: "https://github.com/artefactual/archivematica.git"
+    repo: "{{ archivematica_src_am_repo }}"
     dest: "{{ archivematica_src_dir }}/archivematica"
     version: "{{ archivematica_src_am_version }}"
     force: "yes"
-
+    accept_hostkey: "yes"
+    
 - name: "Get Archivematica latest commit hash"
   command: "git rev-parse HEAD"
   args:
