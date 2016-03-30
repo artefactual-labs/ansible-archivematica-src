@@ -38,6 +38,9 @@ Role Variables
 - `archivematica_src_ss_run_syncdb`: run SS manage.py syncdb before migrate (for stable/0.7.x and previous branches that use Django 1.5.x) (default: false)
 - `archivematica_src_ss_pip_missing_deps`:  workaround to install missing SS pip dependencies in old SS branches (default: false)
 
+- archivematica_src_am_repo: AM repository (default: "https://github.com/artefactual/archivematica.git")
+- archivematica_src_ss_repo: SS repository (default: "https://github.com/artefactual/archivematica-storage-service.git")
+
 Dependencies
 ------------
 

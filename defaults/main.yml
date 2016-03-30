@@ -19,6 +19,10 @@ archivematica_src_install_automationtools: "no"
 # will deploy some extra stuff to make the development workflow easier.
 archivematica_src_environment_type: "production"
 
+# Repositories
+archivematica_src_am_repo: "https://github.com/artefactual/archivematica.git"
+archivematica_src_ss_repo: "https://github.com/artefactual/archivematica-storage-service.git"
+
 # Branches,
 archivematica_src_am_version: "qa/1.x"
 archivematica_src_ss_version: "qa/0.x"
