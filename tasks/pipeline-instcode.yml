@@ -63,9 +63,10 @@
     backup: "yes"
 
 - name: "move archivematicaClientModules to /usr/lib/archivematica/MCPClient"
-  command: "mv {{ archivematica_src_dir }}/archivematica/src/MCPClient/etc/archivematicaClientModules /usr/lib/archivematica/MCPClient/"
-  args:
-    creates: "/usr/lib/archivematica/MCPClient/archivematicaClientModules"
+  file:
+    src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/etc/archivematicaClientModules"
+    dest: "/usr/lib/archivematica/MCPClient/archivematicaClientModules"
+    state: "link"
 
 - name: "template archivematica-mcp-server init service file"
   template:
