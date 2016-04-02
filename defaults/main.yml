@@ -71,3 +71,13 @@ archivematica_src_am_common_pkgdeps: "{{ archivematica_src_am_common_pkgdeps_v1_
 archivematica_src_am_dashboard_pkgdeps: "{{ archivematica_src_am_dashboard_pkgdeps_v1_4 }}"
 archivematica_src_am_mcpserver_pkgdeps: "{{ archivematica_src_am_mcpserver_pkgdeps_v1_4 }}"
 archivematica_src_am_mcpclient_pkgdeps: "{{ archivematica_src_am_mcpclient_pkgdeps_v1_4 }}"
+
+# SS: use gunicorn instead of uwsgi
+archivematica_src_ss_gunicorn: "false"
+## SS gunicorn parameters
+archivematica_src_ss_gunicorn_workers: "4"
+archivematica_src_ss_gunicorn_timeout: "172800"
+archivematica_src_ss_gunicorn_bind: "127.0.0.1:8001"
+## SS nginx gunicorn related parameters
+archivematica_src_ss_nginx_proxy_read_timeout: "172800s"
+archivematica_src_ss_nginx_proxy_pass: "http://127.0.0.1:8001"
