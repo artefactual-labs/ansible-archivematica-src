@@ -1,8 +1,8 @@
 ---
+
 ###########################################################
 #   6- web server config
 ###########################################################
-
 
 - name: "Enable mod-wsgi in Apache"
   command: "a2enmod wsgi"
@@ -16,8 +16,7 @@
     - "default"
   notify:
     - "Restart Apache"
-  ignore_errors: yes
-# note that yes in ignore_errors must be without quotes (ansible bug?)
+  ignore_errors: yes # Not using quotes on purpose (ansible bug in <2.0)
 
 - name: "Template dashboard apache2 config"
   template:

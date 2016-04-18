@@ -1,3 +1,4 @@
+---
 
 ###########################################################
 #   5- Database reset (when flag enabled)
@@ -7,18 +8,18 @@
   mysql_db:
     name: "MCP"
     state: "absent"
-  when: archivematica_src_reset_mcpdb|bool or archivematica_src_reset_am_all|bool
+  when: "archivematica_src_reset_mcpdb|bool or archivematica_src_reset_am_all|bool"
 
 - name: "Remove mysql_dev.complete file created by mysql_dev.sh"
   file:
     path: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.complete"
     state: "absent"
-  when: archivematica_src_reset_mcpdb|bool or archivematica_src_reset_am_all|bool
+  when: "archivematica_src_reset_mcpdb|bool or archivematica_src_reset_am_all|bool"
 
 # TODO where should this go?
-- name: "Reset ElasticSearch indexes"
+- name: "Reset Elasticsearch indexes"
   command: "{{ archivematica_src_dir }}/archivematica/localDevSetup/eraseElasticSearchIndexes.py -f"
-  when: archivematica_src_reset_es|bool or archivematica_src_reset_am_all|bool
+  when: "archivematica_src_reset_es|bool or archivematica_src_reset_am_all|bool"
 
 ###########################################################
 #   5- Database config
@@ -52,7 +53,7 @@
 
 - name: "Set migrations path"
   set_fact:
-    archivematica_src_am_pre_migration: "{{mysql_dev_sh_check.stat.exists}}"
+    archivematica_src_am_pre_migration: "{{ mysql_dev_sh_check.stat.exists }}"
 
 # mysql-dev migrations
 - name: "Load MySQL seed file"
@@ -68,15 +69,15 @@
     app_path: "/usr/share/archivematica/dashboard/"
     settings: "settings.common"
     pythonpath: "/usr/lib/archivematica/archivematicaCommon"
-  tags: amsrc-pipeline-dbconf-syncdb
-  when: archivematica_src_am_pre_migration|bool
+  tags: "amsrc-pipeline-dbconf-syncdb"
+  when: "archivematica_src_am_pre_migration|bool"
 
 - name: "Call mysql_dev script"
   command: "./mysql_dev.sh MCP"
   args:
     chdir: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/"
     creates: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.complete"
-  when: archivematica_src_am_pre_migration|bool
+  when: "archivematica_src_am_pre_migration|bool"
 
 # Django migrations
 - name: "Run migrations"
@@ -85,5 +86,5 @@
     app_path: "/usr/share/archivematica/dashboard/"
     settings: "settings.common"
     pythonpath: "/usr/lib/archivematica/archivematicaCommon"
-  tags: amsrc-pipeline-dbconf-syncdb
-  when: not archivematica_src_am_pre_migration|bool
+  tags: "amsrc-pipeline-dbconf-syncdb"
+  when: "not archivematica_src_am_pre_migration|bool"

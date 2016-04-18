@@ -11,8 +11,6 @@
     system: "yes"
     home: "/var/lib/archivematica-dashboard"
 
-
-
 - name: "Create subdirectories for archivematica-common source files"
   file:
     dest: "{{ item }}"
@@ -21,7 +19,6 @@
     - "/usr/lib/archivematica"
     - "/etc/archivematica/archivematicaCommon"
     - "/usr/share/archivematica/archivematicaCommon"
-
 
 - name: "Create archivematica-dashboard log directories"
   file:
@@ -33,7 +30,6 @@
   with_items:
     - "/var/log/archivematica/dashboard"
 
-
 - name: "Create subdirectories for archivematica-mcp-server source files"
   file:
     dest: "{{ item }}"
@@ -44,7 +40,6 @@
     - "/usr/share/archivematica"
     - "/usr/share/dbconfig-common/data/archivematica-mcp-server/install/"
     - "/usr/share/dbconfig-common/data/archivematica-mcp-server/upgrade/mysql/"
-
 
 - name: "Create archivematica-mcp-server log directories"
   file:
@@ -60,13 +55,12 @@
   file:
     dest: "/var/archivematica/sharedDirectory"
     state: "absent"
-  when: archivematica_src_reset_shareddir or archivematica_src_reset_am_all
+  when: "archivematica_src_reset_shareddir or archivematica_src_reset_am_all"
 
 - name: "Create /var/archivematica/sharedDirectory"
   file:
     dest: "/var/archivematica/sharedDirectory"
     state: "directory"
-
 
 - name: "Create /var/archivematica/sharedDirectory structure"
   command: "rsync -a {{ archivematica_src_dir }}/archivematica/src/MCPServer/share/sharedDirectoryStructure/ /var/archivematica/sharedDirectory/"
@@ -100,7 +94,6 @@
 - name: "Set more permissions for /var/archivematica"
   shell: "find -L /var/archivematica/ -print0 -type d  | sudo xargs -IF -0 chmod u+rwx,g+rwxt,o-rwx F"
 
-
 - name: "Create subdirectories for archivematica-mcp-client source files"
   file:
     dest: "{{ item }}"
@@ -108,7 +101,6 @@
   with_items:
     - "/etc/archivematica/MCPClient"
     - "/usr/lib/archivematica"
-
 
 - name: "Create archivematica-mcp-client log directories"
   file:

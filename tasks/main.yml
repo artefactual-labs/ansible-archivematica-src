@@ -6,8 +6,7 @@
 
 
 - include: "tear-up.yml"
-  tags:
-# do not use "always" tag in role, to avoid issues when incuding other roles in a playbook
+  tags: # do not use "always" tag in role, to avoid issues when incuding other roles in a playbook
   - "amsrc-ss"
   - "amsrc-pipeline"
   - "amsrc-devtools"
@@ -21,7 +20,7 @@
 - include: "archivematica-storage-service.yml"
   tags:
    - "amsrc-ss"
-  when: archivematica_src_install_ss == "yes"
+  when: "archivematica_src_install_ss|bool"
 
 #
 # archivematica pipeline install
@@ -30,7 +29,7 @@
 #   0- Clone source repo
 #   1- OS dependencies (debian packages)
 #   2- python dependencies (pip packages)
-#   3- OS configuration (user/directory/file creation/permissions/ownership )
+#   3- OS configuration (user/directory/file creation/permissions/ownership)
 #   4- Code install
 #   5- Database config
 #   6- web server config
@@ -39,37 +38,37 @@
   tags:
     - "amsrc-pipeline"
     - "amsrc-pipeline-clonecode"
-  when: archivematica_src_install_am == "yes"
+  when: "archivematica_src_install_am|bool"
 
 - include: "pipeline-deps.yml"
   tags:
     - "amsrc-pipeline"
     - "amsrc-pipeline-deps"
-  when: archivematica_src_install_am == "yes"
+  when: "archivematica_src_install_am|bool"
 
 - include: "pipeline-osconf.yml"
   tags:
     - "amsrc-pipeline"
     - "amsrc-pipeline-osconf"
-  when: archivematica_src_install_am == "yes"
+  when: "archivematica_src_install_am|bool"
 
 - include: "pipeline-instcode.yml"
   tags:
     - "amsrc-pipeline"
     - "amsrc-pipeline-instcode"
-  when: archivematica_src_install_am == "yes"
+  when: "archivematica_src_install_am|bool"
 
 - include: "pipeline-dbconf.yml"
   tags:
     - "amsrc-pipeline"
     - "amsrc-pipeline-dbconf"
-  when: archivematica_src_install_am == "yes"
+  when: "archivematica_src_install_am|bool"
 
 - include: "pipeline-websrv.yml"
   tags:
     - "amsrc-pipeline"
     - "amsrc-pipeline-websrv"
-  when: archivematica_src_install_am == "yes"
+  when: "archivematica_src_install_am|bool"
 
 #
 # archivematica-devtools
@@ -78,7 +77,7 @@
 - include: "am-devtools.yml"
   tags:
     - "amsrc-devtools"
-  when: archivematica_src_install_devtools == "yes"
+  when: "archivematica_src_install_devtools|bool"
 
 #
 # automation-tools
@@ -87,9 +86,7 @@
 - include: "automation-tools.yml"
   tags:
     - "amsrc-automationtools"
-  when: archivematica_src_install_automationtools == "yes"
-
-
+  when: "archivematica_src_install_automationtools|bool"
 
 #
 # appraisal-tab
@@ -98,4 +95,4 @@
 - include: "appraisal-tab.yml"
   tags:
     - "amsrc-appraisaltab"
-  when: archivematica_src_install_appraisaltab == "yes"
+  when: "archivematica_src_install_appraisaltab|bool"

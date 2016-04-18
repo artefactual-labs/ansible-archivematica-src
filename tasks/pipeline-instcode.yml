@@ -4,7 +4,7 @@
 #   4- Code install
 ###########################################################
 
-- name: "symlink archivematica-common source files"
+- name: "Symlink archivematica-common source files"
   file:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -17,7 +17,7 @@
     - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements"
       dest: "/usr/share/archivematica/archivematicaCommon/requirements"
 
-- name: "template archivematica-common /etc config"
+- name: "Template archivematica-common /etc config"
   template:
     src: "etc_archivematica_archivematicaCommon_dbsettings.j2"
     dest: "/etc/archivematica/archivematicaCommon/dbsettings"
@@ -51,29 +51,32 @@
     backup: "yes"
 
 - name: "Copy archivematica-mcp-client source files"
-  file: src={{ item.src }} dest={{ item.dest }} state=link
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: "link"
   with_items:
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/lib/"
       dest: "/usr/lib/archivematica/MCPClient"
 
-- name: "template MCPClient /etc config"
+- name: "Template MCPClient /etc config"
   template:
     src: "etc_archivematica_MCPClient_clientConfig.conf.j2"
     dest: "/etc/archivematica/MCPClient/clientConfig.conf"
     backup: "yes"
 
-- name: "move archivematicaClientModules to /usr/lib/archivematica/MCPClient"
+- name: "Move archivematicaClientModules to /usr/lib/archivematica/MCPClient"
   command: "mv {{ archivematica_src_dir }}/archivematica/src/MCPClient/etc/archivematicaClientModules /usr/lib/archivematica/MCPClient/"
   args:
     creates: "/usr/lib/archivematica/MCPClient/archivematicaClientModules"
 
-- name: "template archivematica-mcp-server init service file"
+- name: "Template archivematica-mcp-server init service file"
   template:
     src: "etc_init_archivematica-mcp-server.conf.j2"
     dest: "/etc/init/archivematica-mcp-server.conf"
     backup: "yes"
 
-- name: "template archivematica-mcp-client init service file"
+- name: "Template archivematica-mcp-client init service file"
   template:
     src: "etc_init_archivematica-mcp-client.conf.j2"
     dest: "/etc/init/archivematica-mcp-client.conf"
