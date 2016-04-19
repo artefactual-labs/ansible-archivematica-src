@@ -1,0 +1,52 @@
+---
+
+- include: "components/includes/common.yml"
+
+- name: "Checkout Archivematica code"
+  git:
+    repo: "{{ archivematica_src_am_repo }}"
+    dest: "{{ archivematica_src_dir }}/archivematica"
+    version: "{{ archivematica_src_am_version }}"
+    force: "yes"
+    accept_hostkey: "yes"
+
+- name: "Install archivematica-dashboard package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items: "{{ archivematica_src_am_dashboard_pkgdeps }}"
+
+- name: "Install archivematica-dashboard Python dependencies in virtualenv"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements"
+    requirements: "requirements.txt"
+    virtualenv: "/usr/share/python/archivematica-dashboard"
+    state: "latest"
+
+- name: "Install archivematica-dashboard Python dependencies in virtualenv"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/dashboard/src/requirements"
+    requirements: "production.txt"
+    virtualenv: "/usr/share/python/archivematica-dashboard"
+    state: "latest"
+
+- name: "Create archivematica-dashboard log directories"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+    owner: "archivematica"
+    group: "archivematica"
+    mode: "g+s"
+  with_items:
+    - "/var/log/archivematica/dashboard"
+
+- name: "Copy archivematica-dashboard source files"
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: "link"
+  with_items:
+    - src: "{{ archivematica_src_dir }}/archivematica/src/dashboard/src"
+      dest: "/usr/share/archivematica/dashboard"
+
+- include: "components/includes/dashboard-appraisal-tab.yml"

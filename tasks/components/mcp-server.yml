@@ -1,0 +1,79 @@
+---
+
+- include: "components/includes/common.yml"
+
+- name: "Checkout Archivematica code"
+  git:
+    repo: "{{ archivematica_src_am_repo }}"
+    dest: "{{ archivematica_src_dir }}/archivematica"
+    version: "{{ archivematica_src_am_version }}"
+    force: "yes"
+    accept_hostkey: "yes"
+
+- name: "Install archivematica-mcp-server package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items: "{{ archivematica_src_am_mcpserver_pkgdeps }}"
+
+- name: "Install archivematica-mcp-server Python dependencies in virtualenv"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements"
+    requirements: "requirements.txt"
+    virtualenv: "/usr/share/python/archivematica-mcp-server"
+    state: "latest"
+
+- name: "Install archivematica-mcp-server Python dependencies in virtualenv"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/requirements"
+    requirements: "production.txt"
+    virtualenv: "/usr/share/python/archivematica-mcp-server"
+    state: "latest"
+
+- name: "Create archivematica-mcp-server log directories"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+    owner: "archivematica"
+    group: "archivematica"
+    mode: "g+s"
+  with_items:
+    - "/var/log/archivematica/MCPServer"
+
+- name: "Create subdirectories for archivematica-mcp-server source files"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+  with_items:
+    - "/etc/archivematica/MCPServer"
+    - "/usr/lib/archivematica"
+    - "/usr/share/archivematica"
+    - "/usr/share/dbconfig-common/data/archivematica-mcp-server/install/"
+    - "/usr/share/dbconfig-common/data/archivematica-mcp-server/upgrade/mysql/"
+
+- name: "Template archivematica-mcp-server init service file"
+  template:
+    src: "etc_init_archivematica-mcp-server.conf.j2"
+    dest: "/etc/init/archivematica-mcp-server.conf"
+    backup: "yes"
+  notify:
+    - "Reload upstart"
+
+- name: "Copy archivematica-mcp-server source files"
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: "link"
+  with_items:
+    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/lib"
+      dest: "/usr/lib/archivematica/MCPServer"
+    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share"
+      dest: "/usr/share/archivematica/MCPServer"
+
+- name: "Template MCPServer /etc config"
+  template:
+    src: "etc_archivematica_MCPServer_serverConfig.conf.j2"
+    dest: "/etc/archivematica/MCPServer/serverConfig.conf"
+    backup: "yes"
+
+- include: "components/includes/mcp-server-dbconf.yml"

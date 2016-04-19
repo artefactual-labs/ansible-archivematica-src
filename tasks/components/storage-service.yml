@@ -23,6 +23,14 @@
     force: "yes"
   tags: "amsrc-ss-clone"
 
+- name: "Checkout out archivematica-sampledata repository"
+  git:
+    repo: "https://github.com/artefactual/archivematica-sampledata.git"
+    dest: "~/archivematica-sampledata"
+    update: "no"
+  when: "archivematica_src_install_sample_data|bool"
+  become: "no"
+
 # For some reason, some dirs in the cloned source code
 # are not sometimes readable by all. Add a task to fix it
 # For some other reason this task does not always work
@@ -61,8 +69,6 @@
     - "nginx"
     - "unar"
     - "rsync"
-    - "uwsgi"
-    - "uwsgi-plugin-python"
   tags: "amsrc-ss-osdep"
 
 - name: "Install archivematica-storage-service additional package dependencies"
