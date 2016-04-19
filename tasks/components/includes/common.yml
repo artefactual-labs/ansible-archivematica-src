@@ -1,0 +1,84 @@
+---
+
+- name: "Checkout Archivematica code"
+  git:
+    repo: "{{ archivematica_src_am_repo }}"
+    dest: "{{ archivematica_src_dir }}/archivematica"
+    version: "{{ archivematica_src_am_version }}"
+    force: "yes"
+    accept_hostkey: "yes"
+
+- name: "Create subdirectories for archivematica-common source files"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+  with_items:
+    - "/usr/lib/archivematica"
+    - "/etc/archivematica/archivematicaCommon"
+    - "/usr/share/archivematica/archivematicaCommon"
+
+- name: "Symlink archivematica-common source files"
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: "link"
+  with_items:
+    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/lib"
+      dest: "/usr/lib/archivematica/archivematicaCommon"
+    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements.txt"
+      dest: "/usr/share/archivematica/archivematicaCommon/requirements.txt"
+    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements"
+      dest: "/usr/share/archivematica/archivematicaCommon/requirements"
+
+- name: "Template archivematica-common /etc config"
+  template:
+    src: "etc_archivematica_archivematicaCommon_dbsettings.j2"
+    dest: "/etc/archivematica/archivematicaCommon/dbsettings"
+    backup: "yes"
+
+#
+# Set up /var/archivematica/sharedDirectory
+#
+
+- name: "Clear /var/archivematica/sharedDirectory"
+  file:
+    dest: "/var/archivematica/sharedDirectory"
+    state: "absent"
+  when: "archivematica_src_reset_shareddir or archivematica_src_reset_am_all"
+
+- name: "Create /var/archivematica/sharedDirectory"
+  file:
+    dest: "/var/archivematica/sharedDirectory"
+    state: "directory"
+
+- name: "Create /var/archivematica/sharedDirectory structure"
+  command: "rsync -a {{ archivematica_src_dir }}/archivematica/src/MCPServer/share/sharedDirectoryStructure/ /var/archivematica/sharedDirectory/"
+
+- name: "Set owner, group of /var/archivematica recursively"
+  file:
+    dest: "/var/archivematica"
+    state: "directory"
+    recurse: "yes"
+    owner: "archivematica"
+    group: "archivematica"
+
+- name: "Set owner, group of /var/archivematica/sharedDirectory recursively"
+  file:
+    dest: "/var/archivematica/sharedDirectory"
+    state: "directory"
+    recurse: "yes"
+    owner: "archivematica"
+    group: "archivematica"
+
+- name: "Set permissions for /var/archivematica"
+  file:
+    path: "/var/archivematica/"
+    mode: "g+s"
+
+- name: "Set permissions for /var/archivematica/sharedDirectory"
+  file:
+    path: "/var/archivematica/sharedDirectory"
+    mode: 0664
+
+- name: "Set more permissions for /var/archivematica"
+  shell: "find -L /var/archivematica/ -print0 -type d  | sudo xargs -IF -0 chmod u+rwx,g+rwxt,o-rwx F"

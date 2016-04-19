@@ -1,8 +1,18 @@
 ---
+
 # default values for role variables
 # playbook will use these defaults if not overriden in the playbook
 # (or host_vars, group_vars, etc)
 
+# When you import this role you have to define which components you want to
+# install. The components that are available so far are:
+# - archivematica-mcp-server
+# - archivematica-mcp-client
+# - archivematica-dashboard
+# - archivematica-storage-service
+# - archivematica-devtools
+# - automation-tools
+archivematica_src_components: []
 
 # directory to install source code
 archivematica_src_dir: "/opt/archivematica"
@@ -67,7 +77,7 @@ archivematica_src_ss_run_syncdb: "false"
 archivematica_src_ss_pip_missing_deps: "false"
 
 # dependencies (see vars files)
-archivematica_src_am_common_pkgdeps: "{{ archivematica_src_am_common_pkgdeps_v1_4 }}"
-archivematica_src_am_dashboard_pkgdeps: "{{ archivematica_src_am_dashboard_pkgdeps_v1_4 }}"
-archivematica_src_am_mcpserver_pkgdeps: "{{ archivematica_src_am_mcpserver_pkgdeps_v1_4 }}"
-archivematica_src_am_mcpclient_pkgdeps: "{{ archivematica_src_am_mcpclient_pkgdeps_v1_4 }}"
+archivematica_src_am_common_pkgdeps: "{{ archivematica_src_am_common_pkgdeps_qa_1_6_x }}"
+archivematica_src_am_dashboard_pkgdeps: "{{ archivematica_src_am_dashboard_pkgdeps_qa_1_6_x }}"
+archivematica_src_am_mcpserver_pkgdeps: "{{ archivematica_src_am_mcpserver_pkgdeps_qa_1_6_x }}"
+archivematica_src_am_mcpclient_pkgdeps: "{{ archivematica_src_am_mcpclient_pkgdeps_qa_1_6_x }}"

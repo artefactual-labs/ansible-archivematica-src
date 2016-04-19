@@ -4,98 +4,26 @@
 # Common tasks
 #
 
-
 - include: "tear-up.yml"
-  tags:
-# do not use "always" tag in role, to avoid issues when incuding other roles in a playbook
-  - "amsrc-ss"
-  - "amsrc-pipeline"
-  - "amsrc-devtools"
-  - "amsrc-automationtools"
-  - "amsrc-appraisaltab"
 
 #
-# archivematica-storage-service
+# Components
 #
 
-- include: "archivematica-storage-service.yml"
-  tags:
-   - "amsrc-ss"
-  when: archivematica_src_install_ss == "yes"
+- include: "components/storage-service.yml"
+  when: "'archivematica-storage-service' in archivematica_src_components"
 
-#
-# archivematica pipeline install
-#    (dashboard, MCP server, client)
-#
-#   0- Clone source repo
-#   1- OS dependencies (debian packages)
-#   2- python dependencies (pip packages)
-#   3- OS configuration (user/directory/file creation/permissions/ownership )
-#   4- Code install
-#   5- Database config
-#   6- web server config
+- include: "components/mcp-server.yml"
+  when: "'archivematica-mcp-server' in archivematica_src_components"
 
-- include: "pipeline-clonecode.yml"
-  tags:
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-clonecode"
-  when: archivematica_src_install_am == "yes"
+- include: "components/mcp-client.yml"
+  when: "'archivematica-mcp-client' in archivematica_src_components"
 
-- include: "pipeline-deps.yml"
-  tags:
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-deps"
-  when: archivematica_src_install_am == "yes"
+- include: "components/dashboard.yml"
+  when: "'archivematica-dashboard' in archivematica_src_components"
 
-- include: "pipeline-osconf.yml"
-  tags:
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-osconf"
-  when: archivematica_src_install_am == "yes"
+- include: "components/devtools.yml"
+  when: "'archivematica-devtools' in archivematica_src_components"
 
-- include: "pipeline-instcode.yml"
-  tags:
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-instcode"
-  when: archivematica_src_install_am == "yes"
-
-- include: "pipeline-dbconf.yml"
-  tags:
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-dbconf"
-  when: archivematica_src_install_am == "yes"
-
-- include: "pipeline-websrv.yml"
-  tags:
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-websrv"
-  when: archivematica_src_install_am == "yes"
-
-#
-# archivematica-devtools
-#
-
-- include: "am-devtools.yml"
-  tags:
-    - "amsrc-devtools"
-  when: archivematica_src_install_devtools == "yes"
-
-#
-# automation-tools
-#
-
-- include: "automation-tools.yml"
-  tags:
-    - "amsrc-automationtools"
-  when: archivematica_src_install_automationtools == "yes"
-
-
-
-#
-# appraisal-tab
-#
-
-- include: "appraisal-tab.yml"
-  tags:
-    - "amsrc-appraisaltab"
-  when: archivematica_src_install_appraisaltab == "yes"
+- include: "components/automation-tools.yml"
+  when: "'automation-tools' in archivematica_src_components"

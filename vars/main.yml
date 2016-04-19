@@ -1,110 +1,40 @@
 ---
-# vars file for ansible-role-archivematica-src
 
-# # package dependencies (qa/1.x)
-archivematica_src_am_common_pkgdeps_qa_1_x:
+# todo: postfix?
+
+archivematica_src_am_dashboard_pkgdeps_qa_1_6_x:
+  - "nginx"
   - "python"
   - "python-pip"
   - "libmysqlclient-dev"
-
-archivematica_src_am_dashboard_pkgdeps_qa_1_x:
-  - "apache2-mpm-prefork"
-  - "libapache2-mod-wsgi"
+  
+archivematica_src_am_mcpserver_pkgdeps_qa_1_6_x:
+  - "python"
   - "python-pip"
-
-archivematica_src_am_mcpserver_pkgdeps_qa_1_x:
-  - "dbconfig-common"
-  - "logapp"
+  - "libmysqlclient-dev"
   - "uuid"
 
-archivematica_src_am_mcpclient_pkgdeps_qa_1_x:
+archivematica_src_am_mcpclient_pkgdeps_qa_1_6_x:
+  - "python"
+  - "python-pip"
+  - "libmysqlclient-dev"
   - "atool"
   - "bagit"
   - "bulk-extractor"
-  - "clamav"
-  - "clamav-daemon"
   - "ffmpeg"
   - "fits"
-  - "gearman"
   - "imagemagick"
   - "inkscape"
   - "jhove"
   - "libimage-exiftool-perl"
   - "libxml2-utils"
-  - "logapp"
   - "md5deep"
   - "mediainfo"
   - "nfs-common"
   - "openjdk-7-jre-headless"
   - "p7zip-full"
   - "pbzip2"
-  - "postfix"
   - "python-fido"
-  - "readpst"
-  - "rsync"
-  - "siegfried"
-  - "sleuthkit"
-  - "tesseract-ocr"
-  - "tika"
-  - "tree"
-  - "ufraw"
-  - "unrar-free"
-  - "uuid"
-
-# package dependencies (v1.4)
-
-archivematica_src_am_common_pkgdeps_v1_4:
-  - "python"
-  - "python-pip"
-  - "libmysqlclient-dev"
-  - "python2.7-elementtree"
-  - "python-mimeparse"
-  - "python-dateutil"
-
-archivematica_src_am_dashboard_pkgdeps_v1_4:
-  - "apache2-mpm-prefork"
-  - "libapache2-mod-wsgi"
-  - "python-pip"
-  - "python-gearman"
-  - "python-simplejson"
-
-archivematica_src_am_mcpserver_pkgdeps_v1_4:
-  - "dbconfig-common"
-  - "logapp"
-  - "python-pyinotify"
-  - "python-gearman"
-  - "python-mysqldb"
-  - "python-lxml"
-  - "uuid"
-
-archivematica_src_am_mcpclient_pkgdeps_v1_4:
-  - "atool"
-  - "bagit"
-  - "bulk-extractor"
-  - "clamav"
-  - "clamav-daemon"
-  - "ffmpeg"
-  - "fits"
-  - "gearman"
-  - "imagemagick"
-  - "inkscape"
-  - "jhove"
-  - "libimage-exiftool-perl"
-  - "libxml2-utils"
-  - "logapp"
-  - "md5deep"
-  - "mediainfo"
-  - "nfs-common"
-  - "openjdk-7-jre-headless"
-  - "p7zip-full"
-  - "pbzip2"
-  - "postfix"
-  - "python-fido"
-  - "python-gearman"
-  - "python-lxml"
-  - "python-mysqldb"
-  - "python-pyicu"
-  - "python-unidecode"
   - "readpst"
   - "rsync"
   - "siegfried"
