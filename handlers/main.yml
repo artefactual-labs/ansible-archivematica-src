@@ -1,7 +1,31 @@
 ---
-# handlers file for ansible-role-archivematica-src
 
-- name: "Restart Apache"
+- name: "Reload Nginx"
   service:
-    name: "apache2"
+    name: "nginx"
+    state: "reloaded"
+
+- name: "Restart Nginx"
+  service:
+    name: "nginx"
+    state: "reloaded"
+
+- name: "Restart archivematica-mcp-server"
+  service:
+    name: "archivematica-mcp-server"
+    state: "restarted"
+
+- name: "Restart archivematica-mcp-client"
+  service:
+    name: "archivematica-mcp-client"
+    state: "restarted"
+
+- name: "Reload archivematica-dashboard"
+  service:
+    name: "archivematica-dashboard"
+    state: "reloaded"
+
+- name: "Restart archivematica-dashboard"
+  service:
+    name: "archivematica-dashboard"
     state: "restarted"

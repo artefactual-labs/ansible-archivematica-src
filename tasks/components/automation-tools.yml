@@ -16,7 +16,7 @@
     virtualenv: "/usr/share/python/automation-tools"
     state: latest
 
-- name: "symlink automation-tools source to /usr/lib/archivematica"
+- name: "Symlink automation-tools source to /usr/lib/archivematica"
   file:
     src: "{{ archivematica_src_dir }}/automation-tools"
     dest: "/usr/lib/archivematica/automation-tools"

@@ -1,19 +1,24 @@
 ---
+
 # default values for role variables
 # playbook will use these defaults if not overriden in the playbook
 # (or host_vars, group_vars, etc)
 
+# When you import this role you have to define which components you want to
+# install. The components that are available so far are:
+# - archivematica-mcp-server
+# - archivematica-mcp-client
+# - archivematica-dashboard
+# - archivematica-storage-service
+# - archivematica-devtools
+# - automation-tools
+archivematica_src_components: []
 
 # directory to install source code
 archivematica_src_dir: "/opt/archivematica"
 
-# Components to install
+# Install sample data in storage service
 archivematica_src_install_sample_data: "yes"
-archivematica_src_install_am: "yes"
-archivematica_src_install_ss: "yes"
-archivematica_src_install_devtools: "no"
-archivematica_src_install_appraisaltab: "no"
-archivematica_src_install_automationtools: "no"
 
 # Define the type of environment: "production" or "development". The latter
 # will deploy some extra stuff to make the development workflow easier.
@@ -23,51 +28,31 @@ archivematica_src_environment_type: "production"
 archivematica_src_am_repo: "https://github.com/artefactual/archivematica.git"
 archivematica_src_ss_repo: "https://github.com/artefactual/archivematica-storage-service.git"
 
-# Branches,
+# Branches
 archivematica_src_am_version: "qa/1.x"
 archivematica_src_ss_version: "qa/0.x"
 archivematica_src_devtools_version: "master"
 archivematica_src_automationtools_version: "master"
 
-# SS django environment variables
-# DJANGO_SECRET_KEY shall be changed for every install
-#     (override the value in the playboook, do not change here)
-archivematica_src_ss_env_django_secret_key: "CHANGE_ME_WITH_A_SECRET_KEY"
-archivematica_src_ss_env_django_setings_module: "storage_service.settings.production"
-archivematica_src_ss_env_django_static_root: "/usr/lib/archivematica/storage-service/assets"
-archivematica_src_ss_env_email_host: "localhost"
-archivematica_src_ss_env_email_host_password: ""
-archivematica_src_ss_env_email_host_user: ""
-archivematica_src_ss_env_email_port: "25"
-archivematica_src_ss_env_ss_db_host: ""
-archivematica_src_ss_env_ss_db_name: "/var/archivematica/storage-service/storage.db"
-archivematica_src_ss_env_ss_db_password: ""
-archivematica_src_ss_env_ss_db_user: ""
+# Virtual environments
+archivematica_src_ss_env_dir: "/usr/share/python/storage-env"
+archivematica_src_am_dashboard_env_dir: "/usr/share/python/dashboard-env"
+archivematica_src_am_mcpserver_env_dir: "/usr/share/python/mcpserver-env"
+archivematica_src_am_mcpclient_env_dir: "/usr/share/python/mcpclient-env"
 
-# reset the MCP database (CAUTION: if true, will lose existing MCP database data)
-archivematica_src_reset_mcpdb: "false"
-# delete the existing shared directory
-archivematica_src_reset_shareddir: "false"
-# Delete ElasticSearch indexes
-archivematica_src_reset_es: "false"
-# reset the AM database (MCP), delete AM shared dir and reset ElasticSearch indexes (if true, it overrides the three reset vars above)
-archivematica_src_reset_am_all: "false"
+# Dependencies (see vars files)
+archivematica_src_ss_pkgdeps: "{{ archivematica_src_ss_pkgdeps_qa_0_8_x }}"
+archivematica_src_am_dashboard_pkgdeps: "{{ archivematica_src_am_dashboard_pkgdeps_qa_1_6_x }}"
+archivematica_src_am_mcpserver_pkgdeps: "{{ archivematica_src_am_mcpserver_pkgdeps_qa_1_6_x }}"
+archivematica_src_am_mcpclient_pkgdeps: "{{ archivematica_src_am_mcpclient_pkgdeps_qa_1_6_x }}"
 
-# Reset the SS database
-archivematica_src_reset_ss_db: "false"
+# gunicorn binding
+archivematica_src_ss_bind: "unix:/run/archivematica-storage-service.gunicorn.sock"
+archivematica_src_am_dashboard_bind: "unix:/run/archivematica-dashboard.gunicorn.sock"
 
-## backwards compatibility
-# run SS manage.py syncdb before migrate (for stable/0.7.x and previous branches that use Django 1.5.x)
-archivematica_src_ss_run_syncdb: "false"
-# workaround to install missing SS pip dependencies in old SS branches
-# (some old branches of SS such as qa/0.7.2 commented out some dependencies
-#  in the requirements file and installed in the debian postinst
-#  to work around launchpad building issues)
-# this flag works around such workaround :-) by running a separate pip install for these deps
-archivematica_src_ss_pip_missing_deps: "false"
-
-# dependencies (see vars files)
-archivematica_src_am_common_pkgdeps: "{{ archivematica_src_am_common_pkgdeps_v1_4 }}"
-archivematica_src_am_dashboard_pkgdeps: "{{ archivematica_src_am_dashboard_pkgdeps_v1_4 }}"
-archivematica_src_am_mcpserver_pkgdeps: "{{ archivematica_src_am_mcpserver_pkgdeps_v1_4 }}"
-archivematica_src_am_mcpclient_pkgdeps: "{{ archivematica_src_am_mcpclient_pkgdeps_v1_4 }}"
+# Reset options
+archivematica_src_reset_mcpdb: "no"       # Reset the MCP database (caution: if true, will lose existing MCP database data)
+archivematica_src_reset_shareddir: "no"   # Delete the existing shared directory
+archivematica_src_reset_es: "no"          # Delete Elasticsearch indexes
+archivematica_src_reset_am_all: "no"      # Reset all (if true, it overrides the three reset vars above)
+archivematica_src_reset_ss_db: "no"       # Reset the SS database

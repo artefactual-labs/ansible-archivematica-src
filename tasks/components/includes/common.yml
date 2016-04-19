@@ -1,0 +1,62 @@
+---
+
+- name: "Custom facts"
+  set_fact:
+    archivematica_src_am_common_src_dir: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/lib"
+
+- name: "Checkout Archivematica code"
+  git:
+    repo: "{{ archivematica_src_am_repo }}"
+    dest: "{{ archivematica_src_dir }}/archivematica"
+    version: "{{ archivematica_src_am_version }}"
+    accept_hostkey: "yes"
+    update: "yes"
+    depth: "{{ 1 if is_prod else 0 }}"
+    force: "{{ is_prod }}"
+
+#
+# Set up /var/archivematica/sharedDirectory
+#
+
+- name: "Clear /var/archivematica/sharedDirectory"
+  file:
+    dest: "/var/archivematica/sharedDirectory"
+    state: "absent"
+  when: "archivematica_src_reset_shareddir|bool or archivematica_src_reset_am_all|bool"
+
+- name: "Create /var/archivematica/sharedDirectory"
+  file:
+    dest: "/var/archivematica/sharedDirectory"
+    state: "directory"
+
+- name: "Create /var/archivematica/sharedDirectory structure"
+  command: "rsync -a {{ archivematica_src_dir }}/archivematica/src/MCPServer/share/sharedDirectoryStructure/ /var/archivematica/sharedDirectory/"
+
+- name: "Set owner, group of /var/archivematica recursively"
+  file:
+    dest: "/var/archivematica"
+    state: "directory"
+    recurse: "yes"
+    owner: "{{ archivematica_user }}"
+    group: "{{ archivematica_group }}"
+
+- name: "Set owner, group of /var/archivematica/sharedDirectory recursively"
+  file:
+    dest: "/var/archivematica/sharedDirectory"
+    state: "directory"
+    recurse: "yes"
+    owner: "{{ archivematica_user }}"
+    group: "{{ archivematica_group }}"
+
+- name: "Set permissions for /var/archivematica"
+  file:
+    path: "/var/archivematica/"
+    mode: "g+s"
+
+- name: "Set permissions for /var/archivematica/sharedDirectory"
+  file:
+    path: "/var/archivematica/sharedDirectory"
+    mode: "0664"
+
+- name: "Set more permissions for /var/archivematica"
+  shell: "find -L /var/archivematica/ -print0 -type d  | sudo xargs -IF -0 chmod u+rwx,g+rwxt,o-rwx F"

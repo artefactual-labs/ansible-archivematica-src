@@ -1,0 +1,77 @@
+---
+
+- include: "includes/common.yml"
+
+- name: "Install archivematica-mcp-server package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items: "{{ archivematica_src_am_mcpserver_pkgdeps }}"
+
+- name: "Install archivematica-mcp-server virtualenv with upgraded pip"
+  pip:
+    name: "pip"
+    virtualenv: "{{ archivematica_src_am_mcpserver_env_dir }}"
+    state: "latest"
+
+- name: "Install archivematica-mcp-server Python dependencies in virtualenv"
+  pip:
+    requirements: "{{ item.path }}"
+    virtualenv: "{{ archivematica_src_am_mcpserver_env_dir }}"
+    state: "present"
+  when: "{{ item.environment == 'any' or item.environment == archivematica_src_environment_type }}"
+  with_items:
+    - path: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements/production.txt"
+      environment: "production"
+    - path: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements/local.txt"
+      environment: "development"
+    - path: "{{ archivematica_src_am_mcpserver_src_dir }}/requirements/production.txt"
+      environment: "production"
+    - path: "{{ archivematica_src_am_mcpserver_src_dir }}/requirements/test.txt"
+      environment: "development"
+
+- name: "Create archivematica-mcp-server log directory"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+    owner: "{{ archivematica_user }}"
+    group: "{{ archivematica_group }}"
+    mode: "g+s"
+  with_items:
+    - "/var/log/archivematica/MCPServer"
+
+- name: "Install archivematica-mcp-server upstart service"
+  template:
+    src: "etc/init/archivematica-mcp-server.conf"
+    dest: "/etc/init/archivematica-mcp-server.conf"
+    backup: "yes"
+
+- name: "Reload upstart"
+  command: "initctl reload-configuration"
+
+- name: "Create /etc/archivematica/MCPServer directory"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+  with_items:
+    - "/etc/archivematica/MCPServer"
+  notify:
+    - "Restart archivematica-mcp-server"
+
+- name: "Install MCPServer serverConfig.conf file"
+  template:
+    src: "etc/archivematica/MCPServer/serverConfig.conf"
+    dest: "/etc/archivematica/MCPServer/serverConfig.conf"
+    backup: "yes"
+  notify:
+    - "Restart archivematica-mcp-server"
+
+- include: "includes/mcp-server-dbconf.yml"
+
+- name: "Enable services"
+  service:
+    name: "{{ item }}"
+    state: "restarted"
+    enabled: "yes"
+  with_items:
+    - "archivematica-mcp-server"

@@ -17,12 +17,7 @@ Role Variables
 
 - `archivematica_src_dir`: location where the source code repositories are cloned (default: user home)
 
-- `archivematica_src_install_am`: install pipeline code (default: "yes")
-- `archivematica_src_install_ss`: install storage service (default: "yes")
 - `archivematica_src_install_sample_data`: copy sample data (default: "yes")
-- `archivematica_src_install_devtools`: install archivematica-devtools (default: "no")
-- `archivematica_src_install_automationtools`: install automation-tools (default: "no")
-- `archivematica_src_install_appraisaltab`: install appraisal-tab (default: "no") (WIP)
 
 - `archivematica_src_am_version`: AM branch (tag or commit) to install
 - `archivematica_src_ss_version`: SS branch (tag or commit) to install

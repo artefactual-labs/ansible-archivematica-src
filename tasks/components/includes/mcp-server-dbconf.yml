@@ -1,7 +1,7 @@
 
-###########################################################
-#   5- Database reset (when flag enabled)
-###########################################################
+#
+# Database reset (when flag enabled)
+#
 
 - name: "Drop MCP database"
   mysql_db:
@@ -20,9 +20,9 @@
   command: "{{ archivematica_src_dir }}/archivematica/localDevSetup/eraseElasticSearchIndexes.py -f"
   when: archivematica_src_reset_es|bool or archivematica_src_reset_am_all|bool
 
-###########################################################
-#   5- Database config
-###########################################################
+#
+# Database configuration
+#
 
 # Note that when we are using mysql_db and mysql_user we are assuming that the
 # root user has a local ~/.my.cnf configuration file with the credentials in it
@@ -85,5 +85,5 @@
     app_path: "/usr/share/archivematica/dashboard/"
     settings: "settings.common"
     pythonpath: "/usr/lib/archivematica/archivematicaCommon"
-  tags: amsrc-pipeline-dbconf-syncdb
-  when: not archivematica_src_am_pre_migration|bool
+  tags: "amsrc-pipeline-dbconf-syncdb"
+  when: "not archivematica_src_am_pre_migration|bool"

@@ -1,14 +1,18 @@
 ---
+
 - name: "Install appraisal tab package dependencies"
   apt:
     pkg: "{{ item }}"
     state: "latest"
   with_items:
-     - "npm"
+    - "npm"
 
 - name: "Fix install path of node vs nodejs via symlink"
-  file: src=/usr/bin/nodejs dest=/usr/bin/node state=link
+  file:
+    src: "/usr/bin/nodejs"
+    dest: "/usr/bin/node"
+    state: "link"
 
 - name: "Install appraisal tab dependencies"
-  npm: path="{{ archivematica_src_dir }}/archivematica/src/dashboard/src/external/appraisal-tab/"
-  become: "no"
+  npm:
+    path: "{{ archivematica_src_am_dashboard_src_dir }}/external/appraisal-tab/"

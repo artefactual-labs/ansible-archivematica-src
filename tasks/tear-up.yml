@@ -1,8 +1,13 @@
 ---
 
-- name: "Run the equivalent of apt-get update"
+#
+# Packages
+#
+
+- name: "Update apt packages cache"
   apt:
     update_cache: "yes"
+    cache_valid_time: "300"
 
 - name: "Install necessary packages"
   apt:
@@ -12,10 +17,9 @@
     - "python-pycurl"
     - "git"
 
-- name: "Add required PPAs"
-  apt_repository:
-    repo: "ppa:archivematica/externals-dev"
-    state: "present"
+#
+# Archivematica user
+#
 
 - name: "Create user archivematica"
   user:
@@ -33,6 +37,10 @@
     line: "archivematica ALL=NOPASSWD:/bin/mv,/bin/chown,/bin/chmod,/usr/bin/find,/usr/bin/gs,/usr/bin/inkscape"
     validate: "/usr/sbin/visudo -cf %s"
 
+#
+# Sources container
+#
+
 - name: "Expand archivematica_src_dir"
   set_fact:
     archivematica_src_dir: "{{ archivematica_src_dir|expanduser }}"
@@ -42,10 +50,16 @@
     state: "directory"
     path: "{{ archivematica_src_dir }}"
 
-- name: "Checkout out archivematica-sampledata repository"
-  git:
-    repo: "https://github.com/artefactual/archivematica-sampledata.git"
-    dest: "~/archivematica-sampledata"
-    update: "no"
-  when: "archivematica_src_install_sample_data|bool"
-  become: "no"
+#
+# Disable unneeded services
+#
+
+- name: "Disable unneeded services"
+  service:
+    name: "{{ item }}"
+    state: "stopped"
+    enabled: "no"
+  when: "ansible_distribution_release == '14.04'"
+  with_items:
+    - "chef-client"
+    - "puppet"

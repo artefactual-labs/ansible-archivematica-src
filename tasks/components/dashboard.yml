@@ -1,0 +1,104 @@
+---
+
+- include: "includes/common.yml"
+
+- name: "Install archivematica-dashboard package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items: "{{ archivematica_src_am_dashboard_pkgdeps }}"
+
+- name: "Install archivematica-dashboard virtualenv with upgraded pip"
+  pip:
+    name: "pip"
+    virtualenv: "{{ archivematica_src_am_dashboard_env_dir }}"
+    state: "latest"
+
+- name: "Install archivematica-dashboard Python dependencies in virtualenv"
+  pip:
+    requirements: "{{ item.path }}"
+    virtualenv: "{{ archivematica_src_am_dashboard_env_dir }}"
+    state: "present"
+  when: "{{ item.environment == 'any' or item.environment == archivematica_src_environment_type }}"
+  with_items:
+    - path: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements/production.txt"
+      environment: "production"
+    - path: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements/local.txt"
+      environment: "development"
+    - path: "{{ archivematica_src_am_dashboard_src_dir }}/requirements/production.txt"
+      environment: "production"
+    - path: "{{ archivematica_src_am_dashboard_src_dir }}/requirements/local.txt"
+      environment: "development"
+
+- name: "Create archivematica-dashboard log directories"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+    owner: "{{ archivematica_user }}"
+    group: "{{ archivematica_group }}"
+    mode: "g+s"
+  with_items:
+    - "/var/log/archivematica/dashboard"
+
+- include: "includes/dashboard-appraisal-tab.yml"
+  tags:
+    - "amsrc-dashboard-appraisaltab"
+
+- name: "Remove Nginx default server"
+  file:
+    path: "{{ item }}"
+    state: "absent"
+  with_items:
+    - "/etc/nginx/sites-available/default"
+    - "/etc/nginx/sites-available/default.conf"
+    - "/etc/nginx/sites-enabled/default"
+    - "/etc/nginx/sites-enabled/default.conf"
+  tags: "amsrc-dashboard-websrv"
+
+- name: "Install Nginx dashboard server"
+  template:
+    src: "etc/nginx/sites-available/dashboard.conf"
+    dest: "/etc/nginx/sites-available/dashboard.conf"
+    backup: "yes"
+  tags: "amsrc-dashboard-websrv"
+
+- name: "Enable Nginx dashboard server"
+  file:
+    src: "/etc/nginx/sites-available/dashboard.conf"
+    dest: "/etc/nginx/sites-enabled/dashboard.conf"
+    state: "link"
+  tags: "amsrc-dashboard-websrv"
+
+- name: "Ensure that /etc/archivematica exists"
+  file:
+    path: "/etc/archivematica"
+    state: "directory"
+    recurse: "yes"
+  tags: "amsrc-dashboard-websrv"
+
+- name: "Install gunicorn configuration file"
+  template:
+    src: "etc/archivematica/dashboard.gunicorn-config.py"
+    dest: "/etc/archivematica/dashboard.gunicorn-config.py"
+    backup: "yes"
+  tags: "amsrc-dashboard-websrv"
+
+- name: "Install archivematica-dashboard upstart service"
+  template:
+    src: "etc/init/archivematica-dashboard.conf"
+    dest: "/etc/init/archivematica-dashboard.conf"
+    backup: "yes"
+  tags: "amsrc-dashboard-websrv"
+
+- name: "Reload upstart"
+  command: "initctl reload-configuration"
+
+- name: "Enable services"
+  service:
+    name: "{{ item }}"
+    state: "restarted"
+    enabled: "yes"
+  with_items:
+    - "nginx"
+    - "archivematica-dashboard"
+  tags: "amsrc-dashboard-websrv"
