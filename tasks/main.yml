@@ -24,6 +24,8 @@
       ARCHIVEMATICA_DASHBOARD_DB_PORT: "{{ archivematica_src_am_dashboad_db_port }}"
       ARCHIVEMATICA_DASHBOARD_GEARMAN: "{{ archivematica_src_am_dashboad_gearman }}"
       ARCHIVEMATICA_DASHBOARD_ELASTICSEARCH: "{{ archivematica_src_am_dashboad_elasticsearch }}"
+      ARCHIVEAMTICA_DASHBOARD_WATCHED_DIR: "{{ archivematica_src_am_dashboad_watched_dir }}"
+      ARCHIVEAMTICA_DASHBOARD_SHARED_DIR: "{{ archivematica_src_am_dashboad_shared_dir }}"
     archivematica_src_am_mcpclient_src_dir: "{{ archivematica_src_dir }}/archivematica/src/MCPClient"
     archivematica_src_am_mcpclient_environment:
       ARCHIVEMATICA_MCPCLIENT_SECRET_KEY: "{{ archivematica_src_am_mcpclient_secret_key }}"
