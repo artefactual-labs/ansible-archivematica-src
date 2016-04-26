@@ -30,19 +30,9 @@
 
 - name: "Install archivematica-mcp-client Python dependencies in virtualenv"
   pip:
-    requirements: "{{ item.path }}"
+    requirements: "{{ archivematica_src_am_mcpclient_src_dir }}/requirements.txt"
     virtualenv: "{{ archivematica_src_am_mcpclient_env_dir }}"
     state: "present"
-  when: "{{ item.environment == 'any' or item.environment == archivematica_src_environment_type }}"
-  with_items:
-    - path: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements/production.txt"
-      environment: "production"
-    - path: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements/local.txt"
-      environment: "development"
-    - path: "{{ archivematica_src_am_mcpclient_src_dir }}/requirements/production.txt"
-      environment: "production"
-    - path: "{{ archivematica_src_am_mcpclient_src_dir }}/requirements/test.txt"
-      environment: "development"
 
 - name: "Create archivematica-mcp-client log directory"
   file:
