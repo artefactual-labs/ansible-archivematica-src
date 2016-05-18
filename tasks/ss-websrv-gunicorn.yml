@@ -38,6 +38,31 @@
     state: "link"
   tags: "amsrc-ss-websrv"
 
+# SSL configuration tasks - begin
+- name: "Template nginx sites-available ssl config file"
+  template:
+    src: "etc_nginx_sites_storage-ssl-gunicorn.conf.j2"
+    dest: "/etc/nginx/sites-available/storage-ssl.conf"
+    backup: "yes"
+  when: "archivematica_src_ssl|bool"
+  tags: "amsrc-ss-websrv"
+
+- name: "Remove non-ssl config from sites-enabled"
+  file:
+    path: "/etc/nginx/sites-enabled/storage.conf"
+    state: "absent"
+  when: "archivematica_src_ssl|bool"
+  tags: "amsrc-ss-websrv"
+
+- name: "Add ssl config to sites-enabled"
+  file:
+    src: "/etc/nginx/sites-available/storage-ssl.conf"
+    dest: "/etc/nginx/sites-enabled/storage-ssl.conf"
+    state: "link"
+  when: "archivematica_src_ssl|bool"
+  tags: "amsrc-ss-websrv"
+# SSL configuration tasks - end
+
 - name: "Enable services"
   service:
     name: "{{ item }}"

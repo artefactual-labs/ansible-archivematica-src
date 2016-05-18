@@ -54,6 +54,28 @@
     dest: "/etc/nginx/sites-enabled/dashboard.conf"
     state: "link"
 
+# SSL configuration tasks - begin
+- name: "Template nginx ssl config file"
+  template:
+    src: "etc_nginx_sites_dashboard-ssl-gunicorn.conf.j2"
+    dest: "/etc/nginx/sites-available/dashboard-ssl.conf"
+    backup: "yes"
+  when: "archivematica_src_ssl|bool"
+
+- name: "Remove non-ssl config from sites-enabled"
+  file:
+    path: "/etc/nginx/sites-enabled/dashboard.conf"
+    state: "absent"
+  when: "archivematica_src_ssl|bool"
+
+- name: "Add ssl config to sites-enabled"
+  file:
+    src: "/etc/nginx/sites-available/dashboard-ssl.conf"
+    dest: "/etc/nginx/sites-enabled/dashboard-ssl.conf"
+    state: "link"
+  when: "archivematica_src_ssl|bool"
+# SSL configuration tasks - end
+
 - name: "Enable services"
   service:
     name: "{{ item }}"
