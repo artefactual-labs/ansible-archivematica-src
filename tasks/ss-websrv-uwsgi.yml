@@ -1,0 +1,52 @@
+###########################################################
+#   6- web server config - when using uwsgi with nginx
+###########################################################
+
+- name: "set nginx sites-available config file"
+  template:
+    src: "etc_nginx_sites_storage.conf.j2"
+    dest: "/etc/nginx/sites-available/storage.conf"
+    backup: "yes"
+  tags: "amsrc-ss-websrv"
+
+- name: "set uwsgi apps-available config file"
+  template:
+    src: "etc_uwsgi_apps_storage.ini.j2"
+    dest: "/etc/uwsgi/apps-available/storage.ini"
+    backup: "yes"
+  tags: "amsrc-ss-websrv"
+
+- name: "Remove Nginx default server"
+  file:
+    path: "{{ item }}"
+    state: "absent"
+  with_items:
+    - "/etc/nginx/sites-available/default"
+    - "/etc/nginx/sites-available/default.conf"
+    - "/etc/nginx/sites-enabled/default"
+    - "/etc/nginx/sites-enabled/default.conf"
+  tags: "amsrc-ss-websrv"
+
+- name: "Set up Nginx server"
+  file:
+    src: "/etc/nginx/sites-available/storage.conf"
+    dest: "/etc/nginx/sites-enabled/storage.conf"
+    state: "link"
+  tags: "amsrc-ss-websrv"
+
+- name: "Set up uWSGI server"
+  file:
+    src: "/etc/uwsgi/apps-available/storage.ini"
+    dest: "/etc/uwsgi/apps-enabled/storage.ini"
+    state: "link"
+  tags: "amsrc-ss-websrv"
+
+- name: "Enable services"
+  service:
+    name: "{{ item }}"
+    state: "restarted"
+    enabled: "yes"
+  with_items:
+    - "nginx"
+    - "uwsgi"
+  tags: "amsrc-ss-websrv"

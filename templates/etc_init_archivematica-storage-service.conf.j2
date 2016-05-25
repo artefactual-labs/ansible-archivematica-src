@@ -1,0 +1,34 @@
+# {{ ansible_managed }}
+description "Archivematica Storage Service"
+author "Artefactual Systems"
+
+start on (runlevel [2345] and filesystem)
+stop on runlevel [016]
+
+respawn
+
+setuid archivematica
+setgid archivematica
+
+chdir /usr/lib/archivematica/storage-service
+
+env DJANGO_SECRET_KEY={{ archivematica_src_ss_env_django_secret_key }}
+env DJANGO_SETTINGS_MODULE={{ archivematica_src_ss_env_django_setings_module }}
+env DJANGO_STATIC_ROOT={{ archivematica_src_ss_env_django_static_root }}
+env EMAIL_HOST={{ archivematica_src_ss_env_email_host }}
+env EMAIL_HOST_PASSWORD={{ archivematica_src_ss_env_email_host_password }}
+env EMAIL_HOST_USER={{ archivematica_src_ss_env_email_host_user }}
+env EMAIL_PORT={{ archivematica_src_ss_env_email_port }}
+env SS_DB_HOST={{ archivematica_src_ss_env_ss_db_host }}
+env SS_DB_NAME={{ archivematica_src_ss_env_ss_db_name }}
+env SS_DB_PASSWORD={{ archivematica_src_ss_env_ss_db_password }}
+env SS_DB_USER={{ archivematica_src_ss_env_ss_db_user }}
+
+exec /usr/share/python/archivematica-storage-service/bin/gunicorn storage_service.wsgi:application  \
+--workers {{ archivematica_src_ss_gunicorn_workers }} \
+--timeout {{ archivematica_src_ss_gunicorn_timeout }} \
+--log-level error \
+{% if archivematica_src_environment_type == "development" %}
+--reload \
+{% endif %}
+--bind {{ archivematica_src_ss_gunicorn_bind }}

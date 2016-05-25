@@ -17,10 +17,21 @@
 # archivematica-storage-service
 #
 
-- include: "archivematica-storage-service.yml"
+- include: "ss-main.yml"
   tags:
    - "amsrc-ss"
   when: "archivematica_src_install_ss|bool"
+
+- include: "ss-websrv-uwsgi.yml"
+  tags:
+   - "amsrc-ss"
+  when: "archivematica_src_install_ss|bool and not(archivematica_src_ss_gunicorn|bool)"
+
+- include: "ss-websrv-gunicorn.yml"
+  tags:
+   - "amsrc-ss"
+  when: "archivematica_src_install_ss|bool and archivematica_src_ss_gunicorn|bool"
+
 
 #
 # archivematica pipeline install
