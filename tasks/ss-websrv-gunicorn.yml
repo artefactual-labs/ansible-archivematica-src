@@ -11,8 +11,8 @@
 
 - name: "set gunicorn init file"
   template:
-    src: "etc_init_gunicorn.conf.j2"
-    dest: "/etc/init/gunicorn.conf"
+    src: "etc_init_archivematica-storage-service.conf.j2"
+    dest: "/etc/init/archivematica-storage-service.conf"
     backup: "yes"
   tags: "amsrc-ss-websrv"
 
@@ -44,6 +44,6 @@
     state: "restarted"
     enabled: "yes"
   with_items:
-    - "gunicorn"
+    - "archivematica-storage-service"
     - "nginx"
   tags: "amsrc-ss-websrv"
