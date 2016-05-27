@@ -5,13 +5,26 @@
 #
 
 
+- name: "Set fact: type of environment"
+  set_fact:
+    is_dev: "{{ archivematica_src_environment_type == 'development' }}"
+    is_prod: "{{ archivematica_src_environment_type == 'production' }}"
+  tags: "always" # inocuous to use always here
+
+- name: "Set fact: environment vars"
+  set_fact:
+    archivematica_src_am_dashboard_environment:
+      DJANGO_SETTINGS_MODULE: "{{ 'settings.local' if is_dev else 'settings.common' }}"
+  tags: "always" # inocuous to use always here
+
 - include: "tear-up.yml"
-  tags: # do not use "always" tag in role, to avoid issues when incuding other roles in a playbook
+  tags: # do not use "always" tag in role, to avoid issues when including other roles in a playbook
   - "amsrc-ss"
   - "amsrc-pipeline"
   - "amsrc-devtools"
   - "amsrc-automationtools"
   - "amsrc-appraisaltab"
+
 
 #
 # archivematica-storage-service
@@ -75,11 +88,20 @@
     - "amsrc-pipeline-dbconf"
   when: "archivematica_src_install_am|bool"
 
-- include: "pipeline-websrv.yml"
+- include: "pipeline-websrv-modwsgi.yml"
   tags:
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-websrv"
-  when: "archivematica_src_install_am|bool"
+   - "amsrc-pipeline"
+   - "amsrc-pipeline-websrv"
+  when: "archivematica_src_install_am|bool and not(archivematica_src_am_dashboard_gunicorn|bool)"
+
+- include: "pipeline-websrv-gunicorn.yml"
+  tags:
+   - "amsrc-pipeline"
+   - "amsrc-pipeline-websrv"
+  when: "archivematica_src_install_am|bool and archivematica_src_am_dashboard_gunicorn|bool"
+
+
+
 
 #
 # archivematica-devtools
