@@ -1,0 +1,64 @@
+---
+
+###########################################################
+#   6- dashboard web server config - when using gunicorn with nginx
+###########################################################
+
+- name: "Stop/disable apache2"
+  service:
+    name: "apache2"
+    state: "stopped"
+    enabled: "no"
+
+- name: "Install nginx package"
+  apt:
+    pkg: "nginx"
+    state: "latest"
+  with_items:
+    - "nginx"
+
+- name: "Template dashboard nginx sites-available config file"
+  template:
+    src: "etc_nginx_sites_dashboard-gunicorn.conf.j2"
+    dest: "/etc/nginx/sites-available/dashboard.conf"
+    backup: "yes"
+
+- name: "Template gunicorn configuration file"
+  template:
+    src: "etc_archivematica_dashboard.gunicorn-config.py.j2"
+    dest: "/etc/archivematica/dashboard.gunicorn-config.py"
+    backup: "yes"
+
+- name: "set gunicorn init file"
+  template:
+    src: "etc_init_archivematica-dashboard.conf.j2"
+    dest: "/etc/init/archivematica-dashboard.conf"
+    backup: "yes"
+
+- name: "Reload Upstart configuration"
+  command: "initctl reload-configuration"
+
+- name: "Remove Nginx default server"
+  file:
+    path: "{{ item }}"
+    state: "absent"
+  with_items:
+    - "/etc/nginx/sites-available/default"
+    - "/etc/nginx/sites-available/default.conf"
+    - "/etc/nginx/sites-enabled/default"
+    - "/etc/nginx/sites-enabled/default.conf"
+
+- name: "Set up Nginx server"
+  file:
+    src: "/etc/nginx/sites-available/dashboard.conf"
+    dest: "/etc/nginx/sites-enabled/dashboard.conf"
+    state: "link"
+
+- name: "Enable services"
+  service:
+    name: "{{ item }}"
+    state: "restarted"
+    enabled: "yes"
+  with_items:
+    - "archivematica-dashboard"
+    - "nginx"

@@ -1,7 +1,7 @@
 ---
 
 ###########################################################
-#   6- web server config
+#   6- web server config : apache2 mod_wsgi
 ###########################################################
 
 - name: "Enable mod-wsgi in Apache"

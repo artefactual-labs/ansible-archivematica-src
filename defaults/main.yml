@@ -81,3 +81,11 @@ archivematica_src_ss_gunicorn_bind: "127.0.0.1:8001"
 ## SS nginx gunicorn related parameters
 archivematica_src_ss_nginx_proxy_read_timeout: "172800s"
 archivematica_src_ss_nginx_proxy_pass: "http://127.0.0.1:8001"
+
+# dashboard: use gunicorn instead of apache
+archivematica_src_am_dashboard_gunicorn: "false"
+# dashboard gunicorn parameters
+archivematica_src_am_dashboard_bind: "unix:/run/archivematica-dashboard.gunicorn.sock"
+
+# dashboard nginx gunicorn related parameters
+archivematica_src_am_dashboard_nginx_proxy_read_timeout: "172800s"
