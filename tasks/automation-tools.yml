@@ -21,3 +21,29 @@
     src: "{{ archivematica_src_dir }}/automation-tools"
     dest: "/usr/lib/archivematica/automation-tools"
     state: "link"
+
+- name: "Create directories for logs/database/PID files"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+    owner: "archivematica"
+    group: "archivematica"
+  with_items:
+    - "/var/log/archivematica/automation-tools"
+    - "/var/archivematica/automation-tools"
+
+- name: "Create etc directory for automation tools"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+  with_items:
+    - "/etc/archivematica/automation-tools"
+
+- name: "Template automation tools /etc configuration"
+  template:
+    src: "{{ item }}.j2"
+    dest: "/{{ item }}"
+    backup: "yes"
+  with_items:
+    - "etc/archivematica/automation-tools/transfers.conf"
+    - "etc/archivematica/automation-tools/transfer-script.sh"
