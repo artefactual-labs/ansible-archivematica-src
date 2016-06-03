@@ -82,8 +82,10 @@ archivematica_src_ss_nginx_proxy_pass: "http://127.0.0.1:8001"
 
 # dashboard: use gunicorn instead of apache
 archivematica_src_am_dashboard_gunicorn: "false"
-# dashboard gunicorn parameters
-archivematica_src_am_dashboard_bind: "unix:/run/archivematica-dashboard.gunicorn.sock"
+# dashboard gunicorn parameters:
+#   use of unix sockets breaks AM API whitelisting that relies on REMOTE_ADDR so using tcp sockets instead
+#   ( https://github.com/benoitc/gunicorn/issues/797 )
+archivematica_src_am_dashboard_bind: "127.0.0.1:8002"
 
 # dashboard nginx gunicorn related parameters
 archivematica_src_am_dashboard_nginx_proxy_read_timeout: "172800s"
