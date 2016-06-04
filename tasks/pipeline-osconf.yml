@@ -55,7 +55,7 @@
   file:
     dest: "/var/archivematica/sharedDirectory"
     state: "absent"
-  when: "archivematica_src_reset_shareddir or archivematica_src_reset_am_all"
+  when: "archivematica_src_reset_shareddir|bool or archivematica_src_reset_am_all|bool"
 
 - name: "Create /var/archivematica/sharedDirectory"
   file:

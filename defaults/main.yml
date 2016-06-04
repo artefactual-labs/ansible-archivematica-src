@@ -54,6 +54,12 @@ archivematica_src_reset_am_all: "false"
 # Reset the SS database
 archivematica_src_reset_ss_db: "false"
 
+## Migrations related
+# Migrate AM database from v1.4 to v1.5
+archivematica_src_am_migrate_from_v1_4: "false"
+# Migrate SS database from v0.7 to v0.8
+archivematica_src_ss_migrate_from_v0_7: "false"
+
 ## backwards compatibility
 # run SS manage.py syncdb before migrate (for stable/0.7.x and previous branches that use Django 1.5.x)
 archivematica_src_ss_run_syncdb: "false"
@@ -70,7 +76,7 @@ archivematica_src_am_dashboard_pkgdeps: "{{ archivematica_src_am_dashboard_pkgde
 archivematica_src_am_mcpserver_pkgdeps: "{{ archivematica_src_am_mcpserver_pkgdeps_v1_4 }}"
 archivematica_src_am_mcpclient_pkgdeps: "{{ archivematica_src_am_mcpclient_pkgdeps_v1_4 }}"
 
-# SS: use gunicorn instead of uwsgi
+# SS: use gunicorn instead of uwsgi (from SS 0.8.x)
 archivematica_src_ss_gunicorn: "false"
 ## SS gunicorn parameters
 archivematica_src_ss_gunicorn_workers: "4"
@@ -80,7 +86,7 @@ archivematica_src_ss_gunicorn_bind: "127.0.0.1:8001"
 archivematica_src_ss_nginx_proxy_read_timeout: "172800s"
 archivematica_src_ss_nginx_proxy_pass: "http://127.0.0.1:8001"
 
-# dashboard: use gunicorn instead of apache
+# dashboard: use gunicorn instead of apache (from AM 1.5.x)
 archivematica_src_am_dashboard_gunicorn: "false"
 # dashboard gunicorn parameters:
 #   use of unix sockets breaks AM API whitelisting that relies on REMOTE_ADDR so using tcp sockets instead

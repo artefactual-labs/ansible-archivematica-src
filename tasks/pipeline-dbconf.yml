@@ -79,6 +79,9 @@
     creates: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.complete"
   when: "archivematica_src_am_pre_migration|bool"
 
+- include: "pipeline-dbconf-migrate-1_4-to-1_5.yml"
+  when: "not archivematica_src_am_pre_migration|bool and archivematica_src_am_migrate_from_v1_4|bool"
+
 # Django migrations
 - name: "Run migrations"
   django_manage:

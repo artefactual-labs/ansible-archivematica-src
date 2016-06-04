@@ -59,16 +59,34 @@
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/lib/"
       dest: "/usr/lib/archivematica/MCPClient"
 
+# For 1.6+ the location of archivematicaClientModules file is moved from
+# src/MCPClient/etc/ to src/MCPClient/lib
+# check if file is in etc/, if not there assume it is in lib/
+
+- name: "check if archivematicaClientModules is in src/MCPClient/etc/"
+  stat:
+    path: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/etc/archivematicaClientModules"
+  register: "p"
+
+- name: "set fact for MCP clientConfig.conf"
+  set_fact:
+    archivematica_src_clientmodules: "/etc/archivematica/MCPClient/archivematicaClientModules"
+  when: "p.stat.exists is defined and p.stat.exists"
+
+- name: "set fact for MCP clientConfig.conf"
+  set_fact:
+    archivematica_src_clientmodules: "/usr/lib/archivematica/MCPClient/archivematicaClientModules"
+  when: "p.stat.exists is defined and not p.stat.exists"
+
+- name: "copy archivematicaClientModules to /etc/archivematica/MCPClient/ if required"
+  command: "cp {{ archivematica_src_dir }}/archivematica/src/MCPClient/etc/archivematicaClientModules /etc/archivematica/MCPClient/"
+  when: "p.stat.exists is defined and p.stat.exists"
+
 - name: "Template MCPClient /etc config"
   template:
     src: "etc_archivematica_MCPClient_clientConfig.conf.j2"
     dest: "/etc/archivematica/MCPClient/clientConfig.conf"
     backup: "yes"
-
-- name: "Move archivematicaClientModules to /usr/lib/archivematica/MCPClient"
-  command: "mv {{ archivematica_src_dir }}/archivematica/src/MCPClient/etc/archivematicaClientModules /usr/lib/archivematica/MCPClient/"
-  args:
-    creates: "/usr/lib/archivematica/MCPClient/archivematicaClientModules"
 
 - name: "Template archivematica-mcp-server init service file"
   template:

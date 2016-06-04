@@ -136,4 +136,4 @@
   pip:
     requirements: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/requirements.txt"
     state: "latest"
-  when: "requirements_file.stat.exists == True"
+  when: "requirements_file.stat.exists is defined and requirements_file.stat.exists"

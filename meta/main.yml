@@ -1,8 +1,8 @@
 ---
 galaxy_info:
-  author: Hector Akamine
-  description: An ansible role for installing Archivematica from github
-  company: Artefactual Systems Inc
+  author: Artefactual Systems
+  description: An ansible role for installing Archivematica from source
+  company: Artefactual Systems
   license: AGPLv3
   min_ansible_version: 1.6
   platforms:
@@ -12,4 +12,3 @@ galaxy_info:
     - trusty
 
 dependencies: []
-  
