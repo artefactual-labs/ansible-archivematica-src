@@ -108,7 +108,7 @@
     - "pyopenssl"
     - "ndg-httpsclient"
     - "pyasn1"
-  when: "archivematica_src_ss_pip_missing_deps"
+  when: "archivematica_src_ss_pip_missing_deps|bool"
   tags: "amsrc-ss-pydep"
 
 
@@ -179,89 +179,13 @@
     command: "collectstatic"
     app_path: "/usr/lib/archivematica/storage-service"
     virtualenv: "/usr/share/python/archivematica-storage-service"
-  environment:
-    DJANGO_SECRET_KEY: "{{ archivematica_src_ss_env_django_secret_key }}"
-    DJANGO_SETTINGS_MODULE: "{{ archivematica_src_ss_env_django_setings_module }}"
-    DJANGO_STATIC_ROOT: "{{ archivematica_src_ss_env_django_static_root }}"
-    EMAIL_HOST: "{{ archivematica_src_ss_env_email_host }}"
-    EMAIL_HOST_PASSWORD: "{{ archivematica_src_ss_env_email_host_password }}"
-    EMAIL_HOST_USER: "{{ archivematica_src_ss_env_email_host_user }}"
-    EMAIL_PORT: "{{ archivematica_src_ss_env_email_port }}"
-    SS_DB_HOST: "{{ archivematica_src_ss_env_ss_db_host }}"
-    SS_DB_NAME: "{{ archivematica_src_ss_env_ss_db_name }}"
-    SS_DB_PASSWORD: "{{ archivematica_src_ss_env_ss_db_password }}"
-    SS_DB_USER: "{{ archivematica_src_ss_env_ss_db_user }}"
+  environment: "{{ archivematica_src_ss_environment }}"
   tags: "amsrc-ss-code"
 
 
 ###########################################################
-#   5- Database config
+#   5- Database config - moved to separate files
 ###########################################################
-
-- name: "Remove SS DB"
-  file:
-    state: "absent"
-    path: "{{ archivematica_src_ss_env_ss_db_name }}"
-  when: "archivematica_src_reset_ss_db|bool"
-  tags: "amsrc-ss-db"
-
-- name: "Run SS django manage syncdb"
-  django_manage:
-    command: "syncdb"
-    app_path: "/usr/lib/archivematica/storage-service"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
-  environment:
-    DJANGO_SECRET_KEY: "{{ archivematica_src_ss_env_django_secret_key }}"
-    DJANGO_SETTINGS_MODULE: "{{ archivematica_src_ss_env_django_setings_module }}"
-    DJANGO_STATIC_ROOT: "{{ archivematica_src_ss_env_django_static_root }}"
-    EMAIL_HOST: "{{ archivematica_src_ss_env_email_host }}"
-    EMAIL_HOST_PASSWORD: "{{ archivematica_src_ss_env_email_host_password }}"
-    EMAIL_HOST_USER: "{{ archivematica_src_ss_env_email_host_user }}"
-    EMAIL_PORT: "{{ archivematica_src_ss_env_email_port }}"
-    SS_DB_HOST: "{{ archivematica_src_ss_env_ss_db_host }}"
-    SS_DB_NAME: "{{ archivematica_src_ss_env_ss_db_name }}"
-    SS_DB_PASSWORD: "{{ archivematica_src_ss_env_ss_db_password }}"
-    SS_DB_USER: "{{ archivematica_src_ss_env_ss_db_user }}"
-  when: "archivematica_src_ss_run_syncdb"
-  tags: "amsrc-ss-db"
-
-- name: "Run SS django database migrations"
-  django_manage:
-    command: "migrate"
-    app_path: "/usr/lib/archivematica/storage-service"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
-  environment:
-    DJANGO_SECRET_KEY: "{{ archivematica_src_ss_env_django_secret_key }}"
-    DJANGO_SETTINGS_MODULE: "{{ archivematica_src_ss_env_django_setings_module }}"
-    DJANGO_STATIC_ROOT: "{{ archivematica_src_ss_env_django_static_root }}"
-    EMAIL_HOST: "{{ archivematica_src_ss_env_email_host }}"
-    EMAIL_HOST_PASSWORD: "{{ archivematica_src_ss_env_email_host_password }}"
-    EMAIL_HOST_USER: "{{ archivematica_src_ss_env_email_host_user }}"
-    EMAIL_PORT: "{{ archivematica_src_ss_env_email_port }}"
-    SS_DB_HOST: "{{ archivematica_src_ss_env_ss_db_host }}"
-    SS_DB_NAME: "{{ archivematica_src_ss_env_ss_db_name }}"
-    SS_DB_PASSWORD: "{{ archivematica_src_ss_env_ss_db_password }}"
-    SS_DB_USER: "{{ archivematica_src_ss_env_ss_db_user }}"
-  tags: "amsrc-ss-db"
-
-- name: "Back create API keys for old users"
-  django_manage:
-    command: "backfill_api_keys"
-    app_path: "/usr/lib/archivematica/storage-service"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
-  environment:
-    DJANGO_SECRET_KEY: "{{ archivematica_src_ss_env_django_secret_key }}"
-    DJANGO_SETTINGS_MODULE: "{{ archivematica_src_ss_env_django_setings_module }}"
-    DJANGO_STATIC_ROOT: "{{ archivematica_src_ss_env_django_static_root }}"
-    EMAIL_HOST: "{{ archivematica_src_ss_env_email_host }}"
-    EMAIL_HOST_PASSWORD: "{{ archivematica_src_ss_env_email_host_password }}"
-    EMAIL_HOST_USER: "{{ archivematica_src_ss_env_email_host_user }}"
-    EMAIL_PORT: "{{ archivematica_src_ss_env_email_port }}"
-    SS_DB_HOST: "{{ archivematica_src_ss_env_ss_db_host }}"
-    SS_DB_NAME: "{{ archivematica_src_ss_env_ss_db_name }}"
-    SS_DB_PASSWORD: "{{ archivematica_src_ss_env_ss_db_password }}"
-    SS_DB_USER: "{{ archivematica_src_ss_env_ss_db_user }}"
-  tags: "amsrc-ss-db"
 
 ###########################################################
 #   6- web server config - moved to separate files

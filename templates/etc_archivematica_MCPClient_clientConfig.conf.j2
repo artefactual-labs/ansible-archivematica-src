@@ -2,7 +2,7 @@
 MCPArchivematicaServer = localhost:4730
 sharedDirectoryMounted = /var/archivematica/sharedDirectory/
 maxThreads = 2
-archivematicaClientModules = /usr/lib/archivematica/MCPClient/archivematicaClientModules
+archivematicaClientModules = {{ archivematica_src_clientmodules }}
 clientScriptsDirectory = /usr/lib/archivematica/MCPClient/clientScripts/
 LoadSupportedCommandsSpecial = True
 #numberOfTasks 0 means detect number of cores, and use that.

@@ -1,11 +1,7 @@
 archivematica-src
 =================
 
-Full Archivematica installation from its source code repositories.
-
-Note that the role currently does not handle database migrations completely.
-Do not use to upgrade production systems with old versions of Archivematica or
-the Storage Service (unless you know what you are doing).
+Archivematica installation from its source code repositories.
 
 Requirements
 ------------
@@ -46,24 +42,73 @@ Dependencies
 
 N/A yet.
 
-Example Playbook
+Example Playbooks
 ----------------
+
+Please note that a complete Archivematica installation includes software not installed by this role. See https://github.com/artefactual/deploy-pub/tree/master/playbooks/archivematica for a more complete example.
+
+It is also recommended to take backups of you system (Archivematica and Storage Service databases, AIPS, DIPS, etc) prior to running an upgrade.
+
+1) For installing AM v1.4 (with SS v0.7):
 
 ```yaml
 ---
-- hosts: "servers"
+- hosts: "myserver"
   roles:
      - role: "archivematica-src"
+  vars:
        archivematica_src_dir: "/opt/archivematica"
-       archivematica_src_am_version: "qa/1.x"
-       archivematica_src_ss_version: "qa/0.x"
-  sudo: "yes"
+       archivematica_src_am_version: "stable/1.4.x"
+       archivematica_src_ss_version: "stable/0.7.x"
+       archivematica_src_ss_env_django_secret_key: "mysecretkey"
+       archivematica_src_ss_run_syncdb: "true"
+       archivematica_src_ss_pip_missing_deps: "true"
+  become: "yes"
 ```
+
+2) For installing AM v1.5 (with SS v0.8) using gunicorn/nginx:
+
+```yaml
+---
+- hosts: "myserver"
+  roles:
+     - role: "archivematica-src"
+  vars:
+       archivematica_src_dir: "/opt/archivematica"
+       archivematica_src_am_version: "stable/1.5.x"
+       archivematica_src_ss_version: "stable/0.8.x"
+       archivematica_src_ss_env_django_secret_key: "mysecretkey"
+       archivematica_src_ss_gunicorn: "true"
+       archivematica_src_am_dashboard_gunicorn: "true"
+  become: "yes"
+```
+
+3) To upgrade a source-based AM v1.4 installation to v1.5 (SS v0.7 to v0.8) :
+
+```yaml
+---
+- hosts: "myserver"
+  roles:
+     - role: "archivematica-src"
+  vars:
+       archivematica_src_dir: "/opt/archivematica"
+       archivematica_src_am_version: "stable/1.5.x"
+       archivematica_src_ss_version: "stable/0.8.x"
+       archivematica_src_ss_env_django_secret_key: "mysecretkey"
+       archivematica_src_ss_gunicorn: "true"
+       archivematica_src_am_dashboard_gunicorn: "true"
+       archivematica_src_am_migrate_from_v1_4: "true"
+       archivematica_src_ss_migrate_from_v0_7: "true"
+
+  become: "yes"
+```
+
+Please note that this last playbook is not idempotent, and it will throw an error if run twice. The two migrate related variables should be removed after a successful migration (an alternative could be to specify the `archivematica_src_am_migrate_from_v1_4` and `archivematica_src_ss_migrate_from_v0_7` at run time using `--extra-vars` instead of putting the variables in the playbook). 
 
 License
 -------
 
-N/A yet.
+AGPLv3
 
 Author Information
 ------------------
