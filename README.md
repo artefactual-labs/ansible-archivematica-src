@@ -51,6 +51,31 @@ Role Variables
 - `archivematica_src_am_repo`: AM repository (default: `"https://github.com/artefactual/archivematica.git"`)
 - `archivematica_src_ss_repo`: SS repository (default: `"https://github.com/artefactual/archivematica-storage-service.git"`)
 
+Tags
+----
+
+Tags can be used to control which parts of the playbook to run, especially on updates.
+Note that if something is disabled with the [role variables](#role-variables), it won't be run even if the tag is enabled.
+
+- `amsrc-ss`: Storage service install
+    - `amsrc-ss-clone`: Checkout source code
+    - `amsrc-ss-osdep`: Install operating system dependencies
+    - `amsrc-ss-pydep`: Install Python dependencies (with pip)
+    - `amsrc-ss-osconf`: Configure operating system
+    - `amsrc-ss-code`: Install source code
+    - `amsrc-ss-db`: Configure database
+    - `amsrc-ss-websrv`: Configure webserver
+- `amsrc-pipeline`: Archivematica pipeline install
+    - `amsrc-pipeline-clonecode`: Checkout source code
+    - `amsrc-pipeline-deps`: Install & configure operating system & Python dependencies
+    - `amsrc-pipeline-osconf`: Configure operating system
+    - `amsrc-pipeline-instcode`: Install source code
+    - `amsrc-pipeline-dbconf`: Configure database
+    - `amsrc-pipeline-websrv`: Configure webserver
+- `amsrc-devtools`: Archivematica devtools install
+- `amsrc-automationtools`: Automation tools install
+- `amsrc-appraisaltab`: Appraisal tab install
+
 Dependencies
 ------------
 
