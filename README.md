@@ -11,7 +11,11 @@ N/A yet.
 Role Variables
 --------------
 
+### General
+
 - `archivematica_src_dir`: location where the source code repositories are cloned (default: user home)
+
+### Projects
 
 - `archivematica_src_install_am`: install pipeline code (default: "yes")
 - `archivematica_src_install_ss`: install storage service (default: "yes")
@@ -20,10 +24,14 @@ Role Variables
 - `archivematica_src_install_automationtools`: install automation-tools (default: "no")
 - `archivematica_src_install_appraisaltab`: install appraisal-tab (default: "no") (WIP)
 
+### Version
+
 - `archivematica_src_am_version`: AM branch (tag or commit) to install
 - `archivematica_src_ss_version`: SS branch (tag or commit) to install
 - `archivematica_src_devtools_version`: archivematica-devtools branch (tag or commit) to install (default: master)
 - `archivematica_src_automationtools_version`: automation-tools branch (tag or commit) to install (default: master)
+
+### Reset
 
 - `archivematica_src_reset_mcpdb`: set to true to re-create the MCP database (normally at runtime using `ansible-playbook` `--extra-vars` switch)
 - `archivematica_src_reset_shareddir`: set to true to re-create the shared directory (normally at runtime using `ansible-playbook` `--extra-vars` switch)
@@ -31,11 +39,17 @@ Role Variables
 - `archivematica_src_reset_am_all`: set to true to re-create the MCP db, clear the shared directory and reset ElasticSearch indexes (normally at runtime using `ansible-playbook` `--extra-vars` switch). If true, it overrides the two vars above.
 - `archivematica_src_reset_ss_db`: set to true to re-create the SS database (normally at runtime using `ansible-playbook` `--extra-vars` switch)
 
+### Legacy support
+
 - `archivematica_src_ss_run_syncdb`: run SS manage.py syncdb before migrate (for stable/0.7.x and previous branches that use Django 1.5.x) (default: false)
 - `archivematica_src_ss_pip_missing_deps`:  workaround to install missing SS pip dependencies in old SS branches (default: false)
+- `archivematica_src_am_migrate_from_v1_4`: Migrate AM database from v1.4 to v1.5 (default: false)
+- `archivematica_src_ss_migrate_from_v0_7`: Migrate SS database from v0.7 to v0.8 (default: false)
 
-- archivematica_src_am_repo: AM repository (default: "https://github.com/artefactual/archivematica.git")
-- archivematica_src_ss_repo: SS repository (default: "https://github.com/artefactual/archivematica-storage-service.git")
+### Remote repository
+
+- `archivematica_src_am_repo`: AM repository (default: `"https://github.com/artefactual/archivematica.git"`)
+- `archivematica_src_ss_repo`: SS repository (default: `"https://github.com/artefactual/archivematica-storage-service.git"`)
 
 Dependencies
 ------------
