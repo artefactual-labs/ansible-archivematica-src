@@ -3,6 +3,27 @@ archivematica-src
 
 Archivematica installation from its source code repositories.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [archivematica-src](#archivematica-src)
+  - [Requirements](#requirements)
+  - [Role Variables](#role-variables)
+    - [General](#general)
+    - [Projects](#projects)
+    - [Version](#version)
+    - [Reset](#reset)
+    - [Legacy support](#legacy-support)
+    - [Remote repository](#remote-repository)
+  - [Tags](#tags)
+  - [Dependencies](#dependencies)
+  - [Example Playbooks](#example-playbooks)
+  - [License](#license)
+  - [Author Information](#author-information)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 Requirements
 ------------
 
