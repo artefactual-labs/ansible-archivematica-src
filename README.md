@@ -63,6 +63,7 @@ Note that if something is disabled with the [role variables](#role-variables), i
     - `amsrc-ss-pydep`: Install Python dependencies (with pip)
     - `amsrc-ss-osconf`: Configure operating system
     - `amsrc-ss-code`: Install source code
+        - `amsrc-ss-code-collectstatic`: Run Django's collectstatic
     - `amsrc-ss-db`: Configure database
     - `amsrc-ss-websrv`: Configure webserver
 - `amsrc-pipeline`: Archivematica pipeline install

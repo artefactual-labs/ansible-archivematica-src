@@ -180,7 +180,7 @@
     app_path: "/usr/lib/archivematica/storage-service"
     virtualenv: "/usr/share/python/archivematica-storage-service"
   environment: "{{ archivematica_src_ss_environment }}"
-  tags: "amsrc-ss-code"
+  tags: ["amsrc-ss-code", "amsrc-ss-code-collectstatic"]
 
 
 ###########################################################
