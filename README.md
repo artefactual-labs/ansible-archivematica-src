@@ -7,27 +7,23 @@ Archivematica installation from its source code repositories.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [archivematica-src](#archivematica-src)
-  - [Requirements](#requirements)
-  - [Role Variables](#role-variables)
-    - [General](#general)
-    - [Projects](#projects)
-    - [Version](#version)
-    - [Reset](#reset)
-    - [Legacy support](#legacy-support)
-    - [Remote repository](#remote-repository)
-  - [Tags](#tags)
-  - [Dependencies](#dependencies)
-  - [Example Playbooks](#example-playbooks)
-  - [License](#license)
-  - [Author Information](#author-information)
+- [Role Variables](#role-variables)
+  - [General](#general)
+  - [Projects](#projects)
+  - [Version](#version)
+  - [Reset](#reset)
+  - [Legacy support](#legacy-support)
+  - [Remote repository](#remote-repository)
+  - [Web server](#web-server)
+    - [SSL (when using gunicorn/nginx)](#ssl-when-using-gunicornnginx)
+- [Tags](#tags)
+- [Dependencies](#dependencies)
+- [Example Playbooks](#example-playbooks)
+- [License](#license)
+- [Author Information](#author-information)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-Requirements
-------------
-
-N/A yet.
 
 Role Variables
 --------------
@@ -71,6 +67,18 @@ Role Variables
 
 - `archivematica_src_am_repo`: AM repository (default: `"https://github.com/artefactual/archivematica.git"`)
 - `archivematica_src_ss_repo`: SS repository (default: `"https://github.com/artefactual/archivematica-storage-service.git"`)
+
+### Web server
+
+- `archivematica_src_ss_gunicorn`: use gunicorn/nginx instead of uwsgi/nginx for the Storage Service. For Storage Service branch stable/0.8.x or newer (default:`false`)
+- `archivematica_src_am_dashboard_gunicorn`: use gunicorn/nginx instead of apache/mod_wsgi for Archivematica Dashboard. For Archivematica branch stable/1.5.x or newer (default:`false`)
+
+#### SSL (when using gunicorn/nginx)
+
+- `archivematica_src_ssl`: configure Storage Service and Dashboard to use SSL (default:`false`)
+- `archivematica_src_ssl_include_acme_chlg_loc`: Include ACME challenge location file (`acmetool-location.conf`) in nginx configuration file, provided by role https://github.com/artefactual-labs/ansible-acmetool (default:`false`)
+- `archivematica_src_ssl_fullchain`:  (no default provided, shall be defined in the playbook or host_vars if SSL enabled)
+- `archivematica_src_ssl_privkey`: (no default provided, shall be defined in the playbook or host_vars if SSL enabled)
 
 Tags
 ----
@@ -144,7 +152,28 @@ It is also recommended to take backups of you system (Archivematica and Storage 
   become: "yes"
 ```
 
-3) To upgrade a source-based AM v1.4 installation to v1.5 (SS v0.7 to v0.8) :
+3) For installing AM v1.5 (with SS v0.8) using gunicorn/nginx, with SSL:
+
+```yaml
+---
+- hosts: "myserver"
+  roles:
+     - role: "archivematica-src"
+  vars:
+       archivematica_src_dir: "/opt/archivematica"
+       archivematica_src_am_version: "stable/1.5.x"
+       archivematica_src_ss_version: "stable/0.8.x"
+       archivematica_src_ss_env_django_secret_key: "mysecretkey"
+       archivematica_src_ss_gunicorn: "true"
+       archivematica_src_am_dashboard_gunicorn: "true"
+       archivematica_src_ssl: "true"
+       archivematica_src_ssl_fullchain: "/location/of/fullchain/file"
+       archivematica_src_ssl_privkey: "/location/of/private/key/file"       
+  become: "yes"
+```
+
+
+4) To upgrade a source-based AM v1.4 installation to v1.5 (SS v0.7 to v0.8) :
 
 ```yaml
 ---
@@ -164,7 +193,7 @@ It is also recommended to take backups of you system (Archivematica and Storage 
   become: "yes"
 ```
 
-Please note that this last playbook is not idempotent, and it will throw an error if run twice. The two migrate related variables should be removed after a successful migration (an alternative could be to specify the `archivematica_src_am_migrate_from_v1_4` and `archivematica_src_ss_migrate_from_v0_7` at run time using `--extra-vars` instead of putting the variables in the playbook). 
+Please note that this last playbook is not idempotent, and it will throw an error if run twice. The two migrate related variables should be removed after a successful migration (an alternative could be to specify the `archivematica_src_am_migrate_from_v1_4` and `archivematica_src_ss_migrate_from_v0_7` at run time using `--extra-vars` instead of putting the variables in the playbook).
 
 License
 -------
