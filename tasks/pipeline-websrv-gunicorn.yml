@@ -82,5 +82,7 @@
     state: "restarted"
     enabled: "yes"
   with_items:
+    - "archivematica-mcp-server"
+    - "archivematica-mcp-client"
     - "archivematica-dashboard"
     - "nginx"
