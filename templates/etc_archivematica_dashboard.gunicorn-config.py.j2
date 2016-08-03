@@ -12,10 +12,10 @@ group = "archivematica"
 bind = "{{ archivematica_src_am_dashboard_bind }}"
 
 # http://docs.gunicorn.org/en/stable/settings.html#workers
-workers = 1
+workers = "{{ archivematica_src_am_dashboard_gunicorn_workers }}"
 
 # http://docs.gunicorn.org/en/stable/settings.html#timeout
-timeout = 120
+timeout = "{{ archivematica_src_am_dashboard_gunicorn_timeout }}"
 
 # http://docs.gunicorn.org/en/stable/settings.html#reload
 reload = {{ 'True' if is_dev else 'False' }}
