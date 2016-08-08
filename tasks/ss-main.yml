@@ -125,6 +125,14 @@
     - "/usr/lib/archivematica"
   tags: "amsrc-ss-osconf"
 
+- name: "Create subdirectories for archivematica-storage-service config"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+  with_items:
+    - "/etc/archivematica"
+  tags: "amsrc-ss-osconf"
+
 - name: "Set owner, group, mode of /var/archivematica recursively"
   file:
     dest: "/var/archivematica"
