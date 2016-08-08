@@ -14,6 +14,7 @@ Archivematica installation from its source code repositories.
   - [Reset](#reset)
   - [Legacy support](#legacy-support)
   - [Remote repository](#remote-repository)
+  - [External package dependencies repository](#external-package-dependencies-repository)
   - [Web server](#web-server)
     - [SSL (when using gunicorn/nginx)](#ssl-when-using-gunicornnginx)
 - [Tags](#tags)
@@ -68,6 +69,11 @@ Role Variables
 - `archivematica_src_am_repo`: AM repository (default: `"https://github.com/artefactual/archivematica.git"`)
 - `archivematica_src_ss_repo`: SS repository (default: `"https://github.com/artefactual/archivematica-storage-service.git"`)
 
+### External package dependencies repository
+- `archivematica_src_externals_repo`: externals package server url or ppa (`http://<server>/<repository>` or `ppa:<name>`) (default: `"http://packages.archivematica.org/1.5.x/ubuntu-externals"`) 
+- `archivematica_src_externals_repo_key_id`: repository key id  (ignored for ppa) (default: `"0x5236CA08"`)
+- `archivematica_src_externals_repo_key_url`: repository key url (ignored for ppa) (default: `"https://packages.archivematica.org/GPG-KEY-archivematica"`)
+
 ### Web server
 
 - `archivematica_src_ss_gunicorn`: use gunicorn/nginx instead of uwsgi/nginx for the Storage Service. For Storage Service branch stable/0.8.x or newer (default:`false`)
@@ -79,6 +85,8 @@ Role Variables
 - `archivematica_src_ssl_include_acme_chlg_loc`: Include ACME challenge location file (`acmetool-location.conf`) in nginx configuration file, provided by role https://github.com/artefactual-labs/ansible-acmetool (default:`false`)
 - `archivematica_src_ssl_fullchain`:  (no default provided, shall be defined in the playbook or host_vars if SSL enabled)
 - `archivematica_src_ssl_privkey`: (no default provided, shall be defined in the playbook or host_vars if SSL enabled)
+
+
 
 Tags
 ----
@@ -132,6 +140,8 @@ It is also recommended to take backups of you system (Archivematica and Storage 
        archivematica_src_ss_env_django_secret_key: "mysecretkey"
        archivematica_src_ss_run_syncdb: "true"
        archivematica_src_ss_pip_missing_deps: "true"
+       archivematica_src_externals_repo: "ppa:archivematica/1.4" 
+
   become: "yes"
 ```
 
@@ -149,6 +159,7 @@ It is also recommended to take backups of you system (Archivematica and Storage 
        archivematica_src_ss_env_django_secret_key: "mysecretkey"
        archivematica_src_ss_gunicorn: "true"
        archivematica_src_am_dashboard_gunicorn: "true"
+
   become: "yes"
 ```
 
