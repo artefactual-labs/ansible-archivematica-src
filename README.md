@@ -109,6 +109,7 @@ Note that if something is disabled with the [role variables](#role-variables), i
     - `amsrc-pipeline-osconf`: Configure operating system
     - `amsrc-pipeline-instcode`: Install source code
     - `amsrc-pipeline-dbconf`: Configure database
+        - `amsrc-pipeline-dbconf-syncdb`: Only run Django's syncdb/migrations
     - `amsrc-pipeline-websrv`: Configure webserver
 - `amsrc-devtools`: Archivematica devtools install
 - `amsrc-automationtools`: Automation tools install

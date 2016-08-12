@@ -50,10 +50,12 @@
   stat:
     path: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.sh"
   register: "mysql_dev_sh_check"
+  tags: "amsrc-pipeline-dbconf-syncdb"
 
 - name: "Set migrations path"
   set_fact:
     archivematica_src_am_pre_migration: "{{ mysql_dev_sh_check.stat.exists }}"
+  tags: "amsrc-pipeline-dbconf-syncdb"
 
 # mysql-dev migrations
 - name: "Load MySQL seed file"
