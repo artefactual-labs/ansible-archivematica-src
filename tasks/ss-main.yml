@@ -88,16 +88,21 @@
 - stat:
     path: "{{ archivematica_src_dir }}/archivematica-storage-service/lib"
   register: "ss_lib_dir_check"
+  tags: "amsrc-ss-pydep"
+
 - set_fact:
     ss_pip_install_extra_args: ""
+  tags: "amsrc-ss-pydep"
+
 - set_fact:
     ss_pip_install_extra_args: "--find-links lib"
   when: "ss_lib_dir_check.stat.isdir is defined and ss_lib_dir_check.stat.isdir"
+  tags: "amsrc-ss-pydep"
 
 - name: "Create virtualenv for archivematica-storage-service, pip install requirements"
   pip:
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-    requirements: "requirements.txt"
+    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt'}}"
     virtualenv: "/usr/share/python/archivematica-storage-service"
     extra_args: "{{ ss_pip_install_extra_args }}"
     state: "latest"
