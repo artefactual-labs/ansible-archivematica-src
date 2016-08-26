@@ -85,12 +85,21 @@
 #   2- Python dependencies (pip packages)
 ###########################################################
 
+- stat:
+    path: "{{ archivematica_src_dir }}/archivematica-storage-service/lib"
+  register: "ss_lib_dir_check"
+- set_fact:
+    ss_pip_install_extra_args: ""
+- set_fact:
+    ss_pip_install_extra_args: "--find-links lib"
+  when: "ss_lib_dir_check.stat.isdir is defined and ss_lib_dir_check.stat.isdir"
+
 - name: "Create virtualenv for archivematica-storage-service, pip install requirements"
   pip:
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
     requirements: "requirements.txt"
     virtualenv: "/usr/share/python/archivematica-storage-service"
-    extra_args: "--find-links lib"
+    extra_args: "{{ ss_pip_install_extra_args }}"
     state: "latest"
   tags: "amsrc-ss-pydep"
 
@@ -98,7 +107,7 @@
   pip:
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
     virtualenv: "/usr/share/python/archivematica-storage-service"
-    extra_args: "--find-links lib"
+    extra_args: "{{ ss_pip_install_extra_args }}"
     state: "latest"
     name: "{{ item }}"
   with_items:
