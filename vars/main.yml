@@ -67,6 +67,10 @@ archivematica_src_am_dashboard_pkgdeps_v1_4:
   - "python-pip"
   - "python-gearman"
   - "python-simplejson"
+  - "python-dev"
+  - "libxml2-dev"
+  - "libxslt1-dev"
+  - "libffi-dev"
 
 archivematica_src_am_mcpserver_pkgdeps_v1_4:
   - "dbconfig-common"
