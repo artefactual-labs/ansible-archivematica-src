@@ -47,6 +47,11 @@ server {
   # Adjust to taste
   client_max_body_size 256M;
 
+{% if archivematica_src_ssl_include_acme_chlg_loc|bool %}
+  # location for acme challenge 
+  include /etc/nginx/acmetool-location.conf;
+{% endif %}
+
   location / {
     proxy_set_header Host $http_host;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
