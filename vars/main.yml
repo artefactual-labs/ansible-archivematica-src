@@ -11,6 +11,7 @@ archivematica_src_am_dashboard_pkgdeps_qa_1_x:
   - "apache2-mpm-prefork"
   - "libapache2-mod-wsgi"
   - "python-pip"
+  - "gettext"
 
 archivematica_src_am_mcpserver_pkgdeps_qa_1_x:
   - "dbconfig-common"
