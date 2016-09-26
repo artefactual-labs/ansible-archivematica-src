@@ -78,6 +78,7 @@
     - "libz-dev"
     - "libffi-dev"
     - "libssl-dev"
+    - "gettext"
   tags: "amsrc-ss-osdep"
 
 
