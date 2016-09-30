@@ -7,6 +7,9 @@
 # directory to install source code
 archivematica_src_dir: "/opt/archivematica"
 
+# shared directory for processing, etc
+archivematica_src_shareddir: "/var/archivematica/sharedDirectory"
+
 # Components to install
 archivematica_src_install_sample_data: "yes"
 archivematica_src_install_am: "yes"

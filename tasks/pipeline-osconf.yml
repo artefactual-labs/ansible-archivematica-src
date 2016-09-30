@@ -51,19 +51,19 @@
   with_items:
     - "/var/log/archivematica/MCPServer"
 
-- name: "Clear /var/archivematica/sharedDirectory"
+- name: "Clear shared directory"
   file:
-    dest: "/var/archivematica/sharedDirectory"
+    dest: "{{ archivematica_src_shareddir }}"
     state: "absent"
   when: "archivematica_src_reset_shareddir|bool or archivematica_src_reset_am_all|bool"
 
-- name: "Create /var/archivematica/sharedDirectory"
+- name: "Create shared directory"
   file:
-    dest: "/var/archivematica/sharedDirectory"
+    dest: "{{ archivematica_src_shareddir }}"
     state: "directory"
 
-- name: "Create /var/archivematica/sharedDirectory structure"
-  command: "rsync -a {{ archivematica_src_dir }}/archivematica/src/MCPServer/share/sharedDirectoryStructure/ /var/archivematica/sharedDirectory/"
+- name: "Create shared directory structure"
+  command: "rsync -a {{ archivematica_src_dir }}/archivematica/src/MCPServer/share/sharedDirectoryStructure/ {{ archivematica_src_shareddir }}/"
 
 - name: "Set owner, group of /var/archivematica recursively"
   file:
@@ -73,9 +73,9 @@
     owner: "archivematica"
     group: "archivematica"
 
-- name: "Set owner, group of /var/archivematica/sharedDirectory recursively"
+- name: "Set owner, group of shared directory recursively"
   file:
-    dest: "/var/archivematica/sharedDirectory"
+    dest: "{{ archivematica_src_shareddir }}"
     state: "directory"
     recurse: "yes"
     owner: "archivematica"
@@ -86,9 +86,9 @@
     path: "/var/archivematica/"
     mode: "g+s"
 
-- name: "Set permissions for /var/archivematica/sharedDirectory"
+- name: "Set permissions for shared directory"
   file:
-    path: "/var/archivematica/sharedDirectory"
+    path: "{{ archivematica_src_shareddir }}"
     mode: 0664
 
 - name: "Set more permissions for /var/archivematica"

@@ -3,9 +3,9 @@
 [MCPServer]
 MCPArchivematicaServer  =  localhost:4730
 GearmanServerWorker = localhost:4730
-watchDirectoryPath  =  /var/archivematica/sharedDirectory/watchedDirectories/
-sharedDirectory  =  /var/archivematica/sharedDirectory/
-processingDirectory  =  /var/archivematica/sharedDirectory/currentlyProcessing/
+watchDirectoryPath  =  {{ archivematica_src_shareddir }}/watchedDirectories/
+sharedDirectory  =  {{ archivematica_src_shareddir }}/
+processingDirectory  =  {{ archivematica_src_shareddir }}/currentlyProcessing/
 rejectedDirectory  =  %%sharedPath%%rejected/
 watchDirectoriesPollInterval = 1
 processingXMLFile = processingMCP.xml
