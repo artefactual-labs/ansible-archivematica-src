@@ -62,6 +62,13 @@
     dest: "{{ archivematica_src_shareddir }}"
     state: "directory"
 
+- name: "Symlink shared directory to default location"
+  file:
+    src: "{{ archivematica_src_shareddir }}"
+    dest: "/var/archivematica/sharedDirectory"
+    state: "link"
+  when: archivematica_src_shareddir != "/var/archivematica/sharedDirectory"
+
 - name: "Create shared directory structure"
   command: "rsync -a {{ archivematica_src_dir }}/archivematica/src/MCPServer/share/sharedDirectoryStructure/ {{ archivematica_src_shareddir }}/"
 
