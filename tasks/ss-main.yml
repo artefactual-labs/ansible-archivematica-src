@@ -1,15 +1,5 @@
 ---
-
 # Archivematica Storage Service installer
-
-# This file is divided into the following blocks:
-#   0- Clone source repo
-#   1- OS dependencies (debian packages)
-#   2- python dependencies (pip packages)
-#   3- OS configuration (user/directory/file creation/permissions/ownership )
-#   4- SS code install
-#   5- Database config
-#   6- web server config
 
 ###########################################################
 #   0- Clone source repo
@@ -207,9 +197,64 @@
 
 
 ###########################################################
-#   5- Database config - moved to separate files
+#   5- SS worker
+###########################################################
+
+# grep returns 0 if match found, 1 if not found, and 2 (or >1) if error
+- name: "Check if celery or django-celery is in the pip requirements"
+  command: "grep -E '^celery|^django-celery' base.txt"
+  args:
+    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service/requirements"
+  register: "grep_celery"
+  failed_when: "grep_celery.rc > 1"
+  tags: "amsrc-ss-worker"
+
+- set_fact:
+    ss_worker: true
+  when: "grep_celery.rc == 0"
+  tags: "amsrc-ss-worker"
+
+- set_fact:
+    ss_worker: false
+  when: "grep_celery.rc == 1"
+  tags: "amsrc-ss-worker"
+
+- name: "Install redis-server package if required"
+  apt:
+    pkg: "redis-server"
+    state: "latest"
+  when: "ss_worker|bool"
+  tags: "amsrc-ss-worker"
+
+- name: "Enable and start redis-server if not already running"
+  service:
+    name: "redis-server"
+    state: "started"
+    enabled: "yes"
+  when: "ss_worker|bool"
+  tags: "amsrc-ss-worker"
+
+- name: "Template celery upstart file if required"
+  template:
+    src: "etc_init_archivematica-storage-service-worker.conf.j2"
+    dest: "/etc/init/archivematica-storage-service-worker.conf"
+    backup: "yes"
+  when: "ss_worker|bool"
+  tags: "amsrc-ss-worker"
+
+- name: "Start storage service celery worker"
+  service:
+    name: "archivematica-storage-service-worker"
+    state: "started"
+    enabled: "yes"
+  when: "ss_worker|bool"
+  tags: "amsrc-ss-worker"
+
+
+###########################################################
+#   6- Database config - moved to separate files
 ###########################################################
 
 ###########################################################
-#   6- web server config - moved to separate files
+#   7- web server config - moved to separate files
 ###########################################################
