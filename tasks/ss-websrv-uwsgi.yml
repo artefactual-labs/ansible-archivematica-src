@@ -49,4 +49,8 @@
   with_items:
     - "nginx"
     - "uwsgi"
+  environment:
+    LANG: "en_US.UTF-8"
+    LC_ALL: "en_US.UTF-8"
+    LC_LANG: "en_US.UTF-8"
   tags: "amsrc-ss-websrv"
