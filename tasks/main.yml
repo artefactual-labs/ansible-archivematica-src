@@ -273,10 +273,14 @@
     tags:
       - "amsrc-pipeline"
       - "amsrc-pipeline-websrv"
+<<<<<<< HEAD
 
   when:
     - "archivematica_src_install_am|bool or
        archivematica_src_install_am == 'rpm'"
+=======
+  when: "archivematica_src_configure_dashboard|bool"
+>>>>>>> Add support for docker
 
 
 #
@@ -306,6 +310,26 @@
   tags:
     - "amsrc-sampledata"
 
+<<<<<<< HEAD
+=======
+#
+# docker services configuration
+#
+- include: "docker.yml"
+  tags:
+    - "amsrc-docker"
+  when: ansible_virtualization_type == "docker"
+
+#
+# archivematica-devtools
+#
+
+- include: "am-devtools.yml"
+  tags:
+    - "amsrc-devtools"
+  when: "archivematica_src_install_devtools|bool"
+
+>>>>>>> Add support for docker
 
 #
 # automation-tools
@@ -355,3 +379,4 @@
   when:
     - "archivematica_src_install_ss|bool or archivematica_src_install_ss=='rpm'"
     - "archivematica_src_configure_gpg is defined"
+
