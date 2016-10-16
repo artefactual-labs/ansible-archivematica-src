@@ -1,0 +1,12 @@
+---
+- name: "Install supervisor package"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items:
+     - "supervisor"
+
+- name: "Install supervisor config files"
+  copy:
+     src="supervisor/"
+     dest="/etc/supervisor/conf.d/"
