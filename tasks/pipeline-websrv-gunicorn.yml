@@ -54,10 +54,6 @@
     dest: "/etc/nginx/sites-enabled/dashboard.conf"
     state: "link"
 
-- name: "Disable Nginx sendfile in virtual/dev environment"
-  lineinfile: dest=/etc/nginx/nginx.conf state=absent regexp='^[\s+]sendfile'
-  when: "is_dev|bool"
-
 # SSL configuration tasks - begin
 - name: "Template nginx ssl config file"
   template:
