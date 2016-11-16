@@ -8,5 +8,5 @@
 
 - name: "Install supervisor config files"
   copy:
-     src="supervisor/"
+     src="/etc/supervisor/conf.d/"
      dest="/etc/supervisor/conf.d/"
