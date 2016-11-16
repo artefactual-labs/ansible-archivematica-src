@@ -7,6 +7,13 @@
      - "supervisor"
 
 - name: "Install supervisor config files"
-  copy:
-     src="/etc/supervisor/conf.d/"
-     dest="/etc/supervisor/conf.d/"
+  template:
+     src=etc/supervisor/conf.d/{{ item }}
+     dest=/etc/supervisor/conf.d/
+  with_items:
+     - storage-service.conf
+     - dashboard.conf
+     - fits.conf
+     - mcp-server.conf
+     - mcp-client.conf
+
