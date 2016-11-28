@@ -57,49 +57,40 @@
     state: "absent"
   when: "archivematica_src_reset_shareddir|bool or archivematica_src_reset_am_all|bool"
 
-- name: "Create shared directory"
+# to avoid playbook errors when the shared dir is a symlink, 
+# check for existence before creating 
+- name: "Check if shared directory exists"
+  stat:
+    path: "{{ archivematica_src_shareddir }}"
+  register: "shareddir_st"
+
+- set_fact:
+    create_shareddir: true
+  when: "shareddir_st.stat.exists is defined and not shareddir_st.stat.exists" 
+
+- set_fact:
+    create_shareddir: false
+  when: "shareddir_st.stat.exists is defined and shareddir_st.stat.exists" 
+
+- name: "Create shared directory (if it doesn't exist and there is no symlink to it)"
   file:
     dest: "{{ archivematica_src_shareddir }}"
     state: "directory"
+    owner: "archivematica"
+    group: "archivematica"
+  when: "create_shareddir"
 
+# (this is required because some hardcoding of the shared dir remains in archivematica code)
 - name: "Symlink shared directory to default location"
   file:
     src: "{{ archivematica_src_shareddir }}"
     dest: "/var/archivematica/sharedDirectory"
     state: "link"
-  when: archivematica_src_shareddir != "/var/archivematica/sharedDirectory"
+  when: create_shareddir and archivematica_src_shareddir != "/var/archivematica/sharedDirectory"
 
-- name: "Create shared directory structure"
-  command: "rsync -a {{ archivematica_src_dir }}/archivematica/src/MCPServer/share/sharedDirectoryStructure/ {{ archivematica_src_shareddir }}/"
-
-- name: "Set owner, group of /var/archivematica recursively"
-  file:
-    dest: "/var/archivematica"
-    state: "directory"
-    recurse: "yes"
-    owner: "archivematica"
-    group: "archivematica"
-
-- name: "Set owner, group of shared directory recursively"
-  file:
-    dest: "{{ archivematica_src_shareddir }}"
-    state: "directory"
-    recurse: "yes"
-    owner: "archivematica"
-    group: "archivematica"
-
-- name: "Set permissions for /var/archivematica"
-  file:
-    path: "/var/archivematica/"
-    mode: "g+s"
-
-- name: "Set permissions for shared directory"
-  file:
-    path: "{{ archivematica_src_shareddir }}"
-    mode: 0664
-
-- name: "Set more permissions for /var/archivematica"
-  shell: "find -L /var/archivematica/ -print0 -type d  | sudo xargs -IF -0 chmod u+rwx,g+rwxt,o-rwx F"
+# this should be executed also for upgrades (to reflect changes) 
+- name: "Copy shared directory structure"
+  command: "rsync -a --chown=archivematica:archivematica {{ archivematica_src_dir }}/archivematica/src/MCPServer/share/sharedDirectoryStructure/ {{ archivematica_src_shareddir }}/"
 
 - name: "Create subdirectories for archivematica-mcp-client source files"
   file:
