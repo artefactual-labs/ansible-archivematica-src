@@ -12,33 +12,6 @@
     - "python-pycurl"
     - "git"
 
-# apt repository config for external dependencies 
-#   - if ppa: add the repo
-#   - if not ppa: add the key and the repo
-- name: "Check if externals repo is a ppa"
-  set_fact:
-    extrepo_is_ppa: "{{ 'ppa:' in archivematica_src_externals_repo }}"
-
-- name: "Add external dependencies PPA repository"
-  apt_repository:
-    repo: "{{ archivematica_src_externals_repo }}"
-    state: "present"
-  when: "extrepo_is_ppa|bool"
-
-- name: "Add external dependencies repository key"
-  apt_key:
-    id: "{{ archivematica_src_externals_repo_key_id }}"
-    url: "{{ archivematica_src_externals_repo_key_url }}"
-    state: "present"
-    validate_certs: "no"
-  when: "not(extrepo_is_ppa|bool)"
-
-- name: "Add external dependencies repository"
-  apt_repository:
-    repo: "deb [arch=amd64] {{ archivematica_src_externals_repo }} {{ ansible_distribution_release }} main"
-    state: "present"
-  when: "not(extrepo_is_ppa|bool)"
-
 
 - name: "Create user archivematica"
   user:

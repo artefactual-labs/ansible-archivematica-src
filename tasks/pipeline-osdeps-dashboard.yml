@@ -1,0 +1,26 @@
+---
+- name: "Install dashboard ext. deps. repo keys"
+  apt_key:
+    id: "{{ item.id }}"
+    url: "{{ item.url }}"
+    state: "present"
+    #    validate_certs: "no"
+  with_items: "{{ dashboard.osdeps_repokeys }}"
+  when: 
+    - "dashboard.osdeps_repokeys"
+
+- name: "Add dashboard ext. deps. repos"
+  apt_repository:
+    repo: "{{ item }}"
+    state: "present"
+  with_items: "{{ dashboard.osdeps_repos }}"
+  when:
+    - "dashboard.osdeps_repos"
+
+- name: "Install dashboard ext. package deps."
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items: "{{ dashboard.osdeps_packages }}"
+  when:
+    - "dashboard.osdeps_packages"

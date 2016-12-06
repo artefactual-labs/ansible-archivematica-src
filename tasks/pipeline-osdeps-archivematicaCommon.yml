@@ -1,0 +1,30 @@
+---
+- name: "Install archivematicaCommon ext. deps. repo keys"
+  apt_key:
+    id: "{{ item.id }}"
+    url: "{{ item.url }}"
+    state: "present"
+    #    validate_certs: "no"
+  with_items: "{{ archivematicaCommon.osdeps_repokeys }}"
+  when: 
+    - "archivematicaCommon.osdeps_repokeys"
+
+- name: "Add archivematicaCommon ext. deps. repos"
+  apt_repository:
+    repo: "{{ item }}"
+    state: "present"
+  with_items: "{{ archivematicaCommon.osdeps_repos }}"
+  when:
+    - "archivematicaCommon.osdeps_repos"
+
+- name: "Install archivematicaCommon ext. package deps."
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items: "{{ archivematicaCommon.osdeps_packages }}"
+  when:
+    - "archivematicaCommon.osdeps_packages"
+
+ 
+
+

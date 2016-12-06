@@ -1,0 +1,29 @@
+---
+- name: "Install MCPServer ext. deps. repo keys"
+  apt_key:
+    id: "{{ item.id }}"
+    url: "{{ item.url }}"
+    state: "present"
+    #    validate_certs: "no"
+  with_items: "{{ MCPServer.osdeps_repokeys }}"
+  when: 
+    - "MCPServer.osdeps_repokeys"
+
+- name: "Add MCPServer ext. deps. repos"
+  apt_repository:
+    repo: "{{ item }}"
+    state: "present"
+  with_items: "{{ MCPServer.osdeps_repos }}"
+  when:  
+    - "MCPServer.osdeps_repos"
+
+- name: "Install MCPServer ext. package deps."
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items: "{{ MCPServer.osdeps_packages }}"
+  when:
+    - "MCPServer.osdeps_packages"
+
+  
+

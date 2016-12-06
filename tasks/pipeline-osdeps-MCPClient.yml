@@ -1,0 +1,26 @@
+---
+- name: "Install MCPClient ext. deps. repo keys"
+  apt_key:
+    id: "{{ item.id }}"
+    url: "{{ item.url }}"
+    state: "present"
+    #    validate_certs: "no"
+  with_items: "{{ MCPClient.osdeps_repokeys }}"
+  when: 
+    - "MCPClient.osdeps_repokeys"
+
+- name: "Add MCPClient ext. deps. repos"
+  apt_repository:
+    repo: "{{ item }}"
+    state: "present"
+  with_items: "{{ MCPClient.osdeps_repos }}"
+  when:
+    - "MCPClient.osdeps_repos"
+
+- name: "Install MCPClient ext. package deps."
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items: "{{ MCPClient.osdeps_packages }}"
+  when:
+    - "MCPClient.osdeps_packages"
