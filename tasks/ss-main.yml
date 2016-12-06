@@ -27,49 +27,14 @@
   become: "yes"
   tags: "amsrc-ss-clone"
 
-- name: "Get archivematica-storage-service latest commit hash"
-  command: "git rev-parse HEAD"
-  args:
-    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-  register: "latest_commit_ss"
-  tags: "amsrc-ss-clone"
-
-- name: "Save Archivematica Storage Service latest commit hash"
-  shell: "echo {{ latest_commit_ss.stdout }} > {{ archivematica_src_dir }}/archivematica-storage-service-commit.txt"
-  tags: "amsrc-ss-clone"
-# TODO: Make use of latest_commit_ss
-
 
 ###########################################################
-#   1- OS dependencies (debian packages)
+#   1- OS package dependencies 
 ###########################################################
 
-- name: "Install archivematica-storage-service package dependencies (ref. debian/control)"
-  apt:
-    pkg: "{{ item }}"
-    state: "latest"
-  with_items:
-    - "nginx"
-    - "unar"
-    - "rsync"
-    - "uwsgi"
-    - "uwsgi-plugin-python"
-  tags: "amsrc-ss-osdep"
-
-- name: "Install archivematica-storage-service additional package dependencies"
-  apt:
-    pkg: "{{ item }}"
-    state: "latest"
-  with_items:
-    - "python-virtualenv"
-    - "python-dev"
-    - "libxml2-dev"
-    - "libxslt1-dev"
-    - "libz-dev"
-    - "libffi-dev"
-    - "libssl-dev"
-    - "gettext"
-  tags: "amsrc-ss-osdep"
+- name: "include ss-osdeps.yml"
+  include: "ss-osdeps.yml"
+  static: no
 
 
 ###########################################################
@@ -90,6 +55,10 @@
   when: "ss_lib_dir_check.stat.isdir is defined and ss_lib_dir_check.stat.isdir"
   tags: "amsrc-ss-pydep"
 
+
+
+# a separate task to create the virtualenv before install requirements
+# is required to avoid errors
 - name: "Create virtualenv for archivematica-storage-service"
   pip:
     name: "pip"
@@ -98,21 +67,25 @@
     state: "latest"
   tags: "amsrc-ss-pydep"
 
-- name: "Update setuptools in virtualenv for archivematica-storage-service"
-  pip:
-    name: "setuptools"
-    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
-    state: "absent"
-  tags: "amsrc-ss-pydep"
+## these tasks added in PR #103 are breaking in CentOS
+## (error in pip install after removing setuptools)
+## will remove for now
 
-- name: "Update setuptools in virtualenv for archivematica-storage-service"
-  pip:
-    name: "setuptools"
-    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
-    state: "latest"
-  tags: "amsrc-ss-pydep"
+# - name: "Update setuptools in virtualenv for archivematica-storage-service"
+#   pip:
+#     name: "setuptools"
+#     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
+#     virtualenv: "/usr/share/python/archivematica-storage-service"
+#     state: "absent"
+#   tags: "amsrc-ss-pydep"
+
+# - name: "Update setuptools in virtualenv for archivematica-storage-service"
+#   pip:
+#     name: "setuptools"
+#     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
+#     virtualenv: "/usr/share/python/archivematica-storage-service"
+#     state: "latest"
+#   tags: "amsrc-ss-pydep"
 
 - name: "Create virtualenv for archivematica-storage-service, pip install requirements"
   pip:

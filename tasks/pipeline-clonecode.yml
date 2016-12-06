@@ -12,13 +12,3 @@
     force: "yes"
     accept_hostkey: "yes"
     
-- name: "Get Archivematica latest commit hash"
-  command: "git rev-parse HEAD"
-  args:
-    chdir: "{{ archivematica_src_dir }}/archivematica"
-  register: "latest_commit"
-
-- name: "Save Archivematica last commit hash"
-  shell: "echo {{ latest_commit.stdout }} > {{ archivematica_src_dir }}/archivematica-commit.txt"
-
-# TODO: Make use of latest_commit

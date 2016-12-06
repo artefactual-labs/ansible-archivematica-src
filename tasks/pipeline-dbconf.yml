@@ -85,11 +85,25 @@
   when: "not archivematica_src_am_pre_migration|bool and archivematica_src_am_migrate_from_v1_4|bool"
 
 # Django migrations
-- name: "Run migrations"
+- name: "Run migrations (no virtualenv)"
   django_manage:
     command: "migrate"
     app_path: "/usr/share/archivematica/dashboard/"
     settings: "settings.common"
     pythonpath: "/usr/lib/archivematica/archivematicaCommon"
   tags: "amsrc-pipeline-dbconf-syncdb"
-  when: "not archivematica_src_am_pre_migration|bool"
+  when: 
+    - "not archivematica_src_am_pre_migration|bool"
+    - "not archivematica_src_am_multi_venvs|bool"
+
+- name: "Run migrations (within dashboard virtualenv)"
+  django_manage:
+    command: "migrate"
+    app_path: "/usr/share/archivematica/dashboard/"
+    settings: "settings.common"
+    pythonpath: "/usr/lib/archivematica/archivematicaCommon"
+    virtualenv: "/usr/share/python/archivematica-dashboard"
+  tags: "amsrc-pipeline-dbconf-syncdb"
+  when: 
+    - "not archivematica_src_am_pre_migration|bool"
+    - "archivematica_src_am_multi_venvs|bool"

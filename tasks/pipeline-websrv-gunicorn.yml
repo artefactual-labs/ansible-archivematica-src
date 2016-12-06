@@ -4,18 +4,8 @@
 #   6- dashboard web server config - when using gunicorn with nginx
 ###########################################################
 
-- name: "Stop/disable apache2"
-  service:
-    name: "apache2"
-    state: "stopped"
-    enabled: "no"
-
-- name: "Install nginx package"
-  apt:
-    pkg: "nginx"
-    state: "latest"
-  with_items:
-    - "nginx"
+# Note: the playbook assumes the use of /etc/nginx/{sites-available|sites-enabled}
+#       directories for site config files, even on CentOS/RedHat
 
 - name: "Template dashboard nginx sites-available config file"
   template:
@@ -29,14 +19,59 @@
     dest: "/etc/archivematica/dashboard.gunicorn-config.py"
     backup: "yes"
 
-- name: "set gunicorn init file"
+- name: "set_fact: set gunicorn path to correct value when multi_venvs is true"
+  set_fact:
+    dashboard_gunicorn_path: "/usr/share/python/archivematica-dashboard/bin/gunicorn"
+  when: "archivematica_src_am_multi_venvs|bool"
+
+- name: "Get location of the gunicorn executable for dashboard when multi_venvs is false"
+  command: "which gunicorn"
+  register: dgp
+  when: "not archivematica_src_am_multi_venvs|bool"
+
+
+- name: "set_fact: set gunicorn path to correct value when multi_venvs is false"
+  set_fact:
+    dashboard_gunicorn_path: "{{ dgp.stdout }}"
+  when: "not archivematica_src_am_multi_venvs|bool"
+
+
+# Note: the playbook will configure dashboard for systemd if OS family is RedHat
+#       and upstart otherwise
+#       (this may need to be changed later as Ubuntu 16 uses systemd)
+
+
+- name: "initialize var use_systemd"
+  set_fact:
+    use_systemd: false
+
+- name: "set use_systemd to true depending on distro"
+  set_fact:
+    use_systemd: true
+  when: 
+    - ansible_os_family == "RedHat"
+
+- name: "Config dashboard gunicorn upstart (/etc/init)"
   template:
     src: "etc_init_archivematica-dashboard.conf.j2"
     dest: "/etc/init/archivematica-dashboard.conf"
     backup: "yes"
+  when: not use_systemd
 
 - name: "Reload Upstart configuration"
   command: "initctl reload-configuration"
+  when: not use_systemd
+
+- name: "Add dashboard gunicorn systemd (/etc/systemd)"
+  template:
+    src: "etc/systemd/system/archivematica-dashboard.service.j2"
+    dest: "/etc/systemd/system/archivematica-dashboard.service"
+    backup: "yes"
+  when: use_systemd
+
+- name: "Reload systemd config"
+  command: "systemctl daemon-reload"
+  when: use_systemd
 
 - name: "Remove Nginx default server"
   file:
@@ -45,8 +80,6 @@
   with_items:
     - "/etc/nginx/sites-available/default"
     - "/etc/nginx/sites-available/default.conf"
-    - "/etc/nginx/sites-enabled/default"
-    - "/etc/nginx/sites-enabled/default.conf"
 
 - name: "Set up Nginx server"
   file:
