@@ -4,7 +4,7 @@
     id: "{{ item.id }}"
     url: "{{ item.url }}"
     state: "present"
-    #    validate_certs: "no"
+    validate_certs: "{{ item.validate_certs }}"
   with_items: "{{ MCPServer.osdeps_repokeys }}"
   when: 
     - "MCPServer.osdeps_repokeys"
