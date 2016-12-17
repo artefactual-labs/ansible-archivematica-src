@@ -4,12 +4,6 @@
 #   6- dashboard web server config - when using gunicorn with nginx
 ###########################################################
 
-- name: "Stop/disable apache2"
-  service:
-    name: "apache2"
-    state: "stopped"
-    enabled: "no"
-
 - name: "Install nginx package"
   apt:
     pkg: "nginx"
