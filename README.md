@@ -181,6 +181,8 @@ It is also recommended to take backups of you system (Archivematica and Storage 
        archivematica_src_ssl: "true"
        archivematica_src_ssl_fullchain: "/location/of/fullchain/file"
        archivematica_src_ssl_privkey: "/location/of/private/key/file"       
+       # if using LE SSL certs configured with artefactual-labs/ansible-acmetool, also include the next line (uncomment)
+       #archivematica_src_ssl_include_acme_chlg_loc: True  
   become: "yes"
 ```
 
