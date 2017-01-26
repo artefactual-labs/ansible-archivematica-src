@@ -4,13 +4,27 @@
   apt:
     update_cache: "yes"
 
-- name: "Install necessary packages"
+- name: "remove broken python-pip (for ubuntu 14.04)"
+  apt:
+    pkg: "{{ item }}"
+    state: absent
+  with_items:
+    - "python-pip"
+    
+- name: "Install necessary prerequisite packages"
   apt:
     pkg: "{{ item }}"
     state: "latest"
   with_items:
     - "python-pycurl"
     - "git"
+    - "python-setuptools"
+    - "python-virtualenv"
+
+- name: "install pip with easy_install"
+  easy_install:
+    name: pip
+    state: latest
 
 # apt repository config for external dependencies 
 #   - if ppa: add the repo
