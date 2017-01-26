@@ -12,6 +12,21 @@
     - "python-pycurl"
     - "git"
 
+- name: "Downgrade python-pip and python-virtualenv"
+  apt:
+    pkg: "{{ item }}"
+  with_items:
+    - "python-pip=1.5.4-1"
+    - "python-virtualenv=1.11.4-1"
+    - "git"
+
+- name: "Set python-pip and python-virtualenv on hold"
+  dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  with_items:
+    - "python-pip"
+    - "python-virtualenv"
 # apt repository config for external dependencies 
 #   - if ppa: add the repo
 #   - if not ppa: add the key and the repo
