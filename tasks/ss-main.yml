@@ -90,6 +90,30 @@
   when: "ss_lib_dir_check.stat.isdir is defined and ss_lib_dir_check.stat.isdir"
   tags: "amsrc-ss-pydep"
 
+- name: "Create virtualenv for archivematica-storage-service"
+  pip:
+    name: "pip"
+    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
+    virtualenv: "/usr/share/python/archivematica-storage-service"
+    state: "latest"
+  tags: "amsrc-ss-pydep"
+
+- name: "Update setuptools in virtualenv for archivematica-storage-service"
+  pip:
+    name: "setuptools"
+    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
+    virtualenv: "/usr/share/python/archivematica-storage-service"
+    state: "absent"
+  tags: "amsrc-ss-pydep"
+
+- name: "Update setuptools in virtualenv for archivematica-storage-service"
+  pip:
+    name: "setuptools"
+    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
+    virtualenv: "/usr/share/python/archivematica-storage-service"
+    state: "latest"
+  tags: "amsrc-ss-pydep"
+
 - name: "Create virtualenv for archivematica-storage-service, pip install requirements"
   pip:
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"

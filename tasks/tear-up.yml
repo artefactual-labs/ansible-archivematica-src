@@ -4,10 +4,10 @@
   apt:
     update_cache: "yes"
 
-- name: "remove broken python-pip (for ubuntu 14.04)"
+- name: "Remove broken python-pip (for ubuntu 14.04)"
   apt:
     pkg: "{{ item }}"
-    state: absent
+    state: "absent"
   with_items:
     - "python-pip"
     
