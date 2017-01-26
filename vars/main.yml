@@ -4,13 +4,11 @@
 # # package dependencies (qa/1.x)
 archivematica_src_am_common_pkgdeps_qa_1_x:
   - "python"
-  - "python-pip"
   - "libmysqlclient-dev"
 
 archivematica_src_am_dashboard_pkgdeps_qa_1_x:
   - "apache2-mpm-prefork"
   - "libapache2-mod-wsgi"
-  - "python-pip"
   - "gettext"
 
 archivematica_src_am_mcpserver_pkgdeps_qa_1_x:
@@ -56,7 +54,6 @@ archivematica_src_am_mcpclient_pkgdeps_qa_1_x:
 
 archivematica_src_am_common_pkgdeps_v1_4:
   - "python"
-  - "python-pip"
   - "libmysqlclient-dev"
   - "python2.7-elementtree"
   - "python-mimeparse"
@@ -65,7 +62,6 @@ archivematica_src_am_common_pkgdeps_v1_4:
 archivematica_src_am_dashboard_pkgdeps_v1_4:
   - "apache2-mpm-prefork"
   - "libapache2-mod-wsgi"
-  - "python-pip"
   - "python-gearman"
   - "python-simplejson"
   - "python-dev"

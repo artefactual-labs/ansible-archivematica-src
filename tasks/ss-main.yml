@@ -61,7 +61,6 @@
     pkg: "{{ item }}"
     state: "latest"
   with_items:
-    - "python-virtualenv"
     - "python-dev"
     - "libxml2-dev"
     - "libxslt1-dev"
