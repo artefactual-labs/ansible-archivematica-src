@@ -1,0 +1,65 @@
+---
+
+# apt repository config for external dependencies 
+#   - if ppa: add the repo
+#   - if not ppa: add the key and the repo
+- name: "Check if externals repo is a ppa"
+  set_fact:
+    extrepo_is_ppa: "{{ 'ppa:' in archivematica_src_externals_repo }}"
+
+- name: "Add external dependencies PPA repository"
+  apt_repository:
+    repo: "{{ archivematica_src_externals_repo }}"
+    state: "present"
+  when: "extrepo_is_ppa|bool"
+
+- name: "Add external dependencies repository key"
+  apt_key:
+    id: "{{ archivematica_src_externals_repo_key_id }}"
+    url: "{{ archivematica_src_externals_repo_key_url }}"
+    state: "present"
+    validate_certs: "no"
+  when: "not(extrepo_is_ppa|bool)"
+
+- name: "Add external dependencies repository"
+  apt_repository:
+    repo: "deb [arch=amd64] {{ archivematica_src_externals_repo }} {{ ansible_distribution_release }} main"
+    state: "present"
+  when: "not(extrepo_is_ppa|bool)"
+
+
+- name: "Add multiverse repositories"
+  become: "yes"
+  apt_repository:
+    repo: "{{ item }}"
+    state: "present"
+  with_items:
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }} multiverse"
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-security universe"
+    - "deb http://archive.ubuntu.com/ubuntu/ {{ ansible_distribution_release }}-updates multiverse"
+
+- name: "Install archivematica-common package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items: "{{ archivematica_src_am_common_pkgdeps }}"
+
+- name: "Install archivematica-dashboard package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items: "{{ archivematica_src_am_dashboard_pkgdeps }}"
+
+- name: "Install archivematica-mcp-server package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items: "{{ archivematica_src_am_mcpserver_pkgdeps }}"
+
+- name: "Install archivematica-mcp-client package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items: "{{ archivematica_src_am_mcpclient_pkgdeps }}"
+
+  

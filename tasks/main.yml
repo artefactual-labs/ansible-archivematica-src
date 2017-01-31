@@ -82,10 +82,22 @@
     - "amsrc-pipeline-clonecode"
   when: "archivematica_src_install_am|bool"
 
-- include: "pipeline-deps.yml"
+- include: "pipeline-osdeps.yml"
   tags:
     - "amsrc-pipeline"
-    - "amsrc-pipeline-deps"
+    - "amsrc-pipeline-osdeps"
+  when: "archivematica_src_install_am|bool"
+
+- include: "pipeline-clamav.yml"
+  tags:
+    - "amsrc-pipeline"
+    - "amsrc-pipeline-clamav"
+  when: "archivematica_src_install_am|bool"
+
+- include: "pipeline-pipdeps.yml"
+  tags:
+    - "amsrc-pipeline"
+    - "amsrc-pipeline-pipdeps"
   when: "archivematica_src_install_am|bool"
 
 - include: "pipeline-osconf.yml"
