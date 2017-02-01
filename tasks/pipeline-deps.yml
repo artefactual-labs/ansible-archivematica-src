@@ -38,6 +38,66 @@
     state: "latest"
   with_items: "{{ archivematica_src_am_mcpclient_pkgdeps }}"
 
+
+# Install MediaConch and its dependencies, essentially by running the following
+# commands:
+# wget https://mediaarea.net/download/binary/libmediainfo0/0.7.86/libmediainfo0_0.7.86-1_amd64.xUbuntu_14.04.deb
+# wget https://mediaarea.net/download/binary/libzen0/0.4.33/libzen0_0.4.33-1_amd64.xUbuntu_14.04.deb
+# wget https://mediaarea.net/download/binary/mediaconch/16.05/mediaconch_16.05-1_amd64.xUbuntu_14.04.deb
+# sudo dpkg -i libmediainfo* libzen* mediaconch*
+
+- file: path=/home/vagrant/downloads/ state=directory mode=0755
+  tags:
+      - mediaconch
+
+- name: "Check if MediaConch is already installed."
+  command: dpkg-query -W mediaconch
+  register: mediaconch_check_deb
+  failed_when: mediaconch_check_deb.rc > 1
+  changed_when: mediaconch_check_deb.rc == 1
+  tags:
+      - mediaconch
+
+- name: "Download libmediainfo0"
+  get_url: url="https://mediaarea.net/download/binary/libmediainfo0/0.7.86/libmediainfo0_0.7.86-1_amd64.xUbuntu_14.04.deb" dest="/home/vagrant/downloads/libmediainfo0.deb"
+  when: mediaconch_check_deb.rc == 1
+  tags:
+      - mediaconch
+
+- name: "Download libzen0"
+  get_url: url="https://mediaarea.net/download/binary/libzen0/0.4.33/libzen0_0.4.33-1_amd64.xUbuntu_14.04.deb" dest="/home/vagrant/downloads/libzen0.deb"
+  when: mediaconch_check_deb.rc == 1
+  tags:
+      - mediaconch
+
+- name: "Download mediaconch"
+  get_url: url="https://mediaarea.net/download/binary/mediaconch/16.10/mediaconch_16.10-1_amd64.xUbuntu_14.04.deb" dest="/home/vagrant/downloads/mediaconch.deb"
+  when: mediaconch_check_deb.rc == 1
+  tags:
+      - mediaconch
+
+- name: "Install libzen0"
+  apt: deb="/home/vagrant/downloads/libzen0.deb"
+  become: true
+  when: mediaconch_check_deb.rc == 1
+  tags:
+      - mediaconch
+
+- name: "Install libmediainfo0"
+  apt: deb="/home/vagrant/downloads/libmediainfo0.deb"
+  become: true
+  when: mediaconch_check_deb.rc == 1
+  tags:
+      - mediaconch
+
+- name: "Install mediaconch"
+  apt: deb="/home/vagrant/downloads/mediaconch.deb"
+  become: true
+  when: mediaconch_check_deb.rc == 1
+  tags:
+      - mediaconch
+
+
 # Have found that installation often stalls in freshclam
 # Will download signatures from our repo to try to avoid this
 
