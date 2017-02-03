@@ -38,6 +38,10 @@
     state: "latest"
   with_items: "{{ archivematica_src_am_mcpclient_pkgdeps }}"
 
+
+- include: "pipeline-deps-mediaconch.yml"
+
+
 # Have found that installation often stalls in freshclam
 # Will download signatures from our repo to try to avoid this
 
