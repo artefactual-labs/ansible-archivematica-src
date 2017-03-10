@@ -7,7 +7,7 @@ clientScriptsDirectory = /usr/lib/archivematica/MCPClient/clientScripts/
 LoadSupportedCommandsSpecial = True
 #numberOfTasks 0 means detect number of cores, and use that.
 numberOfTasks = 0
-elasticsearchServer = localhost:9200
+elasticsearchServer = {{ archivematica_src_am_es_host }}
 disableElasticsearchIndexing = False
 temp_dir = {{ archivematica_src_shareddir }}/tmp
 kioskMode = False

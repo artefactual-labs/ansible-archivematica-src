@@ -54,10 +54,18 @@ archivematica_src_ss_env_ss_db_name: "/var/archivematica/storage-service/storage
 archivematica_src_ss_env_ss_db_password: ""
 archivematica_src_ss_env_ss_db_user: ""
 
+
+# database settings
+archivematica_src_am_database_name: "MCP"
+archivematica_src_am_database_user: "archivematica"
+archivematica_src_am_database_host: "localhost"
+archivematica_src_am_database_password: "demo"
 # reset the MCP database (CAUTION: if true, will lose existing MCP database data)
 archivematica_src_reset_mcpdb: "false"
 # delete the existing shared directory
 archivematica_src_reset_shareddir: "false"
+#ES Host
+archivematica_src_am_es_host: "localhost:9200"
 # Delete ElasticSearch indexes
 archivematica_src_reset_es: "false"
 # reset the AM database (MCP), delete AM shared dir and reset ElasticSearch indexes (if true, it overrides the three reset vars above)

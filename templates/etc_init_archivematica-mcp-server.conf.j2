@@ -28,6 +28,7 @@ pre-start script
     done
     gearadmin --getpid || exit 1
 
+    {% if archivematica_src_am_database_host == "localhost" %}
     # Wait for mysql to start - timeout eventually
     for i in $(seq 1 10)
     do
@@ -35,6 +36,7 @@ pre-start script
         sleep 3
     done
     mysqladmin ping || exit 1
+    {% endif %}
 
     exit 0
 
