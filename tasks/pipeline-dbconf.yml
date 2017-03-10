@@ -36,6 +36,7 @@
     encoding: "utf8"
     collation: "utf8_unicode_ci"
   register: "createdb_result"
+  when: 'archivematica_src_am_database_host == "localhost"'
 
 # TODO: need to change the mysql password for user archivematica
 
@@ -45,6 +46,7 @@
     password: "demo"
     priv: "MCP.*:ALL"
     state: "present"
+  when: 'archivematica_src_am_database_host == "localhost"'
 
 - name: "Check if mysql_dev exists"
   stat:
