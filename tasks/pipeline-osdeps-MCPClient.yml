@@ -1,0 +1,71 @@
+---
+# ubuntu block
+- block:
+    - name: "Install MCPClient ext. deps. repo keys"
+      apt_key:
+        id: "{{ item.id }}"
+        url: "{{ item.url }}"
+        state: "present"
+        validate_certs: "{{ item.validate_certs }}"
+      with_items: "{{ MCPClient.osdeps_repokeys }}"
+      when: 
+        - "MCPClient.osdeps_repokeys"
+
+    - name: "Add MCPClient ext. deps. repos"
+      apt_repository:
+        repo: "{{ item }}"
+        state: "present"
+      with_items: "{{ MCPClient.osdeps_repos }}"
+      when:
+        - "MCPClient.osdeps_repos"
+
+    - name: "Install MCPClient ext. package deps."
+      apt:
+        pkg: "{{ item['name'] }}"
+        state: "{{ item['state'] }}"
+      with_items: "{{ MCPClient.osdeps_packages }}"
+      when:
+        - "MCPClient.osdeps_packages"
+
+  when:
+    - ansible_distribution == "Ubuntu"
+
+# Centos/RH block 
+- block: 
+    - name: "Add MCPClient ext. deps. repos (RH/CentOS)"
+      yum_repository:
+        name: "{{ item['name'] }}"
+        description: "{{ item['description'] }}"
+        baseurl: "{{ item['baseurl'] }}"
+        gpgcheck: "{{ item['gpgcheck']}}"
+        enabled: "{{ item['enabled']}}"
+      with_items: "{{ MCPClient.osdeps_repos }}"
+      when:
+        - MCPClient.osdeps_repos
+
+    - name: "Install MCPClient ext. package deps. (RH/CentOS)"
+      yum: 
+        name: "{{ item['name'] }}"
+        state: "{{ item['state'] }}"
+      with_items: "{{ MCPClient.osdeps_packages }}  "
+      when:
+        - MCPClient.osdeps_packages is defined and MCPClient.osdeps_packages 
+
+    - name: "Install MCPClient ext. package deps. (2) (RH/CentOS) "
+      yum: 
+        name: "{{ item['name'] }}"
+        state: "{{ item['state'] }}"
+      with_items: "{{ MCPClient.osdeps_packages_2 }}  "
+      when:
+        - MCPClient.osdeps_packages_2 is defined and MCPClient.osdeps_packages_2
+
+    - name: "Install MCPClient ext. package deps. (3) (RH/CentOS)"
+      yum: 
+        name: "{{ item['name'] }}"
+        state: "{{ item['state'] }}"
+      with_items: "{{ MCPClient.osdeps_packages_3 }}  "
+      when:
+        - MCPClient.osdeps_packages_3 is defined and MCPClient.osdeps_packages_3 
+
+  when:
+    - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"

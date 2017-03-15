@@ -1,31 +1,41 @@
 ---
 
-- name: "Run the equivalent of apt-get update"
-  apt:
-    update_cache: "yes"
+- name: "Install necessary packages required by this ansible role"
+  yum:
+    name: "{{ item }}"
+    state: "latest"
+  with_items:
+    - "epel-release"    
+    - "git"
+    - "MySQL-python"         # required for mysql_db
 
-- name: "Remove broken python-pip (for ubuntu 14.04)"
-  apt:
-    pkg: "{{ item }}"
+- name: "Ensure pip, setuptools, virtualenv are not installed from packages"
+  package:
+    name: "{{ item }}"
     state: "absent"
   with_items:
     - "python-pip"
-    
-- name: "Install necessary prerequisite packages"
-  apt:
-    pkg: "{{ item }}"
-    state: "latest"
-  with_items:
-    - "python-pycurl"
-    - "git"
+    - "python2-pip"
     - "python-setuptools"
     - "python-virtualenv"
 
-- name: "install pip with easy_install"
-  easy_install:
-    name: pip
-    state: latest
+- name: "Download get-pip.py"
+  get_url:
+    url: "https://bootstrap.pypa.io/get-pip.py"
+    dest: "/root/get-pip.py"  
 
+- name: "Install pip with get-pip.py"
+  command: "python get-pip.py"
+  args:
+    chdir: "/root/"
+
+- name: "Install virtualenv and setuptools with pip"
+  pip:
+    name: "{{ item }}"
+    state: "latest"
+  with_items:
+    - "setuptools"
+    - "virtualenv"
 
 - name: "Create user archivematica"
   user:

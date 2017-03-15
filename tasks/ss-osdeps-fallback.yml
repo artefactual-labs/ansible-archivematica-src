@@ -1,0 +1,30 @@
+---
+# fallback only for ubuntu 14
+
+
+- name: "Install archivematica-storage-service package dependencies (ref. debian/control)"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items:
+    - "nginx"
+    - "unar"
+    - "rsync"
+    - "uwsgi"
+    - "uwsgi-plugin-python"
+  tags: "amsrc-ss-osdep"
+
+- name: "Install archivematica-storage-service additional package dependencies"
+  apt:
+    pkg: "{{ item }}"
+    state: "latest"
+  with_items:
+    - "python-virtualenv"
+    - "python-dev"
+    - "libxml2-dev"
+    - "libxslt1-dev"
+    - "libz-dev"
+    - "libffi-dev"
+    - "libssl-dev"
+    - "gettext"
+  tags: "amsrc-ss-osdep"

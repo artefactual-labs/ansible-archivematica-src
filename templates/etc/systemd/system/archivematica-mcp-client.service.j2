@@ -1,0 +1,13 @@
+# This file is managed by ansible
+[Unit]
+Description=Archivematica MCP Client Service
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=archivematica
+EnvironmentFile=-/etc/sysconfig/archivematica-mcp-client
+ExecStart={{ mcp_client_python_path }} /usr/lib/archivematica/MCPClient/archivematicaClient.py
+
+[Install]
+WantedBy=multi-user.target

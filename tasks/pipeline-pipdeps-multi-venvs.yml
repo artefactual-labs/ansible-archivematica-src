@@ -1,0 +1,85 @@
+---
+###########################################################
+#   python dependencies (pip packages) with separate virtualenvs
+###########################################################
+
+- name: "Create virtualenv for archivematica-mcp-server"
+  pip:
+    name: "pip"
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/MCPServer"
+    virtualenv: "/usr/share/python/archivematica-mcp-server"
+    state: "latest"
+
+- name: "Create virtualenv for archivematica-mcp-client"
+  pip:
+    name: "pip"
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/MCPClient"
+    virtualenv: "/usr/share/python/archivematica-mcp-client"
+    state: "latest"
+
+- name: "Create virtualenv for archivematica-dashboard"
+  pip:
+    name: "pip"
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/dashboard"
+    virtualenv: "/usr/share/python/archivematica-dashboard"
+    state: "latest"
+
+
+- name: "Install common pip reqs in virtualenv archivematica-mcp-server"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon"
+    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt'}}"
+    virtualenv: "/usr/share/python/archivematica-mcp-server"
+    state: "latest"
+
+- name: "Install MCPServer pip reqs in virtualenv archivematica-mcp-server"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/MCPServer"
+    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt'}}"
+    virtualenv: "/usr/share/python/archivematica-mcp-server"
+    state: "latest"
+
+- name: "Install dashboard pip reqs in virtualenv archivematica-mcp-server (workaround)"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/dashboard/src"
+    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt'}}"
+    virtualenv: "/usr/share/python/archivematica-mcp-server"
+    state: "latest"
+
+
+- name: "Install common pip reqs in virtualenv archivematica-mcp-client"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon"
+    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt'}}"
+    virtualenv: "/usr/share/python/archivematica-mcp-client"
+    state: "latest"
+
+- name: "Install MCPClient pip reqs in virtualenv archivematica-mcp-client"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/MCPClient"
+    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt'}}"
+    virtualenv: "/usr/share/python/archivematica-mcp-client"
+    state: "latest"
+
+- name: "Install dashboard pip reqs in virtualenv archivematica-mcp-client (workaround)"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/dashboard/src"
+    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt'}}"
+    virtualenv: "/usr/share/python/archivematica-mcp-client"
+    state: "latest"
+
+
+- name: "Install common pip reqs in virtualenv archivematica-dashboard"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon"
+    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt'}}"
+    virtualenv: "/usr/share/python/archivematica-dashboard"
+    state: "latest"
+
+- name: "Install dashboard pip reqs in virtualenv archivematica-dashboard"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/dashboard/src"
+    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt'}}"
+    virtualenv: "/usr/share/python/archivematica-dashboard"
+    state: "latest"
+

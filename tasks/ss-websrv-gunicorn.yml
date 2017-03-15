@@ -2,6 +2,9 @@
 #   6- web server config - when using gunicorn with nginx
 ###########################################################
 
+# Note: the playbook assumes the use of /etc/nginx/{sites-available|sites-enabled}
+#       directories for site config files, even on CentOS/RedHat
+
 - name: "set nginx sites-available config file"
   template:
     src: "etc_nginx_sites_storage-gunicorn.conf.j2"
@@ -16,24 +19,61 @@
     backup: "yes"
   tags: "amsrc-ss-websrv"
 
-- name: "set gunicorn init file"
+# Note: the playbook will configure SS for systemd if OS family is RedHat
+#       and upstart otherwise
+#       (this may need to be changed later as Ubuntu 16 uses systemd)
+
+- name: "initialize var use_systemd"
+  set_fact:
+    use_systemd: false
+  tags: "amsrc-ss-websrv"
+
+- name: "set use_systemd to true depending on distro"
+  set_fact:
+    use_systemd: true
+  when: 
+    - ansible_os_family == "RedHat"
+  tags: "amsrc-ss-websrv"
+
+- name: "Config storage service gunicorn upstart (/etc/init)"
   template:
     src: "etc_init_archivematica-storage-service.conf.j2"
     dest: "/etc/init/archivematica-storage-service.conf"
     backup: "yes"
   tags: "amsrc-ss-websrv"
+  when: not use_systemd
 
 - name: "Reload Upstart configuration"
   command: "initctl reload-configuration"
   tags: "amsrc-ss-websrv"
+  when: not use_systemd
 
-- name: "Remove Nginx default server"
+- name: "Add storage service gunicorn systemd (/etc/systemd)"
+  template:
+    src: "etc/systemd/system/archivematica-storage-service.service.j2"
+    dest: "/etc/systemd/system/archivematica-storage-service.service"
+    backup: "yes"
+  tags: "amsrc-ss-websrv"
+  when: use_systemd
+
+- name: "Reload systemd config"
+  command: "systemctl daemon-reload"
+  tags: "amsrc-ss-websrv"
+  when: use_systemd
+
+- name: "Add storage service gunicorn systemd env file (in /etc/sysconfig)"
+  template:
+    src: "etc/sysconfig/archivematica-storage-service.j2"
+    dest: "/etc/sysconfig/archivematica-storage-service"
+    backup: "yes"
+  tags: "amsrc-ss-websrv"
+  when: use_systemd
+
+- name: "Disable Nginx default server config"
   file:
     path: "{{ item }}"
     state: "absent"
   with_items:
-    - "/etc/nginx/sites-available/default"
-    - "/etc/nginx/sites-available/default.conf"
     - "/etc/nginx/sites-enabled/default"
     - "/etc/nginx/sites-enabled/default.conf"
   tags: "amsrc-ss-websrv"

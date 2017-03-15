@@ -1,0 +1,99 @@
+---
+# osdeps filenames named "distribution"-"major_version".json
+#        example: CentOS-7.yml (case sensitive)
+- set_fact: 
+    osdeps_file: "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.json"
+    tmpdirname: "/tmp/amsrc-{{ ansible_date_time.date }}-{{ ansible_date_time.epoch }}"
+
+# become: false is required in tasks delegated to localhost 
+# (to avoid "sudo: a password is required" error)
+- name: "create temp directory in local machine to store osdeps files"
+  file: 
+    path: "{{ tmpdirname }}/osdeps"
+    state: "directory"
+  become: false
+  delegate_to: "127.0.0.1"
+
+- name: "stat for osdeps file"
+  stat:
+    path: "{{ archivematica_src_dir }}/archivematica-storage-service/osdeps/{{ osdeps_file }}"
+  register: od
+
+- name: "set_fact osdeps"
+  set_fact:
+    osdeps: "{{ od.stat.isreg is defined and od.stat.isreg }}"
+
+- name: "fetch dependencies files from source code repository to local machine"
+  fetch:
+    src: "{{ archivematica_src_dir }}/archivematica-storage-service/osdeps/{{ osdeps_file }}"
+    dest: "{{ tmpdirname }}/osdeps/archivematica-storage-service/{{ osdeps_file }}"
+    flat: "yes" 
+  become: false       # ansible recommends to run fetch without become whenever possible 
+  when: osdeps
+
+# create a namespace for osdeps file variables
+- name: "include variables from retrieved dependencies files in namespace storage_service"
+  include_vars: 
+    file: "{{ tmpdirname }}/osdeps/archivematica-storage-service/{{ osdeps_file }}"
+    name: "storage_service"
+  when: osdeps
+
+#######################################################################
+# Install dependencies according to osdeps files
+#######################################################################
+
+- name: "Install storage service ext. package deps."
+  package:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items: "{{ storage_service.osdeps_packages }}"
+  when: 
+    - osdeps 
+    - storage_service is defined 
+    - storage_service.osdeps_packages is defined
+    - storage_service.osdeps_packages
+
+- name: "Install storage service ext. package deps. 2"
+  package:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items: "{{ storage_service.osdeps_packages_2 }}"
+  when: 
+    - osdeps 
+    - storage_service is defined 
+    - storage_service.osdeps_packages_2 is defined
+    - storage_service.osdeps_packages_2
+
+- name: "Install storage service ext. package deps. 3"
+  package:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items: "{{ storage_service.osdeps_packages_3 }}"
+  when: 
+    - osdeps 
+    - storage_service is defined 
+    - storage_service.osdeps_packages_3 is defined
+    - storage_service.osdeps_packages_3
+
+
+#######################################################################
+# if no osdeps file, fallback to legacy tasks 
+# (install dependencies using the default values in this role)
+#######################################################################
+
+# run fallback tasks if no osdeps file
+# only for ubuntu 14, error if not
+- name: "include ss-osdeps-fallback.yml"
+  include: "ss-osdeps-fallback.yml"
+  static: no
+  when: 
+    - not osdeps 
+    - ansible_distribution=="Ubuntu" and ansible_distribution_major_version=="14"
+
+## error if no osdeps file and not ubuntu 14
+- name: "error if no osdeps and no fallback"
+  fail: 
+    msg: "Error: no osdeps and no fallback for this distro version"
+  when: 
+    - not osdeps 
+    - not (ansible_distribution=="Ubuntu" and ansible_distribution_major_version=="14")

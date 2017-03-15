@@ -1,4 +1,4 @@
-# {{ ansible_managed }}
+# this file is managed by ansible
 
 description "Archivematica MCP Client"
 
@@ -8,7 +8,14 @@ start on (net-device-up
 stop on runlevel [016]
 
 env CONF=/etc/archivematica/MCPClient
-env LOCATION=/usr/lib/archivematica/MCPClient/archivematicaClient.py
+env LOCATION="{{ mcp_client_python_path }} /usr/lib/archivematica/MCPClient/archivematicaClient.py"
+{% if archivematica_src_am_multi_venvs|bool %}
+# fix PATH so that python is the MCPClient virtualenv is used
+env PATH="/usr/share/python/archivematica-mcp-client/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+env PYTHONPATH=/usr/lib/archivematica/archivematicaCommon/:/usr/share/archivematica/dashboard/
+{% else %}
+env PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+{% endif %}
 
 setuid archivematica
 setgid archivematica
@@ -17,8 +24,7 @@ script
 
     # Is this still necessary?
     test -f /etc/default/locale && . /etc/default/locale || true
-    test -f /etc/environment && . /etc/environment || true
 
-    LANG=$LANG $LOCATION
+    $LOCATION
 
 end script

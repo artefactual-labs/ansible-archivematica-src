@@ -24,10 +24,13 @@ archivematica_src_environment_type: "production"
 # Repositories
 archivematica_src_am_repo: "https://github.com/artefactual/archivematica.git"
 archivematica_src_ss_repo: "https://github.com/artefactual/archivematica-storage-service.git"
-# Repositories for external packages (defaulting to externals repo for stable/1.5.x)
-## externals package server url or ppa (http://<server>/<repository> or ppa:<name>)
+
+# Moving external dependencies repo information out of the role
+# These are fallback values to try to avoid breaking things when deploying legacy branches
+## Repositories for external packages (defaulting to externals repo for stable/1.5.x)
+### externals package server url or ppa (http://<server>/<repository> or ppa:<name>)
 archivematica_src_externals_repo: "http://packages.archivematica.org/1.5.x/ubuntu-externals" 
-## repository key id and url (ignored for ppa)
+### repository key id and url (ignored for ppa)
 archivematica_src_externals_repo_key_id: "0x5236CA08"
 archivematica_src_externals_repo_key_url: "https://packages.archivematica.org/GPG-KEY-archivematica"
 
@@ -120,6 +123,10 @@ archivematica_src_ssl_include_acme_chlg_loc: "false"
 #   archivematica_src_ssl_fullchain: "/var/lib/acme/live/mysite.org/fullchain"
 #   archivematica_src_ssl_privkey: "/var/lib/acme/live/mysite.org/privkey"
 
+# pipeline: create separate virtualenvs for each pipeline component
+#           (dashboard, MCPServer, MCPClient)
+#           default: no (no virtualenv created for pipeline, legacy config)
+archivematica_src_am_multi_venvs: "no"
 
 # automation tools
 archivematica_src_install_automationtools: "no"
