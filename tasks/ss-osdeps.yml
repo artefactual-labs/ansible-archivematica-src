@@ -21,7 +21,7 @@
 
 - name: "set_fact osdeps"
   set_fact:
-    osdeps: "{{ od.stat.isreg is defined and od.stat.isreg }}"
+    osdeps: "{{ od.stat.exists is defined and od.stat.exists }}"
 
 - name: "fetch dependencies files from source code repository to local machine"
   fetch:
