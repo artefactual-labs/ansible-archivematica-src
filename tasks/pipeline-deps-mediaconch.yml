@@ -1,0 +1,76 @@
+---
+
+###########################################################
+# Install MediaConch 16.12 and dependencies
+###########################################################
+#
+# Essentially by running the following commands:
+# wget https://mediaarea.net/download/binary/libmediainfo0/0.7.91/libmediainfo0_0.7.91-1_amd64.xUbuntu_14.04.deb
+# wget https://mediaarea.net/download/binary/libzen0/0.4.34/libzen0_0.4.34-1_amd64.xUbuntu_14.04.deb
+# wget https://mediaarea.net/download/binary/mediaconch/16.12/mediaconch_16.12-1_amd64.xUbuntu_14.04.deb
+# sudo dpkg -i libmediainfo* libzen* mediaconch*
+
+- name: "Create dir /tmp/mediaconch/ for MediaConch-related downloads"
+  file:
+    path: "/tmp/mediaconch/"
+    state: "directory"
+    mode: "0755"
+  tags:
+    - "mediaconch"
+
+- name: "Check if MediaConch is already installed."
+  command: "dpkg-query -W mediaconch"
+  register: "mediaconch_check_deb"
+  failed_when: "mediaconch_check_deb.rc > 1"
+  changed_when: "mediaconch_check_deb.rc == 1"
+  tags:
+    - "mediaconch"
+
+- name: "Download libmediainfo0"
+  get_url:
+    url: "https://mediaarea.net/download/binary/libmediainfo0/0.7.91/libmediainfo0_0.7.91-1_amd64.xUbuntu_14.04.deb"
+    dest: "/tmp/mediaconch/libmediainfo0.deb"
+  when: "mediaconch_check_deb.rc == 1"
+  tags:
+    - "mediaconch"
+
+- name: "Download libzen0"
+  get_url:
+    url: "https://mediaarea.net/download/binary/libzen0/0.4.34/libzen0_0.4.34-1_amd64.xUbuntu_14.04.deb"
+    dest: "/tmp/mediaconch/libzen0.deb"
+  when: "mediaconch_check_deb.rc == 1"
+  tags:
+    - "mediaconch"
+
+- name: "Download mediaconch"
+  get_url:
+    url: "https://mediaarea.net/download/binary/mediaconch/16.12/mediaconch_16.12-1_amd64.xUbuntu_14.04.deb"
+    dest: "/tmp/mediaconch/mediaconch.deb"
+  when: "mediaconch_check_deb.rc == 1"
+  tags:
+    - "mediaconch"
+
+- name: "Install libzen0"
+  apt:
+    deb: "/tmp/mediaconch/libzen0.deb"
+  become: "true"
+  when: "mediaconch_check_deb.rc == 1"
+  tags:
+    - "mediaconch"
+
+- name: "Install libmediainfo0"
+  apt:
+    deb: "/tmp/mediaconch/libmediainfo0.deb"
+  become: "true"
+  when: "mediaconch_check_deb.rc == 1"
+  tags:
+    - "mediaconch"
+
+- name: "Install mediaconch"
+  apt:
+    deb: "/tmp/mediaconch/mediaconch.deb"
+  become: "true"
+  when: "mediaconch_check_deb.rc == 1"
+  tags:
+    - "mediaconch"
+
