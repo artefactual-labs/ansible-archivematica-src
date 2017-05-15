@@ -170,3 +170,12 @@
   tags:
     - "amsrc-appraisaltab"
   when: "archivematica_src_install_appraisaltab|bool"
+
+#
+# acceptance-tests
+#
+
+- include: "acceptance-tests.yml"
+  tags:
+    - "amsrc-acceptancetests"
+  when: "archivematica_src_install_acceptance_tests|bool"

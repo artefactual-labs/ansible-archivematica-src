@@ -1,0 +1,98 @@
+---
+
+- name: "Install packages"
+  apt:
+    pkg: "{{ item }}"
+    state: installed
+    update_cache: yes
+    cache_valid_time: 3600
+  with_items:
+    - tightvncserver
+    - icewm
+
+- name: "Checkout acceptance tests repository"
+  git:
+    repo: "https://github.com/artefactual-labs/archivematica-acceptance-tests.git"
+    dest: "{{ archivematica_src_dir }}/archivematica-acceptance-tests"
+    version: "{{ archivematica_src_acceptance_tests_version }}"
+    force: "yes"
+
+- name: "Install pip dependencies in virtualenv"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/archivematica-acceptance-tests"
+    requirements: "requirements.txt"
+    virtualenv: "/usr/share/python/archivematica-acceptance-tests"
+    virtualenv_python: "python3.4"
+    state: latest
+
+#
+# Install Firefox
+#
+- name: "Check if firefox-mozilla-build is installed"
+  command: "dpkg-query -W firefox-mozilla-build"
+  register: firefox_check_deb
+  failed_when:
+    - firefox_check_deb.rc > 1
+  changed_when:
+    - firefox_check_deb.rc == 1
+
+- name: "Download Firefox 47 deb"
+  get_url:
+    url: "http://sourceforge.net/projects/ubuntuzilla/files/mozilla/apt/pool/main/f/firefox-mozilla-build/firefox-mozilla-build_47.0.1-0ubuntu1_amd64.deb"
+    dest: "/tmp/firefox-mozilla-build_47.0.1-0ubuntu1_amd64.deb"
+  when:
+    - firefox_check_deb.rc == 1
+    - "'Firefox' in archivematica_src_acceptance_tests_browser_list"
+
+- name: "Install Firefox 47"
+  command: "dpkg -i /tmp/firefox-mozilla-build_47.0.1-0ubuntu1_amd64.deb"
+  when:
+    - firefox_check_deb.rc == 1
+    - "'Firefox' in archivematica_src_acceptance_tests_browser_list"
+
+#
+# Install chrome
+#
+
+- name: "Add Google Chrome key"
+  apt_key:
+    url: "https://dl-ssl.google.com/linux/linux_signing_key.pub"
+    state: present
+  when:
+    - "'Chrome' in archivematica_src_acceptance_tests_browser_list"
+
+- name: "Add Google Chrome repo"
+  apt_repository:
+    repo: "deb http://dl.google.com/linux/chrome/deb/ stable main"
+    filename: "google-chrome"
+  when:
+    - "'Chrome' in archivematica_src_acceptance_tests_browser_list"
+
+- name: "Install packages"
+  apt: 
+    pkg: "google-chrome-stable"
+    state: installed
+    update_cache: yes
+    cache_valid_time: 3600
+  when: "'Chrome' in archivematica_src_acceptance_tests_browser_list"
+
+- name: Download and install ChromeDriver
+  get_url:
+    url: "http://chromedriver.storage.googleapis.com/{{ archivematica_src_acceptance_tests_chromedriver_version }}/chromedriver_linux64.zip"
+    dest: "/tmp/chromedriver_linux64.zip"
+  when: "'Chrome' in archivematica_src_acceptance_tests_browser_list"
+
+- command: "unzip /tmp/chromedriver_linux64.zip -d /usr/local/bin"
+  become: yes
+  args:
+    creates: "/usr/local/bin/chromedriver"
+  when: "'Chrome' in archivematica_src_acceptance_tests_browser_list"
+
+- name: "Set permissions" 
+  file:
+    path: "/usr/local/bin/chromedriver"
+    owner: root
+    group: root
+    mode: 0755
+    state: file
+  when: "'Chrome' in archivematica_src_acceptance_tests_browser_list"

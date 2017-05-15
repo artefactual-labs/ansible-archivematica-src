@@ -134,3 +134,9 @@ archivematica_src_automationtools_version: "master"
 archivematica_src_automationtools_transfers_logfile: "/var/log/archivematica/automation-tools/transfers.log"
 archivematica_src_automationtools_transfers_databasefile: "/var/archivematica/automation-tools/transfers.db"
 archivematica_src_automationtools_transfers_pidfile: "/var/archivematica/automation-tools/transfers-pid.lck"
+
+# acceptance tests
+archivematica_src_install_acceptance_tests: "no"
+archivematica_src_acceptance_tests_version: "master"
+archivematica_src_acceptance_tests_browser_list: [ "Chrome" , "Firefox" ]
+archivematica_src_acceptance_tests_chromedriver_version: "2.29"
