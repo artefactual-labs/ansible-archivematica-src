@@ -88,20 +88,6 @@
     dest: "/etc/archivematica/MCPClient/clientConfig.conf"
     backup: "yes"
 
-# Note: the playbook will configure MCP for systemd if OS family is RedHat
-#       and upstart otherwise
-#       (this may need to be changed later as Ubuntu 16 uses systemd)
-
-- name: "initialize var use_systemd"
-  set_fact:
-    use_systemd: false
-
-- name: "set use_systemd to true depending on distro"
-  set_fact:
-    use_systemd: true
-  when: 
-    - ansible_os_family == "RedHat"
-
 - name: "set_fact: set python locations for MCP server and client to correct values when multi_venvs is true"
   set_fact:
     mcp_server_python_path: "/usr/share/python/archivematica-mcp-server/bin/python"
@@ -124,49 +110,55 @@
     src: "etc_init_archivematica-mcp-server.conf.j2"
     dest: "/etc/init/archivematica-mcp-server.conf"
     backup: "yes"
-  when: not use_systemd
+  when:
+    - ansible_service_mgr == "upstart"
 
 - name: "Config archivematica-mcp-client upstart (/etc/init/)"
   template:
     src: "etc_init_archivematica-mcp-client.conf.j2"
     dest: "/etc/init/archivematica-mcp-client.conf"
     backup: "yes"
-  when: not use_systemd
-
+  when:
+    - ansible_service_mgr == "upstart"
 - name: "Reload Upstart configuration"
   command: "initctl reload-configuration"
-  when: not use_systemd
+  when: 
+    - ansible_service_mgr == "upstart"
 
 - name: "Config archivematica-mcp-server systemd (/etc/systemd)"
   template:
     src: "etc/systemd/system/archivematica-mcp-server.service.j2"
     dest: "/etc/systemd/system/archivematica-mcp-server.service"
     backup: "yes"
-  when: use_systemd
+  when:
+    - ansible_service_mgr == "systemd"
 
 - name: "Config archivematica-mcp-client systemd (/etc/systemd)"
   template:
     src: "etc/systemd/system/archivematica-mcp-client.service.j2"
     dest: "/etc/systemd/system/archivematica-mcp-client.service"
     backup: "yes"
-  when: use_systemd
+  when:
+    - ansible_service_mgr == "systemd"
 
-- name: "Add MCP server systemd env file (in /etc/sysconfig)"
+- name: "Add MCP server systemd env file"
   template:
     src: "etc/sysconfig/archivematica-mcp-server.j2"
-    dest: "/etc/sysconfig/archivematica-mcp-server"
+    dest: "{{ systemd_environment_path}}/archivematica-mcp-server"
     backup: "yes"
-  when: use_systemd
+  when:
+    - ansible_service_mgr == "systemd"
 
-- name: "Add MCP client systemd env file (in /etc/sysconfig)"
+- name: "Add MCP client systemd env file"
   template:
     src: "etc/sysconfig/archivematica-mcp-client.j2"
-    dest: "/etc/sysconfig/archivematica-mcp-client"
+    dest: "{{ systemd_environment_path}}/archivematica-mcp-client"
     backup: "yes"
-  when: use_systemd
+  when:
+    - ansible_service_mgr == "systemd"
 
 - name: "Reload systemd config"
   command: "systemctl daemon-reload"
   tags: "amsrc-ss-websrv"
-  when: use_systemd
-
+  when:
+    - ansible_service_mgr == "systemd"

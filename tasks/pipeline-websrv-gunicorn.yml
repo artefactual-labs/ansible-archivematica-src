@@ -35,43 +35,31 @@
     dashboard_gunicorn_path: "{{ dgp.stdout }}"
   when: "not archivematica_src_am_multi_venvs|bool"
 
-
-# Note: the playbook will configure dashboard for systemd if OS family is RedHat
-#       and upstart otherwise
-#       (this may need to be changed later as Ubuntu 16 uses systemd)
-
-
-- name: "initialize var use_systemd"
-  set_fact:
-    use_systemd: false
-
-- name: "set use_systemd to true depending on distro"
-  set_fact:
-    use_systemd: true
-  when: 
-    - ansible_os_family == "RedHat"
-
 - name: "Config dashboard gunicorn upstart (/etc/init)"
   template:
     src: "etc_init_archivematica-dashboard.conf.j2"
     dest: "/etc/init/archivematica-dashboard.conf"
     backup: "yes"
-  when: not use_systemd
+  when: 
+     - ansible_service_mgr == "upstart"
 
 - name: "Reload Upstart configuration"
   command: "initctl reload-configuration"
-  when: not use_systemd
+  when:
+    - ansible_service_mgr == "upstart"
 
 - name: "Add dashboard gunicorn systemd (/etc/systemd)"
   template:
     src: "etc/systemd/system/archivematica-dashboard.service.j2"
     dest: "/etc/systemd/system/archivematica-dashboard.service"
     backup: "yes"
-  when: use_systemd
+  when:
+    - ansible_service_mgr == "systemd"
 
 - name: "Reload systemd config"
   command: "systemctl daemon-reload"
-  when: use_systemd
+  when:
+    - ansible_service_mgr == "systemd"
 
 - name: "Remove Nginx default server"
   file:
@@ -119,3 +107,20 @@
     - "archivematica-mcp-client"
     - "archivematica-dashboard"
     - "nginx"
+  when:
+    - ansible_service_mgr == "upstart"
+
+- name: "Enable services"
+  systemd:
+    name: "{{ item }}"
+    state: "restarted"
+    enabled: "yes"
+    daemon_reload: "yes"
+  with_items:
+    - "archivematica-mcp-server"
+    - "archivematica-mcp-client"
+    - "archivematica-dashboard"
+    - "nginx"
+  when:
+    - ansible_service_mgr == "systemd"
+

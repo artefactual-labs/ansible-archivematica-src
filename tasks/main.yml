@@ -29,6 +29,18 @@
       SS_DB_USER: "{{ archivematica_src_ss_env_ss_db_user }}"
   tags: "always" # inocuous to use always here
 
+- name: "initialize systemd folder"
+  set_fact:
+    systemd_environment_path: "/etc/default"
+  tags: "always" # inocuous to use always here
+
+- name: "initialize systemd folder (RedHat)"
+  set_fact:
+    systemd_environment_path: "/etc/sysconfig"
+  when:
+     - ansible_os_family == "RedHat" and ansible_service_mgr == "systemd"
+  tags: "always" # inocuous to use always here
+
 - name: "include common.yml common tasks for all components"
   include: "common.yml"
   tags: # do not use "always" tag in role, to avoid issues when including other roles in a playbook

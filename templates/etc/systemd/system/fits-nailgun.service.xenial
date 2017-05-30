@@ -1,0 +1,10 @@
+[Unit]
+Description=FITS Nailgun server
+After=syslog.target network.target
+
+[Service]
+User=archivematica
+ExecStart=/usr/bin/fits-ngserver.sh /usr/share/maven-repo/com/martiansoftware/nailgun-server/debian/nailgun-server-debian.jar
+
+[Install]
+WantedBy=multi-user.target
