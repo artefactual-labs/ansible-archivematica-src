@@ -122,12 +122,22 @@
     name: "fits"
     state: "started"
     enabled: "yes"
-  when: ansible_distribution=="Ubuntu"
+  when:
+    - ansible_service_mgr == "upstart"
 
-- name: "Enable and start fits-nailgun (RedHat)"
-  service:
+- name: Create systemd init file for fits (Ubuntu 16.04)
+  template:
+     src: "etc/systemd/system/fits-nailgun.service.xenial" 
+     dest: "/etc/systemd/system/fits-nailgun.service"
+  when:
+    - ansible_service_mgr == "systemd" and ansible_distribution == "Ubuntu"
+
+- name: "Enable and start fits-nailgun (Systemd)"
+  systemd:
     name: "fits-nailgun"
     state: "started"
     enabled: "yes"
-  when: ansible_os_family=="RedHat"
+    daemon_reload: "yes"
+  when:
+    - ansible_service_mgr == "systemd"
 

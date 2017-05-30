@@ -19,21 +19,6 @@
     backup: "yes"
   tags: "amsrc-ss-websrv"
 
-# Note: the playbook will configure SS for systemd if OS family is RedHat
-#       and upstart otherwise
-#       (this may need to be changed later as Ubuntu 16 uses systemd)
-
-- name: "initialize var use_systemd"
-  set_fact:
-    use_systemd: false
-  tags: "amsrc-ss-websrv"
-
-- name: "set use_systemd to true depending on distro"
-  set_fact:
-    use_systemd: true
-  when: 
-    - ansible_os_family == "RedHat"
-  tags: "amsrc-ss-websrv"
 
 - name: "Config storage service gunicorn upstart (/etc/init)"
   template:
@@ -41,12 +26,15 @@
     dest: "/etc/init/archivematica-storage-service.conf"
     backup: "yes"
   tags: "amsrc-ss-websrv"
-  when: not use_systemd
+  when: 
+    - ansible_service_mgr == "upstart"
 
 - name: "Reload Upstart configuration"
   command: "initctl reload-configuration"
   tags: "amsrc-ss-websrv"
-  when: not use_systemd
+  when: 
+    - ansible_service_mgr == "upstart"
+
 
 - name: "Add storage service gunicorn systemd (/etc/systemd)"
   template:
@@ -54,20 +42,17 @@
     dest: "/etc/systemd/system/archivematica-storage-service.service"
     backup: "yes"
   tags: "amsrc-ss-websrv"
-  when: use_systemd
+  when: 
+    - ansible_service_mgr == "systemd"
 
-- name: "Reload systemd config"
-  command: "systemctl daemon-reload"
-  tags: "amsrc-ss-websrv"
-  when: use_systemd
-
-- name: "Add storage service gunicorn systemd env file (in /etc/sysconfig)"
+- name: "Add storage service gunicorn systemd env file (in {{ systemd_environment_path }})"
   template:
     src: "etc/sysconfig/archivematica-storage-service.j2"
-    dest: "/etc/sysconfig/archivematica-storage-service"
+    dest: "{{ systemd_environment_path }}/archivematica-storage-service"
     backup: "yes"
   tags: "amsrc-ss-websrv"
-  when: use_systemd
+  when: 
+    - ansible_service_mgr == "systemd"
 
 - name: "Disable Nginx default server config"
   file:
@@ -110,7 +95,7 @@
   tags: "amsrc-ss-websrv"
 # SSL configuration tasks - end
 
-- name: "Enable services"
+- name: "Enable services (upstart)"
   service:
     name: "{{ item }}"
     state: "restarted"
@@ -118,4 +103,20 @@
   with_items:
     - "archivematica-storage-service"
     - "nginx"
+  when:
+    - ansible_service_mgr == "upstart"
   tags: "amsrc-ss-websrv"
+
+- name: "Enable services (systemd)"
+  service:
+    name: "{{ item }}"
+    state: "restarted"
+    enabled: "yes"
+    daemon_reload: "yes"
+  with_items:
+    - "archivematica-storage-service"
+    - "nginx"
+  when:
+    - ansible_service_mgr == "systemd"
+  tags: "amsrc-ss-websrv"
+
