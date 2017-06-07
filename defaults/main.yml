@@ -67,10 +67,16 @@ archivematica_src_am_database_password: "demo"
 archivematica_src_reset_mcpdb: "false"
 # delete the existing shared directory
 archivematica_src_reset_shareddir: "false"
-#ES Host
-archivematica_src_am_es_host: "localhost:9200"
+
+#Gearman server
+archivematica_src_gearman_server: "localhost:4730"
+
+#ElasticSearch server configuration
+archivematica_src_elasticsearch_server: "localhost:9200"
+archivematica_src_elasticsearch_timeout: 10
 # Delete ElasticSearch indexes
 archivematica_src_reset_es: "false"
+
 # reset the AM database (MCP), delete AM shared dir and reset ElasticSearch indexes (if true, it overrides the three reset vars above)
 archivematica_src_reset_am_all: "false"
 
