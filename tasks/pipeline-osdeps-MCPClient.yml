@@ -27,6 +27,13 @@
       when:
         - "MCPClient.osdeps_packages"
 
+    - name: "Install MCPClient ext. package deb file deps."
+      apt:
+        deb: "{{ item }}"
+      with_items: "{{ MCPClient.osdeps_debfiles }}"
+      when:
+        - "MCPClient.osdeps_debfiles"
+
   when:
     - ansible_distribution == "Ubuntu"
 
