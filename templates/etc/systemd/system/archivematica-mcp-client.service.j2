@@ -7,6 +7,7 @@ After=syslog.target network.target
 Type=simple
 User=archivematica
 EnvironmentFile=-{{ systemd_environment_path }}/archivematica-mcp-client
+Environment=PATH=/usr/share/python/archivematica-mcp-client/bin/
 ExecStart={{ mcp_client_python_path }} /usr/lib/archivematica/MCPClient/archivematicaClient.py
 
 [Install]
