@@ -34,6 +34,7 @@
 
 - name: "include ss-osdeps.yml"
   include: "ss-osdeps.yml"
+  tags: "amsrc-ss-osdeps"
   static: no
 
 
