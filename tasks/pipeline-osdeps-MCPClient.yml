@@ -32,7 +32,7 @@
         deb: "{{ item }}"
       with_items: "{{ MCPClient.osdeps_debfiles }}"
       when:
-        - "MCPClient.osdeps_debfiles"
+        - "MCPClient.osdeps_debfiles is defined and MCPClient.osdeps_debfiles"
 
   when:
     - ansible_distribution == "Ubuntu"
