@@ -7,7 +7,7 @@
 
 - name: "Set fact: type of environment"
   set_fact:
-    is_dev: "{{ archivematica_src_environment_type == 'development' }}"
+    is_dev: "{{ archivematica_src_environment_type == 'development' or archivematica_src_environment_type == 'shibboleth' }}"
     is_prod: "{{ archivematica_src_environment_type == 'production' }}"
   tags: "always" # inocuous to use always here
 
@@ -15,6 +15,10 @@
   set_fact:
     archivematica_src_am_dashboard_environment:
       DJANGO_SETTINGS_MODULE: "{{ 'settings.local' if is_dev else 'settings.common' }}"
+      PYTHONPATH: "/usr/lib/archivematica/archivematicaCommon"
+      ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_ALLOWED_HOSTS: "{{ archivematica_src_am_dashboard_allowed_hosts }}"
+      ARCHIVEMATICA_DASHBOARD_SHIBBOLETH_AUTHENTICATION: "{{ archivematica_src_am_dashboard_shibboleth_authentication }}"
+
     archivematica_src_ss_environment:
       DJANGO_SECRET_KEY: "{{ archivematica_src_ss_env_django_secret_key }}"
       DJANGO_SETTINGS_MODULE: "{{ archivematica_src_ss_env_django_setings_module }}"
@@ -27,6 +31,8 @@
       SS_DB_NAME: "{{ archivematica_src_ss_env_ss_db_name }}"
       SS_DB_PASSWORD: "{{ archivematica_src_ss_env_ss_db_password }}"
       SS_DB_USER: "{{ archivematica_src_ss_env_ss_db_user }}"
+      SS_SHIBBOLETH_AUTHENTICATION: "{{ archivematica_src_ss_env_ss_shibboleth_authentication }}"
+      DJANGO_ALLOWED_HOSTS: "{{ archivematica_src_ss_env_django_allowed_hosts }}"
   tags: "always" # inocuous to use always here
 
 - name: "initialize systemd folder"

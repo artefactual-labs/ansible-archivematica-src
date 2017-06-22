@@ -16,7 +16,7 @@ env PYTHONPATH=/usr/lib/archivematica/archivematicaCommon/:/usr/share/archivemat
 {% else %}
 env PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 {% endif %}
-
+env DJANGO_SETTINGS_MODULE=settings.common
 setuid archivematica
 setgid archivematica
 

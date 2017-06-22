@@ -91,9 +91,9 @@
 # copy of shared dir structure should be executed also for upgrades (to reflect changes) 
 # Note: --chown option requires rsync version >=3.1.0
 #       centos 7 does not currently support it
-- name: "Copy shared directory structure (non RH)"
-  command: "rsync -a --chown=archivematica:archivematica {{ archivematica_src_dir }}/archivematica/src/MCPServer/share/sharedDirectoryStructure/ {{ archivematica_src_shareddir }}/"
-  when: not (ansible_os_family == "RedHat")
+#- name: "Copy shared directory structure (non RH)"
+#  command: "rsync -a --chown=archivematica:archivematica {{ archivematica_src_dir }}/archivematica/src/MCPServer/share/sharedDirectoryStructure/ {{ archivematica_src_shareddir }}/"
+#  when: not (ansible_os_family == "RedHat")
 
 - name: "Copy shared directory structure (RH)"
   command: "rsync -rl {{ archivematica_src_dir }}/archivematica/src/MCPServer/share/sharedDirectoryStructure/ {{ archivematica_src_shareddir }}/"

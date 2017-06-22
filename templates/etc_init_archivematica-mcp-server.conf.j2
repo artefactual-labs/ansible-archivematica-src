@@ -12,6 +12,8 @@ env LOCATION="{{ mcp_server_python_path }} /usr/lib/archivematica/MCPServer/arch
 env PYTHONPATH=/usr/lib/archivematica/archivematicaCommon/:/usr/share/archivematica/dashboard/
 {% endif %}
 
+env DJANGO_SETTINGS_MODULE=settings.common
+
 setuid archivematica
 setgid archivematica
 

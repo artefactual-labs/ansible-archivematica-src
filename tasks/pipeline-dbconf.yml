@@ -103,7 +103,33 @@
     settings: "settings.common"
     pythonpath: "/usr/lib/archivematica/archivematicaCommon"
     virtualenv: "/usr/share/python/archivematica-dashboard"
+  environment: "{{ archivematica_src_am_dashboard_environment }}"
   tags: "amsrc-pipeline-dbconf-syncdb"
   when: 
     - "not archivematica_src_am_pre_migration|bool"
     - "archivematica_src_am_multi_venvs|bool"
+
+- name: "Install default settings"
+  django_manage:
+    command: 'install \
+              --username="test" \
+              --password="test" \
+              --email="test@test.com" \
+              --org-name="test" \
+              --org-id="test" \
+              --api-key="test" \
+              --ss-url="http://archivematica-storage-service:8000" \
+              --ss-user="test" \
+              --ss-api-key="test"'
+    app_path: "/usr/share/archivematica/dashboard/"
+    settings: "settings.common"
+    pythonpath: "/usr/lib/archivematica/archivematicaCommon"
+    virtualenv: "/usr/share/python/archivematica-dashboard"
+  environment: "{{ archivematica_src_am_dashboard_environment }}"
+  tags: "amsrc-pipeline-dbconf-syncdb"
+  when: 
+    - "not archivematica_src_am_pre_migration|bool"
+    - "archivematica_src_am_multi_venvs|bool"
+  ignore_errors: True
+
+
