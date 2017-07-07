@@ -39,6 +39,9 @@ archivematica_src_am_version: "qa/1.x"
 archivematica_src_ss_version: "qa/0.x"
 archivematica_src_devtools_version: "master"
 
+archivematica_src_am_env_django_secret_key: "CHANGE_ME_WITH_A_SECRET_KEY"
+archivematica_src_am_env_django_allowed_hosts: "*"
+
 # SS django environment variables
 # DJANGO_SECRET_KEY shall be changed for every install
 #     (override the value in the playboook, do not change here)
