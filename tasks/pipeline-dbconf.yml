@@ -91,6 +91,7 @@
     app_path: "/usr/share/archivematica/dashboard/"
     settings: "settings.common"
     pythonpath: "/usr/lib/archivematica/archivematicaCommon"
+  environment: "{{ archivematica_src_am_dashboard_environment }}"
   tags: "amsrc-pipeline-dbconf-syncdb"
   when: 
     - "not archivematica_src_am_pre_migration|bool"
@@ -103,6 +104,7 @@
     settings: "settings.common"
     pythonpath: "/usr/lib/archivematica/archivematicaCommon"
     virtualenv: "/usr/share/python/archivematica-dashboard"
+  environment: "{{ archivematica_src_am_dashboard_environment }}"
   tags: "amsrc-pipeline-dbconf-syncdb"
   when: 
     - "not archivematica_src_am_pre_migration|bool"

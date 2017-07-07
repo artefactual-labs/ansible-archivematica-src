@@ -15,6 +15,8 @@
   set_fact:
     archivematica_src_am_dashboard_environment:
       DJANGO_SETTINGS_MODULE: "{{ 'settings.local' if is_dev else 'settings.common' }}"
+      ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_ALLOWED_HOSTS: "{{ archivematica_src_am_env_django_allowed_hosts }}"
+      ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY: "{{ archivematica_src_am_env_django_secret_key }}"
     archivematica_src_ss_environment:
       DJANGO_SECRET_KEY: "{{ archivematica_src_ss_env_django_secret_key }}"
       DJANGO_SETTINGS_MODULE: "{{ archivematica_src_ss_env_django_setings_module }}"
