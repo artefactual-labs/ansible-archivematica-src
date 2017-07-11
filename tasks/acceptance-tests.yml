@@ -22,7 +22,7 @@
     chdir: "{{ archivematica_src_dir }}/archivematica-acceptance-tests"
     requirements: "requirements.txt"
     virtualenv: "/usr/share/python/archivematica-acceptance-tests"
-    virtualenv_python: "python3.4"
+    virtualenv_python: "python3"
     state: latest
 
 #
