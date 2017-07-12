@@ -15,6 +15,7 @@ env PATH="/usr/share/python/archivematica-mcp-client/bin:/usr/local/sbin:/usr/lo
 env PYTHONPATH=/usr/lib/archivematica/archivematicaCommon/:/usr/share/archivematica/dashboard/
 {% else %}
 env PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+env DJANGO_SETTINGS_MODULE=settings.common
 {% endif %}
 
 setuid archivematica
