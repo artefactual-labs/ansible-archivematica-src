@@ -40,7 +40,6 @@ Role Variables
 - `archivematica_src_install_sample_data`: copy sample data (default: "yes")
 - `archivematica_src_install_devtools`: install archivematica-devtools (default: "no")
 - `archivematica_src_install_automationtools`: install automation-tools (default: "no")
-- `archivematica_src_install_appraisaltab`: install appraisal-tab (default: "no") (WIP)
 
 ### Version
 

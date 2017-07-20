@@ -52,7 +52,6 @@
   - "amsrc-pipeline"
   - "amsrc-devtools"
   - "amsrc-automationtools"
-  - "amsrc-appraisaltab"
 
 
 
@@ -170,15 +169,6 @@
   tags:
     - "amsrc-automationtools"
   when: "archivematica_src_install_automationtools|bool"
-
-#
-# appraisal-tab
-#
-
-- include: "appraisal-tab.yml"
-  tags:
-    - "amsrc-appraisaltab"
-  when: "archivematica_src_install_appraisaltab|bool"
 
 #
 # acceptance-tests
