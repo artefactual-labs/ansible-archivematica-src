@@ -5,7 +5,7 @@
     name: "{{ item }}"
     state: "latest"
   with_items:
-    - "epel-release"    
+    - "epel-release"
     - "git"
     - "MySQL-python"         # required for mysql_db
   when: ansible_os_family == "RedHat"
@@ -20,7 +20,6 @@
     - "python-mysqldb"         # required for mysql_db
   when: ansible_distribution == "Ubuntu"
 
-
 - name: "Ensure pip is not installed from packages"
   package:
     name: "{{ item }}"
@@ -32,7 +31,7 @@
 - name: "Download get-pip.py"
   get_url:
     url: "https://bootstrap.pypa.io/get-pip.py"
-    dest: "/root/get-pip.py"  
+    dest: "/root/get-pip.py"
 
 - name: "Install pip with get-pip.py"
   command: "python get-pip.py"

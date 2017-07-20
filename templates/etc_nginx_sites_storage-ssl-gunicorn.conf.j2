@@ -26,23 +26,13 @@ server {
     # Adjust to taste
     client_max_body_size 256M;
 
-    location /static {
-{% if is_dev|bool %}
-        # dev environment: disable sendfile when serving static files (work around vagrant vboxsf issue)
-        sendfile off;
-{% endif %}
-        alias /usr/lib/archivematica/storage-service/assets;
-    }
-
     location / {
-    proxy_set_header Host $http_host;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_redirect off;
-    proxy_buffering off;
-
-    proxy_read_timeout {{ archivematica_src_ss_nginx_proxy_read_timeout }};
-    proxy_pass http://archivematica_storage_service_backend;
-
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_redirect off;
+        proxy_buffering off;
+        proxy_read_timeout {{ archivematica_src_ss_nginx_proxy_read_timeout }};
+        proxy_pass http://archivematica_storage_service_backend;
     }
 
     # redirect to https (required when not using the standard ports 80/443)

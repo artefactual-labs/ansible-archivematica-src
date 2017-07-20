@@ -71,17 +71,11 @@
    - "amsrc-ss-db"
   when: "archivematica_src_install_ss|bool"
 
-- include: "ss-websrv-uwsgi.yml"
-  tags:
-   - "amsrc-ss"
-   - "amsrc-ss-websrv"
-  when: "archivematica_src_install_ss|bool and not(archivematica_src_ss_gunicorn|bool)"
-
 - include: "ss-websrv-gunicorn.yml"
   tags:
    - "amsrc-ss"
    - "amsrc-ss-websrv"
-  when: "archivematica_src_install_ss|bool and archivematica_src_ss_gunicorn|bool"
+  when: "archivematica_src_install_ss|bool"
 
 
 #
