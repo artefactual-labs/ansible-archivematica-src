@@ -21,6 +21,7 @@
       DJANGO_SECRET_KEY: "{{ archivematica_src_ss_env_django_secret_key }}"
       DJANGO_SETTINGS_MODULE: "{{ archivematica_src_ss_env_django_setings_module }}"
       DJANGO_STATIC_ROOT: "{{ archivematica_src_ss_env_django_static_root }}"
+      DJANGO_ALLOWED_HOSTS: "{{ archivematica_src_ss_env_django_allowed_hosts }}"
       EMAIL_HOST: "{{ archivematica_src_ss_env_email_host }}"
       EMAIL_HOST_PASSWORD: "{{ archivematica_src_ss_env_email_host_password }}"
       EMAIL_HOST_USER: "{{ archivematica_src_ss_env_email_host_user }}"
