@@ -29,7 +29,7 @@
 
 
 ###########################################################
-#   1- OS package dependencies 
+#   1- OS package dependencies
 ###########################################################
 
 - name: "include ss-osdeps.yml"
@@ -143,28 +143,6 @@
     state: "directory"
   with_items:
     - "/etc/archivematica"
-  tags: "amsrc-ss-osconf"
-
-- name: "Create archivematica-storage-service log directories"
-  file:
-    dest: "{{ item }}"
-    state: "directory"
-    owner: "archivematica"
-    group: "archivematica"
-    mode: "g+s"
-  with_items:
-    - "/var/log/archivematica/storage-service"
-  tags: "amsrc-ss-osconf"
-
-- name: "Touch SS log files"
-  file:
-    path: "/var/log/archivematica/storage-service/{{ item }}"
-    owner: "archivematica"
-    group: "archivematica"
-    state: "touch"
-  with_items:
-    - "storage_service.log"
-    - "storage_service_debug.log"
   tags: "amsrc-ss-osconf"
 
 
