@@ -59,21 +59,7 @@
 # archivematica-storage-service
 #
 
-- include: "ss-main.yml"
-  tags:
-   - "amsrc-ss"
-  when: "archivematica_src_install_ss|bool"
-
-- include: "ss-db.yml"
-  tags:
-   - "amsrc-ss"
-   - "amsrc-ss-db"
-  when: "archivematica_src_install_ss|bool"
-
-- include: "ss-websrv-gunicorn.yml"
-  tags:
-   - "amsrc-ss"
-   - "amsrc-ss-websrv"
+- include: "ss.yml"
   when: "archivematica_src_install_ss|bool"
 
 

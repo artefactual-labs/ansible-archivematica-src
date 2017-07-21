@@ -42,24 +42,7 @@
 #   2- Python dependencies (pip packages)
 ###########################################################
 
-- stat:
-    path: "{{ archivematica_src_dir }}/archivematica-storage-service/lib"
-  register: "ss_lib_dir_check"
-  tags: "amsrc-ss-pydep"
-
-- set_fact:
-    ss_pip_install_extra_args: ""
-  tags: "amsrc-ss-pydep"
-
-- set_fact:
-    ss_pip_install_extra_args: "--find-links lib"
-  when: "ss_lib_dir_check.stat.isdir is defined and ss_lib_dir_check.stat.isdir"
-  tags: "amsrc-ss-pydep"
-
-
-
-# a separate task to create the virtualenv before install requirements
-# is required to avoid errors
+# We need to install pip before.
 - name: "Create virtualenv for archivematica-storage-service"
   pip:
     name: "pip"
@@ -68,50 +51,12 @@
     state: "latest"
   tags: "amsrc-ss-pydep"
 
-## these tasks added in PR #103 are breaking in CentOS
-## (error in pip install after removing setuptools)
-## will remove for now
-
-# - name: "Update setuptools in virtualenv for archivematica-storage-service"
-#   pip:
-#     name: "setuptools"
-#     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-#     virtualenv: "/usr/share/python/archivematica-storage-service"
-#     state: "absent"
-#   tags: "amsrc-ss-pydep"
-
-# - name: "Update setuptools in virtualenv for archivematica-storage-service"
-#   pip:
-#     name: "setuptools"
-#     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-#     virtualenv: "/usr/share/python/archivematica-storage-service"
-#     state: "latest"
-#   tags: "amsrc-ss-pydep"
-
 - name: "Create virtualenv for archivematica-storage-service, pip install requirements"
   pip:
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
     requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt'}}"
     virtualenv: "/usr/share/python/archivematica-storage-service"
-    extra_args: "{{ ss_pip_install_extra_args }}"
     state: "latest"
-  tags: "amsrc-ss-pydep"
-
-- name: "Work around to install pip deps commented out in old SS branches"
-  pip:
-    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
-    extra_args: "{{ ss_pip_install_extra_args }}"
-    state: "latest"
-    name: "{{ item }}"
-  with_items:
-    - "python-swiftclient"
-    - "python-keystoneclient"
-    - "sword2"
-    - "pyopenssl"
-    - "ndg-httpsclient"
-    - "pyasn1"
-  when: "archivematica_src_ss_pip_missing_deps|bool"
   tags: "amsrc-ss-pydep"
 
 
@@ -169,67 +114,3 @@
     virtualenv: "/usr/share/python/archivematica-storage-service"
   environment: "{{ archivematica_src_ss_environment }}"
   tags: ["amsrc-ss-code", "amsrc-ss-code-collectstatic"]
-
-
-###########################################################
-#   5- SS worker
-###########################################################
-
-# grep returns 0 if match found, 1 if not found, and 2 (or >1) if error
-- name: "Check if celery or django-celery is in the pip requirements"
-  command: "grep -E '^celery|^django-celery' base.txt"
-  args:
-    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service/requirements"
-  register: "grep_celery"
-  failed_when: "grep_celery.rc > 1"
-  tags: "amsrc-ss-worker"
-
-- set_fact:
-    ss_worker: true
-  when: "grep_celery.rc == 0"
-  tags: "amsrc-ss-worker"
-
-- set_fact:
-    ss_worker: false
-  when: "grep_celery.rc == 1"
-  tags: "amsrc-ss-worker"
-
-- name: "Install redis-server package if required"
-  apt:
-    pkg: "redis-server"
-    state: "latest"
-  when: "ss_worker|bool"
-  tags: "amsrc-ss-worker"
-
-- name: "Enable and start redis-server if not already running"
-  service:
-    name: "redis-server"
-    state: "started"
-    enabled: "yes"
-  when: "ss_worker|bool"
-  tags: "amsrc-ss-worker"
-
-- name: "Template celery upstart file if required"
-  template:
-    src: "etc_init_archivematica-storage-service-worker.conf.j2"
-    dest: "/etc/init/archivematica-storage-service-worker.conf"
-    backup: "yes"
-  when: "ss_worker|bool"
-  tags: "amsrc-ss-worker"
-
-- name: "Start storage service celery worker"
-  service:
-    name: "archivematica-storage-service-worker"
-    state: "started"
-    enabled: "yes"
-  when: "ss_worker|bool"
-  tags: "amsrc-ss-worker"
-
-
-###########################################################
-#   6- Database config - moved to separate files
-###########################################################
-
-###########################################################
-#   7- web server config - moved to separate files
-###########################################################

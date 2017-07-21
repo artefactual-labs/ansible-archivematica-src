@@ -1,0 +1,43 @@
+
+# grep returns 0 if match found, 1 if not found, and 2 (or >1) if error
+- name: "Check if celery or django-celery is in the pip requirements"
+  command: "grep -E '^celery|^django-celery' base.txt"
+  args:
+    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service/requirements"
+  register: "grep_celery"
+  failed_when: "grep_celery.rc > 1"
+
+- set_fact:
+    ss_worker: true
+  when: "grep_celery.rc == 0"
+
+- set_fact:
+    ss_worker: false
+  when: "grep_celery.rc == 1"
+
+- name: "Install redis-server package if required"
+  apt:
+    pkg: "redis-server"
+    state: "latest"
+  when: "ss_worker|bool"
+
+- name: "Enable and start redis-server if not already running"
+  service:
+    name: "redis-server"
+    state: "started"
+    enabled: "yes"
+  when: "ss_worker|bool"
+
+- name: "Template celery upstart file if required"
+  template:
+    src: "etc_init_archivematica-storage-service-worker.conf.j2"
+    dest: "/etc/init/archivematica-storage-service-worker.conf"
+    backup: "yes"
+  when: "ss_worker|bool"
+
+- name: "Start storage service celery worker"
+  service:
+    name: "archivematica-storage-service-worker"
+    state: "started"
+    enabled: "yes"
+  when: "ss_worker|bool"
