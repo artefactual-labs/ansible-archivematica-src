@@ -26,8 +26,6 @@
     # MCPServer
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/lib"
       dest: "/usr/lib/archivematica/MCPServer"
-    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share"
-      dest: "/usr/share/archivematica/MCPServer"
 
     # MCPClient
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/lib/"
