@@ -25,15 +25,6 @@ archivematica_src_environment_type: "production"
 archivematica_src_am_repo: "https://github.com/artefactual/archivematica.git"
 archivematica_src_ss_repo: "https://github.com/artefactual/archivematica-storage-service.git"
 
-# Moving external dependencies repo information out of the role
-# These are fallback values to try to avoid breaking things when deploying legacy branches
-## Repositories for external packages (defaulting to externals repo for stable/1.5.x)
-### externals package server url or ppa (http://<server>/<repository> or ppa:<name>)
-archivematica_src_externals_repo: "http://packages.archivematica.org/1.5.x/ubuntu-externals" 
-### repository key id and url (ignored for ppa)
-archivematica_src_externals_repo_key_id: "0x5236CA08"
-archivematica_src_externals_repo_key_url: "https://packages.archivematica.org/GPG-KEY-archivematica"
-
 # Branches
 archivematica_src_am_version: "qa/1.x"
 archivematica_src_ss_version: "qa/0.x"
@@ -98,12 +89,6 @@ archivematica_src_ss_run_syncdb: "false"
 #  to work around launchpad building issues)
 # this flag works around such workaround :-) by running a separate pip install for these deps
 archivematica_src_ss_pip_missing_deps: "false"
-
-# dependencies (see vars files)
-archivematica_src_am_common_pkgdeps: "{{ archivematica_src_am_common_pkgdeps_v1_4 }}"
-archivematica_src_am_dashboard_pkgdeps: "{{ archivematica_src_am_dashboard_pkgdeps_v1_4 }}"
-archivematica_src_am_mcpserver_pkgdeps: "{{ archivematica_src_am_mcpserver_pkgdeps_v1_4 }}"
-archivematica_src_am_mcpclient_pkgdeps: "{{ archivematica_src_am_mcpclient_pkgdeps_v1_4 }}"
 
 ## SS nginx gunicorn parameters
 ### in both nginx and gunicorn config files

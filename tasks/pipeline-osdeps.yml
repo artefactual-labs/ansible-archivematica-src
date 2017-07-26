@@ -17,8 +17,6 @@
 #  - If this role finds osdeps files for the OS of the target VM 
 #    (matching distribution and version), it will configure 
 #    dependencies according to these files 
-#  - If this role doesn't find any osdeps file for the OS, it 
-#    will use the role defaults 
 ############################################################
 
 # osdeps filenames in the archivematica repo are something like "Ubuntu-14.04.json"
@@ -94,28 +92,9 @@
   static: no
   when: dashboard is defined
 
-#######################################################################
-# if no osdeps files, fallback to legacy tasks 
-# (install dependencies using the default values in this role)
-#######################################################################
-
-# run fallback tasks if comps_osdeps is empty 
-# (i.e., no osdeps json file found for any component, for the target OS, in the AM source repo)
-# only for ubuntu 14, error if not
-- name: "include pipeline-osdeps-fallback"
-  include: "pipeline-osdeps-fallback.yml"
-  static: no
-  when: 
-    - not comps_osdeps
-    - ansible_distribution=="Ubuntu" and ansible_distribution_major_version=="14"
-
-## error if no osdeps file and not ubuntu 14
-- name: "error if no osdeps and no fallback"
-  fail: 
-    msg: "Error: no osdeps and no fallback for this distro version"
-  when: 
-    - not comps_osdeps 
-    - not (ansible_distribution=="Ubuntu" and ansible_distribution_major_version=="14")
+#
+# FITS via Nailgun
+#
 
 - name: "Enable and start fits (Ubuntu)"
   service:

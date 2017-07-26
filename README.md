@@ -14,7 +14,6 @@ Archivematica installation from its source code repositories.
   - [Reset](#reset)
   - [Legacy support](#legacy-support)
   - [Remote repository](#remote-repository)
-  - [External package dependencies repository](#external-package-dependencies-repository)
   - [Web server](#web-server)
     - [SSL](#ssl)
 - [Tags](#tags)
@@ -68,12 +67,6 @@ Role Variables
 
 - `archivematica_src_am_repo`: AM repository (default: `"https://github.com/artefactual/archivematica.git"`)
 - `archivematica_src_ss_repo`: SS repository (default: `"https://github.com/artefactual/archivematica-storage-service.git"`)
-
-### External package dependencies repository
-
-- `archivematica_src_externals_repo`: externals package server url or ppa (`http://<server>/<repository>` or `ppa:<name>`) (default: `"http://packages.archivematica.org/1.5.x/ubuntu-externals"`) 
-- `archivematica_src_externals_repo_key_id`: repository key id  (ignored for ppa) (default: `"0x5236CA08"`)
-- `archivematica_src_externals_repo_key_url`: repository key url (ignored for ppa) (default: `"https://packages.archivematica.org/GPG-KEY-archivematica"`)
 
 ### Web server
 
