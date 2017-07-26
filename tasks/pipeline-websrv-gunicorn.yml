@@ -19,21 +19,9 @@
     dest: "/etc/archivematica/dashboard.gunicorn-config.py"
     backup: "yes"
 
-- name: "set_fact: set gunicorn path to correct value when multi_venvs is true"
+- name: "set_fact: set gunicorn path to correct value"
   set_fact:
     dashboard_gunicorn_path: "/usr/share/python/archivematica-dashboard/bin/gunicorn"
-  when: "archivematica_src_am_multi_venvs|bool"
-
-- name: "Get location of the gunicorn executable for dashboard when multi_venvs is false"
-  command: "which gunicorn"
-  register: dgp
-  when: "not archivematica_src_am_multi_venvs|bool"
-
-
-- name: "set_fact: set gunicorn path to correct value when multi_venvs is false"
-  set_fact:
-    dashboard_gunicorn_path: "{{ dgp.stdout }}"
-  when: "not archivematica_src_am_multi_venvs|bool"
 
 - name: "Config dashboard gunicorn upstart (/etc/init)"
   template:

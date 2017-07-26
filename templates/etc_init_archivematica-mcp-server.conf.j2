@@ -8,10 +8,8 @@ stop on runlevel [016]
 
 env CONF=/etc/archivematica/MCPServer
 env LOCATION="{{ mcp_server_python_path }} /usr/lib/archivematica/MCPServer/archivematicaMCP.py"
-{% if archivematica_src_am_multi_venvs|bool %}
 env PYTHONPATH=/usr/lib/archivematica/archivematicaCommon/:/usr/share/archivematica/dashboard/
 env DJANGO_SETTINGS_MODULE=settings.production
-{% endif %}
 
 setuid archivematica
 setgid archivematica

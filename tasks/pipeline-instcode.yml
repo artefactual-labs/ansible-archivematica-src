@@ -88,22 +88,10 @@
     dest: "/etc/archivematica/MCPClient/clientConfig.conf"
     backup: "yes"
 
-- name: "set_fact: set python locations for MCP server and client to correct values when multi_venvs is true"
+- name: "set_fact: set python locations for MCP server and client"
   set_fact:
     mcp_server_python_path: "/usr/share/python/archivematica-mcp-server/bin/python"
     mcp_client_python_path: "/usr/share/python/archivematica-mcp-client/bin/python"
-  when: "archivematica_src_am_multi_venvs|bool"
-
-- name: "Get python location for MCP server and client when multi_venvs is false"
-  command: "which python"
-  register: p
-  when: "not archivematica_src_am_multi_venvs|bool"
-
-- name: "set_fact: set python locations to correct value when multi_venvs is false"
-  set_fact:
-    mcp_server_python_path: "{{ p.stdout }}"
-    mcp_client_python_path: "{{ p.stdout }}"
-  when: "not archivematica_src_am_multi_venvs|bool"
 
 - name: "Config archivematica-mcp-server upstart (/etc/init)"
   template:

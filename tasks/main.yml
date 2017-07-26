@@ -109,17 +109,11 @@
 #     - "amsrc-pipeline-clamav"
 #   when: "archivematica_src_install_am|bool"
 
-- include: "pipeline-pipdeps.yml"
+- include: "pipeline-pip-deps.yml"
   tags:
     - "amsrc-pipeline"
     - "amsrc-pipeline-pipdeps"
-  when: "archivematica_src_install_am|bool and not(archivematica_src_am_multi_venvs|bool)"
-
-- include: "pipeline-pipdeps-multi-venvs.yml"
-  tags:
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-pipdeps"
-  when: "archivematica_src_install_am|bool and archivematica_src_am_multi_venvs|bool"
+  when: "archivematica_src_install_am|bool"
 
 - include: "pipeline-osconf.yml"
   tags:

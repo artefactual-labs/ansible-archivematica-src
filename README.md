@@ -84,9 +84,6 @@ Role Variables
 - `archivematica_src_ssl_fullchain`:  (no default provided, shall be defined in the playbook or host_vars if SSL enabled)
 - `archivematica_src_ssl_privkey`: (no default provided, shall be defined in the playbook or host_vars if SSL enabled)
 
-### Pipeline venvs (added for 1.6.x)
-
-- `archivematica_src_am_multi_venvs`: create separate virtualenvs for each pipeline component (dashboard, MCPServer, MCPClient) (default:`no`)
 
 Tags
 ----
@@ -148,7 +145,6 @@ It is also recommended to take backups of your system (Archivematica and Storage
        archivematica_src_ss_env_django_secret_key: "mysecretkey"
        archivematica_src_ss_gunicorn: "true"
        archivematica_src_am_dashboard_gunicorn: "true"
-       archivematica_src_am_multi_venvs: "yes"
 
   become: "yes"
 ```

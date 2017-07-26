@@ -86,19 +86,6 @@
 - include: "pipeline-dbconf-migrate-1_4-to-1_5.yml"
   when: "not archivematica_src_am_pre_migration|bool and archivematica_src_am_migrate_from_v1_4|bool"
 
-# Django migrations
-- name: "Run migrations (no virtualenv)"
-  django_manage:
-    command: "migrate"
-    app_path: "/usr/share/archivematica/dashboard/"
-    settings: "settings.production"
-    pythonpath: "/usr/lib/archivematica/archivematicaCommon"
-  environment: "{{ archivematica_src_am_dashboard_environment }}"
-  tags: "amsrc-pipeline-dbconf-syncdb"
-  when: 
-    - "not archivematica_src_am_pre_migration|bool"
-    - "not archivematica_src_am_multi_venvs|bool"
-
 - name: "Run migrations (within dashboard virtualenv)"
   django_manage:
     command: "migrate"
@@ -110,4 +97,3 @@
   tags: "amsrc-pipeline-dbconf-syncdb"
   when: 
     - "not archivematica_src_am_pre_migration|bool"
-    - "archivematica_src_am_multi_venvs|bool"
