@@ -17,6 +17,7 @@
       DJANGO_SETTINGS_MODULE: "{{ 'settings.local' if is_dev else 'settings.common' }}"
       ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_ALLOWED_HOSTS: "{{ archivematica_src_am_env_django_allowed_hosts }}"
       ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY: "{{ archivematica_src_am_env_django_secret_key }}"
+      ARCHIVEMATICA_DASHBOARD_DASHBOARD_SHIBBOLETH_AUTHENTICATION: "{{ archivematica_src_shibboleth_authentication }}"
     archivematica_src_ss_environment:
       DJANGO_SECRET_KEY: "{{ archivematica_src_ss_env_django_secret_key }}"
       DJANGO_SETTINGS_MODULE: "{{ archivematica_src_ss_env_django_setings_module }}"
@@ -29,6 +30,7 @@
       SS_DB_NAME: "{{ archivematica_src_ss_env_ss_db_name }}"
       SS_DB_PASSWORD: "{{ archivematica_src_ss_env_ss_db_password }}"
       SS_DB_USER: "{{ archivematica_src_ss_env_ss_db_user }}"
+      SS_SHIBBOLETH_AUTHENTICATION: "{{ archivematica_src_shibboleth_authentication }}"
   tags: "always" # inocuous to use always here
 
 - name: "initialize systemd folder"

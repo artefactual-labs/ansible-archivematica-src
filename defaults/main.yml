@@ -157,3 +157,6 @@ archivematica_src_install_acceptance_tests: "no"
 archivematica_src_acceptance_tests_version: "master"
 archivematica_src_acceptance_tests_browser_list: [ "Chrome" , "Firefox" ]
 archivematica_src_acceptance_tests_chromedriver_version: "2.29"
+
+# Shibboleth authentication
+archivematica_src_shibboleth_authentication: "false"
