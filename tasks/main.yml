@@ -14,7 +14,7 @@
 - name: "Set fact: environment vars"
   set_fact:
     archivematica_src_am_dashboard_environment:
-      DJANGO_SETTINGS_MODULE: "{{ 'settings.local' if is_dev else 'settings.common' }}"
+      DJANGO_SETTINGS_MODULE: "{{ 'settings.local' if is_dev else 'settings.production' }}"
       ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_ALLOWED_HOSTS: "{{ archivematica_src_am_env_django_allowed_hosts }}"
       ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY: "{{ archivematica_src_am_env_django_secret_key }}"
       ARCHIVEMATICA_DASHBOARD_DASHBOARD_SHIBBOLETH_AUTHENTICATION: "{{ archivematica_src_shibboleth_authentication }}"

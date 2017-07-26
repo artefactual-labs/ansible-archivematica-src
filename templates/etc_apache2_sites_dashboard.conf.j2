@@ -30,7 +30,7 @@
   {% if archivematica_src_environment_type == "development" %}
     SetEnv DJANGO_SETTINGS_MODULE settings.local
   {% else %}
-    SetEnv DJANGO_SETTINGS_MODULE settings.common
+    SetEnv DJANGO_SETTINGS_MODULE settings.production
   {% endif %}
   WSGIScriptAlias / /usr/share/archivematica/dashboard/apache/django.wsgi
   WSGIDaemonProcess dashboard user=archivematicadashboard group=archivematica python-path=/usr/share/archivematica/dashboard:/usr/lib/archivematica/archivematicaCommon

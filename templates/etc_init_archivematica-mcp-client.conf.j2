@@ -16,7 +16,7 @@ env PYTHONPATH=/usr/lib/archivematica/MCPClient/:/usr/lib/archivematica/archivem
 {% else %}
 env PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 {% endif %}
-env DJANGO_SETTINGS_MODULE=settings.common
+env DJANGO_SETTINGS_MODULE=settings.production
 
 setuid archivematica
 setgid archivematica

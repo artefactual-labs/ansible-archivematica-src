@@ -71,7 +71,7 @@
   django_manage:
     command: "syncdb"
     app_path: "/usr/share/archivematica/dashboard/"
-    settings: "settings.common"
+    settings: "settings.production"
     pythonpath: "/usr/lib/archivematica/archivematicaCommon"
   tags: "amsrc-pipeline-dbconf-syncdb"
   when: "archivematica_src_am_pre_migration|bool"
@@ -91,7 +91,7 @@
   django_manage:
     command: "migrate"
     app_path: "/usr/share/archivematica/dashboard/"
-    settings: "settings.common"
+    settings: "settings.production"
     pythonpath: "/usr/lib/archivematica/archivematicaCommon"
   environment: "{{ archivematica_src_am_dashboard_environment }}"
   tags: "amsrc-pipeline-dbconf-syncdb"
@@ -103,7 +103,7 @@
   django_manage:
     command: "migrate"
     app_path: "/usr/share/archivematica/dashboard/"
-    settings: "settings.common"
+    settings: "settings.production"
     pythonpath: "/usr/lib/archivematica/archivematicaCommon"
     virtualenv: "/usr/share/python/archivematica-dashboard"
   environment: "{{ archivematica_src_am_dashboard_environment }}"
