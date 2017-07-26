@@ -105,8 +105,6 @@ archivematica_src_am_dashboard_pkgdeps: "{{ archivematica_src_am_dashboard_pkgde
 archivematica_src_am_mcpserver_pkgdeps: "{{ archivematica_src_am_mcpserver_pkgdeps_v1_4 }}"
 archivematica_src_am_mcpclient_pkgdeps: "{{ archivematica_src_am_mcpclient_pkgdeps_v1_4 }}"
 
-# SS: use gunicorn instead of uwsgi (from SS 0.8.x)
-archivematica_src_ss_gunicorn: "false"
 ## SS nginx gunicorn parameters
 ### in both nginx and gunicorn config files
 archivematica_src_ss_bind: "127.0.0.1:8001"
@@ -117,8 +115,6 @@ archivematica_src_ss_gunicorn_workers: "4"
 archivematica_src_ss_gunicorn_timeout: "172800"
 archivematica_src_ss_gunicorn_sendfile: "True"
 
-# dashboard: use gunicorn instead of apache (from AM 1.5.x)
-archivematica_src_am_dashboard_gunicorn: "false"
 ## dashboard nginx gunicorn related parameters
 ###   use of unix sockets breaks AM API whitelisting that relies on REMOTE_ADDR so using tcp sockets instead
 ###   ( https://github.com/benoitc/gunicorn/issues/797 )

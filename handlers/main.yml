@@ -1,7 +1,1 @@
 ---
-# handlers file for ansible-role-archivematica-src
-
-- name: "Restart Apache"
-  service:
-    name: "apache2"
-    state: "restarted"

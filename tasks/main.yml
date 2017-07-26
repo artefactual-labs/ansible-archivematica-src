@@ -72,17 +72,11 @@
    - "amsrc-ss-db"
   when: "archivematica_src_install_ss|bool"
 
-- include: "ss-websrv-uwsgi.yml"
-  tags:
-   - "amsrc-ss"
-   - "amsrc-ss-websrv"
-  when: "archivematica_src_install_ss|bool and not(archivematica_src_ss_gunicorn|bool)"
-
 - include: "ss-websrv-gunicorn.yml"
   tags:
    - "amsrc-ss"
    - "amsrc-ss-websrv"
-  when: "archivematica_src_install_ss|bool and archivematica_src_ss_gunicorn|bool"
+  when: "archivematica_src_install_ss|bool"
 
 
 #
@@ -145,17 +139,11 @@
     - "amsrc-pipeline-dbconf"
   when: "archivematica_src_install_am|bool"
 
-- include: "pipeline-websrv-modwsgi.yml"
-  tags:
-   - "amsrc-pipeline"
-   - "amsrc-pipeline-websrv"
-  when: "archivematica_src_install_am|bool and not(archivematica_src_am_dashboard_gunicorn|bool)"
-
 - include: "pipeline-websrv-gunicorn.yml"
   tags:
    - "amsrc-pipeline"
    - "amsrc-pipeline-websrv"
-  when: "archivematica_src_install_am|bool and archivematica_src_am_dashboard_gunicorn|bool"
+  when: "archivematica_src_install_am|bool"
 
 
 

@@ -16,7 +16,7 @@ Archivematica installation from its source code repositories.
   - [Remote repository](#remote-repository)
   - [External package dependencies repository](#external-package-dependencies-repository)
   - [Web server](#web-server)
-    - [SSL (when using gunicorn/nginx)](#ssl-when-using-gunicornnginx)
+    - [SSL](#ssl)
 - [Tags](#tags)
 - [Dependencies](#dependencies)
 - [Example Playbooks](#example-playbooks)
@@ -70,16 +70,14 @@ Role Variables
 - `archivematica_src_ss_repo`: SS repository (default: `"https://github.com/artefactual/archivematica-storage-service.git"`)
 
 ### External package dependencies repository
+
 - `archivematica_src_externals_repo`: externals package server url or ppa (`http://<server>/<repository>` or `ppa:<name>`) (default: `"http://packages.archivematica.org/1.5.x/ubuntu-externals"`) 
 - `archivematica_src_externals_repo_key_id`: repository key id  (ignored for ppa) (default: `"0x5236CA08"`)
 - `archivematica_src_externals_repo_key_url`: repository key url (ignored for ppa) (default: `"https://packages.archivematica.org/GPG-KEY-archivematica"`)
 
 ### Web server
 
-- `archivematica_src_ss_gunicorn`: use gunicorn/nginx instead of uwsgi/nginx for the Storage Service. For Storage Service branch stable/0.8.x or newer (default:`false`)
-- `archivematica_src_am_dashboard_gunicorn`: use gunicorn/nginx instead of apache/mod_wsgi for Archivematica Dashboard. For Archivematica branch stable/1.5.x or newer (default:`false`)
-
-#### SSL (when using gunicorn/nginx)
+#### SSL
 
 - `archivematica_src_ssl`: configure Storage Service and Dashboard to use SSL (default:`false`)
 - `archivematica_src_ssl_include_acme_chlg_loc`: Include ACME challenge location file (`acmetool-location.conf`) in nginx configuration file, provided by role https://github.com/artefactual-labs/ansible-acmetool (default:`false`)

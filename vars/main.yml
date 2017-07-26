@@ -8,8 +8,6 @@ archivematica_src_am_common_pkgdeps_qa_1_x:
   - "libmysqlclient-dev"
 
 archivematica_src_am_dashboard_pkgdeps_qa_1_x:
-  - "apache2-mpm-prefork"
-  - "libapache2-mod-wsgi"
   - "python-pip"
   - "gettext"
 
