@@ -77,7 +77,7 @@
 
 - name: "Config archivematica-mcp-server upstart (/etc/init)"
   template:
-    src: "etc_init_archivematica-mcp-server.conf.j2"
+    src: "etc/init/archivematica-mcp-server.conf"
     dest: "/etc/init/archivematica-mcp-server.conf"
     backup: "yes"
   when:
@@ -85,7 +85,7 @@
 
 - name: "Config archivematica-mcp-client upstart (/etc/init/)"
   template:
-    src: "etc_init_archivematica-mcp-client.conf.j2"
+    src: "etc/init/archivematica-mcp-client.conf"
     dest: "/etc/init/archivematica-mcp-client.conf"
     backup: "yes"
   when:

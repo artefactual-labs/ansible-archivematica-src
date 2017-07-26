@@ -233,7 +233,7 @@
 
 - name: "Template celery upstart file if required"
   template:
-    src: "etc_init_archivematica-storage-service-worker.conf.j2"
+    src: "etc/init/archivematica-storage-service-worker.conf"
     dest: "/etc/init/archivematica-storage-service-worker.conf"
     backup: "yes"
   when: "ss_worker|bool"

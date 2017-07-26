@@ -7,22 +7,23 @@
 
 - name: "set nginx sites-available config file"
   template:
-    src: "etc_nginx_sites_storage-gunicorn.conf.j2"
+    src: "etc/nginx/sites-available/storage.conf"
     dest: "/etc/nginx/sites-available/storage.conf"
     backup: "yes"
   tags: "amsrc-ss-websrv"
 
-- name: "Template gunicorn configuration file"
-  template:
-    src: "etc_archivematica_storage-service.gunicorn-config.py.j2"
+- name: "Copy gunicorn configuration file"
+  copy:
+    src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/storage-service.gunicorn-config.py"
     dest: "/etc/archivematica/storage-service.gunicorn-config.py"
     backup: "yes"
+    force: "yes"
+    remote_src: "yes"
   tags: "amsrc-ss-websrv"
-
 
 - name: "Config storage service gunicorn upstart (/etc/init)"
   template:
-    src: "etc_init_archivematica-storage-service.conf.j2"
+    src: "etc/init/archivematica-storage-service.conf"
     dest: "/etc/init/archivematica-storage-service.conf"
     backup: "yes"
   tags: "amsrc-ss-websrv"
@@ -73,7 +74,7 @@
 # SSL configuration tasks - begin
 - name: "Template nginx sites-available ssl config file"
   template:
-    src: "etc_nginx_sites_storage-ssl-gunicorn.conf.j2"
+    src: "etc/nginx/sites-available/storage-ssl.conf"
     dest: "/etc/nginx/sites-available/storage-ssl.conf"
     backup: "yes"
   when: "archivematica_src_ssl|bool"

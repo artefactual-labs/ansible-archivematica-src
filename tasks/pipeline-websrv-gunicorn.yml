@@ -9,15 +9,17 @@
 
 - name: "Template dashboard nginx sites-available config file"
   template:
-    src: "etc_nginx_sites_dashboard-gunicorn.conf.j2"
+    src: "etc/nginx/sites-available/dashboard.conf"
     dest: "/etc/nginx/sites-available/dashboard.conf"
     backup: "yes"
 
-- name: "Template gunicorn configuration file"
-  template:
-    src: "etc_archivematica_dashboard.gunicorn-config.py.j2"
+- name: "Copy gunicorn configuration file"
+  copy:
+    src: "{{ archivematica_src_dir }}/archivematica/src/dashboard/install/dashboard.gunicorn-config.py"
     dest: "/etc/archivematica/dashboard.gunicorn-config.py"
     backup: "yes"
+    force: "yes"
+    remote_src: "yes"
 
 - name: "set_fact: set gunicorn path to correct value"
   set_fact:
@@ -25,7 +27,7 @@
 
 - name: "Config dashboard gunicorn upstart (/etc/init)"
   template:
-    src: "etc_init_archivematica-dashboard.conf.j2"
+    src: "etc/init/archivematica-dashboard.conf"
     dest: "/etc/init/archivematica-dashboard.conf"
     backup: "yes"
   when: 
@@ -66,7 +68,7 @@
 # SSL configuration tasks - begin
 - name: "Template nginx ssl config file"
   template:
-    src: "etc_nginx_sites_dashboard-ssl-gunicorn.conf.j2"
+    src: "etc/nginx/sites-available/dashboard-ssl.conf"
     dest: "/etc/nginx/sites-available/dashboard-ssl.conf"
     backup: "yes"
   when: "archivematica_src_ssl|bool"
