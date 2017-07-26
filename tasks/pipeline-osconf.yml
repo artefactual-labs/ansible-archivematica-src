@@ -88,22 +88,6 @@
     state: "link"
   when: create_shareddir and archivematica_src_shareddir != "/var/archivematica/sharedDirectory"
 
-# copy of shared dir structure should be executed also for upgrades (to reflect changes) 
-# Note: --chown option requires rsync version >=3.1.0
-#       centos 7 does not currently support it
-- name: "Copy shared directory structure (non RH)"
-  command: "rsync -a --chown=archivematica:archivematica {{ archivematica_src_dir }}/archivematica/src/MCPServer/share/sharedDirectoryStructure/ {{ archivematica_src_shareddir }}/"
-  when: not (ansible_os_family == "RedHat")
-
-- name: "Copy shared directory structure (RH)"
-  command: "rsync -rl {{ archivematica_src_dir }}/archivematica/src/MCPServer/share/sharedDirectoryStructure/ {{ archivematica_src_shareddir }}/"
-  when: ansible_os_family == "RedHat"
-- name: "Fix shared directory structure ownership (RH)"
-  shell: "ls -1 | xargs chown -R archivematica:archivematica"
-  args:
-    chdir: "{{ archivematica_src_shareddir }}"
-  when: ansible_os_family == "RedHat"
-
 - name: "Create subdirectories for archivematica-mcp-client source files"
   file:
     dest: "{{ item }}"
