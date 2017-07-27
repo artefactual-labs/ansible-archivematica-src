@@ -4,12 +4,14 @@
 #   4- Code install
 ###########################################################
 
-- name: "Symlink archivematica-common source files"
+- name: "Symlink source files"
   file:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     state: "link"
   with_items:
+    
+    # archivematicaCommon
     - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/lib"
       dest: "/usr/lib/archivematica/archivematicaCommon"
     - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements.txt"
@@ -17,118 +19,70 @@
     - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements"
       dest: "/usr/share/archivematica/archivematicaCommon/requirements"
 
-- name: "Copy archivematica-dashboard source files"
-  file:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    state: "link"
-  with_items:
+    # Dashboard
     - src: "{{ archivematica_src_dir }}/archivematica/src/dashboard/src"
       dest: "/usr/share/archivematica/dashboard"
 
-
-- name: "Copy archivematica-mcp-server source files"
-  file:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    state: "link"
-  with_items:
+    # MCPServer
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/lib"
       dest: "/usr/lib/archivematica/MCPServer"
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share"
       dest: "/usr/share/archivematica/MCPServer"
 
-- name: "Copy archivematica-mcp-client source files"
-  file:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    state: "link"
-  with_items:
+    # MCPClient
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/lib/"
       dest: "/usr/lib/archivematica/MCPClient"
-
-# For 1.6+ the location of archivematicaClientModules file is moved from
-# src/MCPClient/etc/ to src/MCPClient/lib
-# check if file is in etc/, if not there assume it is in lib/
-
-- name: "check if archivematicaClientModules is in src/MCPClient/etc/"
-  stat:
-    path: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/etc/archivematicaClientModules"
-  register: "p"
-
-- name: "set fact for MCP clientConfig.conf"
-  set_fact:
-    archivematica_src_clientmodules: "/etc/archivematica/MCPClient/archivematicaClientModules"
-  when: "p.stat.exists is defined and p.stat.exists"
-
-- name: "set fact for MCP clientConfig.conf"
-  set_fact:
-    archivematica_src_clientmodules: "/usr/lib/archivematica/MCPClient/archivematicaClientModules"
-  when: "p.stat.exists is defined and not p.stat.exists"
-
-- name: "copy archivematicaClientModules to /etc/archivematica/MCPClient/ if required"
-  command: "cp {{ archivematica_src_dir }}/archivematica/src/MCPClient/etc/archivematicaClientModules /etc/archivematica/MCPClient/"
-  when: "p.stat.exists is defined and p.stat.exists"
 
 - name: "set_fact: set python locations for MCP server and client"
   set_fact:
     mcp_server_python_path: "/usr/share/python/archivematica-mcp-server/bin/python"
     mcp_client_python_path: "/usr/share/python/archivematica-mcp-client/bin/python"
 
-- name: "Config archivematica-mcp-server upstart (/etc/init)"
-  template:
-    src: "etc/init/archivematica-mcp-server.conf"
-    dest: "/etc/init/archivematica-mcp-server.conf"
-    backup: "yes"
-  when:
-    - ansible_service_mgr == "upstart"
+#
+# upstart
+#
 
-- name: "Config archivematica-mcp-client upstart (/etc/init/)"
+- name: "upstart | Install services"
   template:
-    src: "etc/init/archivematica-mcp-client.conf"
-    dest: "/etc/init/archivematica-mcp-client.conf"
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     backup: "yes"
   when:
-    - ansible_service_mgr == "upstart"
+    - "ansible_service_mgr == 'upstart'"
+  with_items:
+    - src: "etc/init/archivematica-mcp-server.conf"
+      dest: "/etc/init/archivematica-mcp-server.conf"
+    - src: "etc/init/archivematica-mcp-client.conf"
+      dest: "/etc/init/archivematica-mcp-client.conf"
+
 - name: "Reload Upstart configuration"
   command: "initctl reload-configuration"
   when: 
-    - ansible_service_mgr == "upstart"
+    - "ansible_service_mgr == 'upstart'"
 
-- name: "Config archivematica-mcp-server systemd (/etc/systemd)"
+#
+# systemd
+#
+
+- name: "systemd | Install configuration files"
   template:
-    src: "etc/systemd/system/archivematica-mcp-server.service.j2"
-    dest: "/etc/systemd/system/archivematica-mcp-server.service"
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     backup: "yes"
   when:
-    - ansible_service_mgr == "systemd"
-
-- name: "Config archivematica-mcp-client systemd (/etc/systemd)"
-  template:
-    src: "etc/systemd/system/archivematica-mcp-client.service.j2"
-    dest: "/etc/systemd/system/archivematica-mcp-client.service"
-    backup: "yes"
-  when:
-    - ansible_service_mgr == "systemd"
-
-- name: "Add MCP server systemd env file"
-  template:
-    src: "etc/sysconfig/archivematica-mcp-server.j2"
-    dest: "{{ systemd_environment_path}}/archivematica-mcp-server"
-    backup: "yes"
-  when:
-    - ansible_service_mgr == "systemd"
-
-- name: "Add MCP client systemd env file"
-  template:
-    src: "etc/sysconfig/archivematica-mcp-client.j2"
-    dest: "{{ systemd_environment_path}}/archivematica-mcp-client"
-    backup: "yes"
-  when:
-    - ansible_service_mgr == "systemd"
+    - "ansible_service_mgr == 'systemd'"
+  with_items:
+    - src: "etc/systemd/system/archivematica-mcp-server.service.j2"
+      dest: "/etc/systemd/system/archivematica-mcp-server.service"
+    - src: "etc/systemd/system/archivematica-mcp-client.service.j2"
+      dest: "/etc/systemd/system/archivematica-mcp-client.service"
+    - src: "etc/sysconfig/archivematica-mcp-server.j2"
+      dest: "{{ systemd_environment_path}}/archivematica-mcp-server"
+    - src: "etc/sysconfig/archivematica-mcp-client.j2"
+      dest: "{{ systemd_environment_path}}/archivematica-mcp-client"
 
 - name: "Reload systemd config"
   command: "systemctl daemon-reload"
   tags: "amsrc-ss-websrv"
   when:
-    - ansible_service_mgr == "systemd"
+    - "ansible_service_mgr == 'systemd'"

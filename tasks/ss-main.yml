@@ -97,24 +97,6 @@
     state: "latest"
   tags: "amsrc-ss-pydep"
 
-- name: "Work around to install pip deps commented out in old SS branches"
-  pip:
-    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
-    extra_args: "{{ ss_pip_install_extra_args }}"
-    state: "latest"
-    name: "{{ item }}"
-  with_items:
-    - "python-swiftclient"
-    - "python-keystoneclient"
-    - "sword2"
-    - "pyopenssl"
-    - "ndg-httpsclient"
-    - "pyasn1"
-  when: "archivematica_src_ss_pip_missing_deps|bool"
-  tags: "amsrc-ss-pydep"
-
-
 ###########################################################
 #   3- OS configuration (user/directory/file creation/permissions/ownership )
 ###########################################################

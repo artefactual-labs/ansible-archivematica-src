@@ -10,7 +10,6 @@
     state: "directory"
   with_items:
     - "/usr/lib/archivematica"
-    - "/etc/archivematica/archivematicaCommon"
     - "/usr/share/archivematica/archivematicaCommon"
 
 - name: "Create subdirectories for archivematica-mcp-server source files"
@@ -18,11 +17,8 @@
     dest: "{{ item }}"
     state: "directory"
   with_items:
-    - "/etc/archivematica/MCPServer"
     - "/usr/lib/archivematica"
     - "/usr/share/archivematica"
-    - "/usr/share/dbconfig-common/data/archivematica-mcp-server/install/"
-    - "/usr/share/dbconfig-common/data/archivematica-mcp-server/upgrade/mysql/"
 
 - name: "Clear shared directory"
   file:
@@ -82,5 +78,4 @@
     dest: "{{ item }}"
     state: "directory"
   with_items:
-    - "/etc/archivematica/MCPClient"
     - "/usr/lib/archivematica"
