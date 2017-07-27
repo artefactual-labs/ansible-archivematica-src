@@ -4,13 +4,6 @@
 #   3- OS configuration (user/directory/file creation/permissions/ownership )
 ###########################################################
 
-- name: "Create user archivematicadashboard"
-  user:
-    name: "archivematicadashboard"
-    uid: "334"
-    system: "yes"
-    home: "/var/lib/archivematica-dashboard"
-
 - name: "Create subdirectories for archivematica-common source files"
   file:
     dest: "{{ item }}"
