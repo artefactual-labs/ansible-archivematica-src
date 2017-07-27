@@ -13,16 +13,6 @@
     - "/etc/archivematica/archivematicaCommon"
     - "/usr/share/archivematica/archivematicaCommon"
 
-- name: "Create archivematica-dashboard log directories"
-  file:
-    dest: "{{ item }}"
-    state: "directory"
-    owner: "archivematica"
-    group: "archivematica"
-    mode: "g+s"
-  with_items:
-    - "/var/log/archivematica/dashboard"
-
 - name: "Create subdirectories for archivematica-mcp-server source files"
   file:
     dest: "{{ item }}"
@@ -33,16 +23,6 @@
     - "/usr/share/archivematica"
     - "/usr/share/dbconfig-common/data/archivematica-mcp-server/install/"
     - "/usr/share/dbconfig-common/data/archivematica-mcp-server/upgrade/mysql/"
-
-- name: "Create archivematica-mcp-server log directories"
-  file:
-    dest: "{{ item }}"
-    state: "directory"
-    owner: "archivematica"
-    group: "archivematica"
-    mode: "g+s"
-  with_items:
-    - "/var/log/archivematica/MCPServer"
 
 - name: "Clear shared directory"
   file:
@@ -104,13 +84,3 @@
   with_items:
     - "/etc/archivematica/MCPClient"
     - "/usr/lib/archivematica"
-
-- name: "Create archivematica-mcp-client log directories"
-  file:
-    dest: "{{ item }}"
-    state: "directory"
-    owner: "archivematica"
-    group: "archivematica"
-    mode: "g+s"
-  with_items:
-    - "/var/log/archivematica/MCPClient"
