@@ -4,21 +4,18 @@
 #   3- OS configuration (user/directory/file creation/permissions/ownership )
 ###########################################################
 
-- name: "Create subdirectories for archivematica-common source files"
+- name: "Create subdirectories for source files"
   file:
     dest: "{{ item }}"
     state: "directory"
   with_items:
     - "/usr/lib/archivematica"
     - "/usr/share/archivematica/archivematicaCommon"
-
-- name: "Create subdirectories for archivematica-mcp-server source files"
-  file:
-    dest: "{{ item }}"
-    state: "directory"
-  with_items:
-    - "/usr/lib/archivematica"
     - "/usr/share/archivematica"
+
+#
+# Shared directory
+#
 
 - name: "Clear shared directory"
   file:
@@ -55,11 +52,4 @@
     src: "{{ archivematica_src_shareddir }}"
     dest: "/var/archivematica/sharedDirectory"
     state: "link"
-  when: create_shareddir and archivematica_src_shareddir != "/var/archivematica/sharedDirectory"
-
-- name: "Create subdirectories for archivematica-mcp-client source files"
-  file:
-    dest: "{{ item }}"
-    state: "directory"
-  with_items:
-    - "/usr/lib/archivematica"
+  when: "create_shareddir and archivematica_src_shareddir != '/var/archivematica/sharedDirectory'"
