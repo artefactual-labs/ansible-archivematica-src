@@ -10,7 +10,7 @@
     dest: "{{ item.dest }}"
     state: "link"
   with_items:
-    
+
     # archivematicaCommon
     - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/lib"
       dest: "/usr/lib/archivematica/archivematicaCommon"
@@ -48,14 +48,14 @@
   when:
     - "ansible_service_mgr == 'upstart'"
   with_items:
-    - src: "etc/init/archivematica-mcp-server.conf"
+    - src: "etc/init/archivematica-mcp-server.conf.j2"
       dest: "/etc/init/archivematica-mcp-server.conf"
-    - src: "etc/init/archivematica-mcp-client.conf"
+    - src: "etc/init/archivematica-mcp-client.conf.j2"
       dest: "/etc/init/archivematica-mcp-client.conf"
 
 - name: "Reload Upstart configuration"
   command: "initctl reload-configuration"
-  when: 
+  when:
     - "ansible_service_mgr == 'upstart'"
 
 #
@@ -75,9 +75,9 @@
     - src: "etc/systemd/system/archivematica-mcp-client.service.j2"
       dest: "/etc/systemd/system/archivematica-mcp-client.service"
     - src: "etc/sysconfig/archivematica-mcp-server.j2"
-      dest: "{{ systemd_environment_path}}/archivematica-mcp-server"
+      dest: "{{ systemd_environment_path }}/archivematica-mcp-server"
     - src: "etc/sysconfig/archivematica-mcp-client.j2"
-      dest: "{{ systemd_environment_path}}/archivematica-mcp-client"
+      dest: "{{ systemd_environment_path }}/archivematica-mcp-client"
 
 - name: "Reload systemd config"
   command: "systemctl daemon-reload"

@@ -9,7 +9,7 @@
 
 - name: "Template dashboard nginx sites-available config file"
   template:
-    src: "etc/nginx/sites-available/dashboard.conf"
+    src: "etc/nginx/sites-available/dashboard.conf.j2"
     dest: "/etc/nginx/sites-available/dashboard.conf"
     backup: "yes"
 
@@ -27,10 +27,10 @@
 
 - name: "Config dashboard gunicorn upstart (/etc/init)"
   template:
-    src: "etc/init/archivematica-dashboard.conf"
+    src: "etc/init/archivematica-dashboard.conf.j2"
     dest: "/etc/init/archivematica-dashboard.conf"
     backup: "yes"
-  when: 
+  when:
      - ansible_service_mgr == "upstart"
 
 - name: "Reload Upstart configuration"
@@ -68,7 +68,7 @@
 # SSL configuration tasks - begin
 - name: "Template nginx ssl config file"
   template:
-    src: "etc/nginx/sites-available/dashboard-ssl.conf"
+    src: "etc/nginx/sites-available/dashboard-ssl.conf.j2"
     dest: "/etc/nginx/sites-available/dashboard-ssl.conf"
     backup: "yes"
   when: "archivematica_src_ssl|bool"
@@ -113,4 +113,3 @@
     - "nginx"
   when:
     - ansible_service_mgr == "systemd"
-
