@@ -103,12 +103,6 @@
     - "amsrc-pipeline-osdeps"
   when: "archivematica_src_install_am|bool"
 
-# - include: "pipeline-clamav.yml"
-#   tags:
-#     - "amsrc-pipeline"
-#     - "amsrc-pipeline-clamav"
-#   when: "archivematica_src_install_am|bool"
-
 - include: "pipeline-pip-deps.yml"
   tags:
     - "amsrc-pipeline"
