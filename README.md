@@ -39,7 +39,6 @@ Role Variables
 - `archivematica_src_install_sample_data`: copy sample data (default: "yes")
 - `archivematica_src_install_devtools`: install archivematica-devtools (default: "no")
 - `archivematica_src_install_automationtools`: install automation-tools (default: "no")
-- `archivematica_src_install_appraisaltab`: install appraisal-tab (default: "no") (WIP)
 
 ### Version
 
@@ -105,7 +104,6 @@ Note that if something is disabled with the [role variables](#role-variables), i
     - `amsrc-pipeline-websrv`: Configure webserver
 - `amsrc-devtools`: Archivematica devtools install
 - `amsrc-automationtools`: Automation tools install
-- `amsrc-appraisaltab`: Appraisal tab install
 
 Dependencies
 ------------
@@ -118,7 +116,7 @@ Example Playbooks
 Please note that a complete Archivematica installation includes software not installed by this role, in particular:
 
 - MySQL compatible database server (MySQL, MariaDB, Percona)
-- ElasticSearch
+- Elasticsearch
 - ClamAV (daemon and client)
 
 See https://github.com/artefactual/deploy-pub/tree/master/playbooks/archivematica to find examples.
