@@ -33,7 +33,7 @@
     chdir: "{{ item.1 }}"
     virtualenv: "{{ item.0.path }}"
     state: "latest"
-    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt'}}"
+    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt' }}"
   with_subelements:
     - "{{ virtualenvs }}"
     - "requirements_dir"

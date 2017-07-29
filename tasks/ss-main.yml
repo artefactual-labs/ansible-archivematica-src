@@ -91,14 +91,14 @@
 - name: "Create virtualenv for archivematica-storage-service, pip install requirements"
   pip:
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt'}}"
+    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt' }}"
     virtualenv: "/usr/share/python/archivematica-storage-service"
     extra_args: "{{ ss_pip_install_extra_args }}"
     state: "latest"
   tags: "amsrc-ss-pydep"
 
 ###########################################################
-#   3- OS configuration (user/directory/file creation/permissions/ownership )
+#   3- OS configuration (user/directory/file creation/permissions/ownership)
 ###########################################################
 
 - name: "Create subdirectory for archivematica-storage-service source files"
