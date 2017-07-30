@@ -10,12 +10,6 @@
     state: "absent"
   when: "archivematica_src_reset_mcpdb|bool or archivematica_src_reset_am_all|bool"
 
-- name: "Remove mysql_dev.complete file created by mysql_dev.sh"
-  file:
-    path: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.complete"
-    state: "absent"
-  when: "archivematica_src_reset_mcpdb|bool or archivematica_src_reset_am_all|bool"
-
 # TODO where should this go?
 - name: "Reset Elasticsearch indexes"
   command: "{{ archivematica_src_dir }}/archivematica/localDevSetup/eraseElasticSearchIndexes.py -f"
@@ -35,7 +29,6 @@
     state: "present"
     encoding: "utf8"
     collation: "utf8_unicode_ci"
-  register: "createdb_result"
   when: 'archivematica_src_am_database_host == "localhost"'
 
 # TODO: need to change the mysql password for user archivematica
@@ -48,45 +41,10 @@
     state: "present"
   when: 'archivematica_src_am_database_host == "localhost"'
 
-- name: "Check if mysql_dev exists"
-  stat:
-    path: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.sh"
-  register: "mysql_dev_sh_check"
-  tags: "amsrc-pipeline-dbconf-syncdb"
-
-- name: "Set migrations path"
-  set_fact:
-    archivematica_src_am_pre_migration: "{{ mysql_dev_sh_check.stat.exists }}"
-  tags: "amsrc-pipeline-dbconf-syncdb"
-
-# mysql-dev migrations
-- name: "Load MySQL seed file"
-  mysql_db:
-    name: "MCP"
-    state: "import"
-    target: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql"
-  when: "createdb_result|changed and archivematica_src_am_pre_migration|bool"
-
-- name: "Run syncdb"
-  django_manage:
-    command: "syncdb"
-    app_path: "/usr/share/archivematica/dashboard/"
-    settings: "settings.production"
-    pythonpath: "/usr/lib/archivematica/archivematicaCommon"
-  tags: "amsrc-pipeline-dbconf-syncdb"
-  when: "archivematica_src_am_pre_migration|bool"
-
-- name: "Call mysql_dev script"
-  command: "./mysql_dev.sh MCP"
-  args:
-    chdir: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/"
-    creates: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/share/mysql_dev.complete"
-  when: "archivematica_src_am_pre_migration|bool"
-
 - include: "pipeline-dbconf-migrate-1_4-to-1_5.yml"
-  when: "not archivematica_src_am_pre_migration|bool and archivematica_src_am_migrate_from_v1_4|bool"
+  when: "archivematica_src_am_migrate_from_v1_4|bool"
 
-- name: "Run migrations (within dashboard virtualenv)"
+- name: "Run migrations"
   django_manage:
     command: "migrate"
     app_path: "/usr/share/archivematica/dashboard/"
@@ -95,5 +53,3 @@
     virtualenv: "/usr/share/python/archivematica-dashboard"
   environment: "{{ archivematica_src_am_dashboard_environment }}"
   tags: "amsrc-pipeline-dbconf-syncdb"
-  when: 
-    - "not archivematica_src_am_pre_migration|bool"
