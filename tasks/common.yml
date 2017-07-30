@@ -1,25 +1,8 @@
 ---
 
-- name: "Install necessary packages required by this ansible role (RedHat)"
-  yum:
-    name: "{{ item }}"
-    state: "latest"
-  with_items:
-    - "epel-release"    
-    - "git"
-    - "MySQL-python"         # required for mysql_db
-  when: ansible_os_family == "RedHat"
-
-- name: "Install necessary packages required by this ansible role (ubuntu)"
-  apt:
-    pkg: "{{ item }}"
-    state: "latest"
-  with_items:
-    - "python-pycurl"
-    - "git"
-    - "python-mysqldb"         # required for mysql_db
-  when: ansible_distribution == "Ubuntu"
-
+#
+# Prepare pip
+#
 
 - name: "Ensure pip is not installed from packages"
   package:
@@ -32,7 +15,7 @@
 - name: "Download get-pip.py"
   get_url:
     url: "https://bootstrap.pypa.io/get-pip.py"
-    dest: "/root/get-pip.py"  
+    dest: "/root/get-pip.py"
 
 - name: "Install pip with get-pip.py"
   command: "python get-pip.py"
@@ -45,6 +28,11 @@
     state: "latest"
   with_items:
     - "virtualenv"
+
+
+#
+# Create `archivematica` user
+#
 
 - name: "Create user archivematica"
   user:
@@ -62,6 +50,11 @@
     line: "archivematica ALL=NOPASSWD:/bin/mv,/bin/chown,/bin/chmod,/usr/bin/find,/usr/bin/gs,/usr/bin/inkscape"
     validate: "/usr/sbin/visudo -cf %s"
 
+
+#
+# Prepare `archivematica_src_dir`
+#
+
 - name: "Expand archivematica_src_dir"
   set_fact:
     archivematica_src_dir: "{{ archivematica_src_dir|expanduser }}"
@@ -70,12 +63,3 @@
   file:
     state: "directory"
     path: "{{ archivematica_src_dir }}"
-
-- name: "Checkout out archivematica-sampledata repository"
-  git:
-    repo: "https://github.com/artefactual/archivematica-sampledata.git"
-    dest: "~/archivematica-sampledata"
-    update: "no"
-    depth: 1
-  when: "archivematica_src_install_sample_data|bool"
-  become: "no"

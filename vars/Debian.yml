@@ -1,0 +1,6 @@
+---
+systemd_environment_path: "/etc/default"
+ansible_deps:
+  - "python-pycurl"
+  - "git"
+  - "python-mysqldb" # Required for mysql_db module

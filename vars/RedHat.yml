@@ -1,0 +1,6 @@
+---
+systemd_environment_path: "/etc/sysconfig"
+ansible_deps:
+  - "epel-release"
+  - "git"
+  - "MySQL-python" # Required for mysql_db module

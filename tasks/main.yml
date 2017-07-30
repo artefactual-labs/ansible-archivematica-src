@@ -4,6 +4,10 @@
 # Common tasks
 #
 
+- name: "Load OS-specific vars"
+  include_vars: "{{ ansible_os_family }}.yml"
+  tags:
+    - "always" # inocuous to use always here
 
 - name: "Set fact: type of environment"
   set_fact:
@@ -34,27 +38,21 @@
       SS_SHIBBOLETH_AUTHENTICATION: "{{ archivematica_src_shibboleth_authentication }}"
   tags: "always" # inocuous to use always here
 
-- name: "initialize systemd folder"
-  set_fact:
-    systemd_environment_path: "/etc/default"
+- name: "Install necessary packages required by this role"
+  package:
+    name: "{{ item }}"
+    state: "latest"
+  with_items: "{{ ansible_deps }}"
   tags: "always" # inocuous to use always here
 
-- name: "initialize systemd folder (RedHat)"
-  set_fact:
-    systemd_environment_path: "/etc/sysconfig"
-  when:
-     - ansible_os_family == "RedHat" and ansible_service_mgr == "systemd"
-  tags: "always" # inocuous to use always here
-
-- name: "include common.yml common tasks for all components"
+- name: "Include common.yml common tasks for all components"
   include: "common.yml"
   tags: # do not use "always" tag in role, to avoid issues when including other roles in a playbook
-  - "amsrc-common"
-  - "amsrc-ss"
-  - "amsrc-pipeline"
-  - "amsrc-devtools"
-  - "amsrc-automationtools"
-
+    - "amsrc-common"
+    - "amsrc-ss"
+    - "amsrc-pipeline"
+    - "amsrc-devtools"
+    - "amsrc-automationtools"
 
 
 #
@@ -63,25 +61,27 @@
 
 - include: "ss-main.yml"
   tags:
-   - "amsrc-ss"
+    - "amsrc-ss"
   when: "archivematica_src_install_ss|bool"
 
 - include: "ss-db.yml"
   tags:
-   - "amsrc-ss"
-   - "amsrc-ss-db"
+    - "amsrc-ss"
+    - "amsrc-ss-db"
   when: "archivematica_src_install_ss|bool"
 
 - include: "ss-websrv-gunicorn.yml"
   tags:
-   - "amsrc-ss"
-   - "amsrc-ss-websrv"
+    - "amsrc-ss"
+    - "amsrc-ss-websrv"
   when: "archivematica_src_install_ss|bool"
 
 
 #
-# archivematica pipeline install
-#    (dashboard, MCP server, client)
+# Pipeline:
+# - archivematica-dashboard
+# - archivematica-mcp-server
+# - archivematica-mcp-client
 #
 #   0- Clone source repo
 #   1- OS dependencies (debian packages)
@@ -129,11 +129,23 @@
 
 - include: "pipeline-websrv-gunicorn.yml"
   tags:
-   - "amsrc-pipeline"
-   - "amsrc-pipeline-websrv"
+    - "amsrc-pipeline"
+    - "amsrc-pipeline-websrv"
   when: "archivematica_src_install_am|bool"
 
 
+#
+# archivematica-sampledata
+#
+
+- name: "Checkout out archivematica-sampledata repository"
+  git:
+    repo: "https://github.com/artefactual/archivematica-sampledata.git"
+    dest: "~/archivematica-sampledata"
+    update: "no"
+    depth: 1
+  when: "archivematica_src_install_sample_data|bool"
+  become: "no"
 
 
 #
@@ -145,6 +157,7 @@
     - "amsrc-devtools"
   when: "archivematica_src_install_devtools|bool"
 
+
 #
 # automation-tools
 #
@@ -153,6 +166,7 @@
   tags:
     - "amsrc-automationtools"
   when: "archivematica_src_install_automationtools|bool"
+
 
 #
 # acceptance-tests
