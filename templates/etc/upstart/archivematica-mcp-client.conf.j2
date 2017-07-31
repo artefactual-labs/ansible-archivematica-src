@@ -1,16 +1,19 @@
-# this file is managed by ansible
+# {{ ansible_managed }}
 
 description "Archivematica MCP Client"
+author "Artefactual Systems"
 
 start on (net-device-up
           and local-filesystems
           and runlevel [2345])
 stop on runlevel [016]
 
-env LOCATION="{{ mcp_client_python_path }} /usr/lib/archivematica/MCPClient/archivematicaClient.py"
-env PATH="/usr/share/python/archivematica-mcp-client/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
-env PYTHONPATH=/usr/lib/archivematica/MCPClient/:/usr/lib/archivematica/archivematicaCommon/:/usr/share/archivematica/dashboard/
-env DJANGO_SETTINGS_MODULE=settings.production
+env PATH={{ archivematica_src_am_mcpclient_virtualenv }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+env PYTHONPATH={{ archivematica_src_am_mcpclient_app }}:{{ archivematica_src_am_common_app }}:{{ archivematica_src_am_dashboard_app }}
+
+{% for key, value in archivematica_src_am_mcpclient_environment.iteritems() %}
+env {{ key }}={{ value }}
+{% endfor %}
 
 setuid archivematica
 setgid archivematica
@@ -20,6 +23,6 @@ script
     # Is this still necessary?
     test -f /etc/default/locale && . /etc/default/locale || true
 
-    $LOCATION
+    {{ archivematica_src_am_mcpclient_virtualenv }}/bin/python {{ archivematica_src_am_mcpclient_app }}/archivematicaClient.py
 
 end script

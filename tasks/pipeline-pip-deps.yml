@@ -4,23 +4,23 @@
   set_fact:
     virtualenvs:
       - name: "Archivematica MCPServer"
-        path: "/usr/share/python/archivematica-mcp-server"
+        path: "{{ archivematica_src_am_mcpserver_virtualenv }}"
         requirements_dir:
           - "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon"
           - "{{ archivematica_src_dir }}/archivematica/src/MCPServer"
           - "{{ archivematica_src_dir }}/archivematica/src/dashboard/src"
       - name: "Archivematica MCPClient"
-        path: "/usr/share/python/archivematica-mcp-client"
+        path: "{{ archivematica_src_am_mcpclient_virtualenv }}"
         requirements_dir:
           - "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon"
           - "{{ archivematica_src_dir }}/archivematica/src/MCPClient"
           - "{{ archivematica_src_dir }}/archivematica/src/dashboard/src"
       - name: "Archivematica Dashboard"
-        path: "/usr/share/python/archivematica-dashboard"
+        path: "{{ archivematica_src_am_dashboard_virtualenv }}"
         requirements_dir:
           - "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon"
           - "{{ archivematica_src_dir }}/archivematica/src/dashboard/src"
-      
+
 - name: "virtualenv | Create environment and install a recent version of pip"
   pip:
     name: "pip"

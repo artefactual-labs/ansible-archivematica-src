@@ -13,28 +13,20 @@
 
     # archivematicaCommon
     - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/lib"
-      dest: "/usr/lib/archivematica/archivematicaCommon"
-    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements.txt"
-      dest: "/usr/share/archivematica/archivematicaCommon/requirements.txt"
-    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/requirements"
-      dest: "/usr/share/archivematica/archivematicaCommon/requirements"
+      dest: "{{ archivematica_src_am_common_app }}"
 
     # Dashboard
     - src: "{{ archivematica_src_dir }}/archivematica/src/dashboard/src"
-      dest: "/usr/share/archivematica/dashboard"
+      dest: "{{ archivematica_src_am_dashboard_app }}"
 
     # MCPServer
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/lib"
-      dest: "/usr/lib/archivematica/MCPServer"
+      dest: "{{ archivematica_src_am_mcpserver_app }}"
 
     # MCPClient
     - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/lib/"
-      dest: "/usr/lib/archivematica/MCPClient"
+      dest: "{{ archivematica_src_am_mcpclient_app }}"
 
-- name: "set_fact: set python locations for MCP server and client"
-  set_fact:
-    mcp_server_python_path: "/usr/share/python/archivematica-mcp-server/bin/python"
-    mcp_client_python_path: "/usr/share/python/archivematica-mcp-client/bin/python"
 
 #
 # upstart
@@ -84,3 +76,17 @@
   tags: "amsrc-ss-websrv"
   when:
     - "ansible_service_mgr == 'systemd'"
+
+
+#
+# collectstatic
+#
+
+- name: "Collect static files"
+  django_manage:
+    command: "collectstatic"
+    app_path: "{{ archivematica_src_am_dashboard_app }}"
+    pythonpath: "{{ archivematica_src_am_common_app }}"
+    virtualenv: "{{ archivematica_src_am_dashboard_virtualenv }}"
+  environment: "{{ archivematica_src_am_dashboard_environment }}"
+  tags: "amsrc-ss-websrv"

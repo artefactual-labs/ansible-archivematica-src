@@ -1,4 +1,5 @@
-# this file is managed by ansible
+# {{ ansible_managed }}
+
 [Unit]
 Description=Archivematica Dashboard
 After=syslog.target network.target
@@ -7,11 +8,12 @@ After=syslog.target network.target
 PIDFile=/run/archivematica-dashboard_gunicorn.pid
 User=archivematica
 Group=archivematica
-WorkingDirectory=/usr/share/archivematica/dashboard/
-ExecStart={{ dashboard_gunicorn_path }}  --config /etc/archivematica/dashboard.gunicorn-config.py wsgi:application
+EnvironmentFile=-{{ systemd_environment_path }}/archivematica-dashboard
+WorkingDirectory={{ archivematica_src_am_dashboard_app }}
+ExecStart={{ dashboard_gunicorn_path }} --config {{ archivematica_src_am_dashboard_gunicorn_config }} wsgi:application
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
-PrivateTmp=true      
+PrivateTmp=true
 
 [Install]
 WantedBy=multi-user.target

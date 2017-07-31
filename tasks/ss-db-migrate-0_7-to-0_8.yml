@@ -2,27 +2,27 @@
 - name: "Fake locations 0.4 migration"
   django_manage:
     command: "migrate locations 0002_v0_4 --fake"
-    app_path: "/usr/lib/archivematica/storage-service"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
+    app_path: "{{ archviematica_src_ss_app }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
   environment: "{{ archivematica_src_ss_environment }}"
 
 - name: "Fake locations 0.5 migration"
   django_manage:
     command: "migrate locations 0003_v0_5 --fake"
-    app_path: "/usr/lib/archivematica/storage-service"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
+    app_path: "{{ archviematica_src_ss_app }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
   environment: "{{ archivematica_src_ss_environment }}"
 
 - name: "Fake locations 0.7 migration"
   django_manage:
     command: "migrate locations 0004_v0_7 --fake"
-    app_path: "/usr/lib/archivematica/storage-service"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
+    app_path: "{{ archviematica_src_ss_app }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
   environment: "{{ archivematica_src_ss_environment }}"
 
 - name: "migrate with --fake-initial"
   django_manage:
     command: "migrate --fake-initial"
-    app_path: "/usr/lib/archivematica/storage-service"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
+    app_path: "{{ archviematica_src_ss_app }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
   environment: "{{ archivematica_src_ss_environment }}"

@@ -3,80 +3,20 @@ archivematica-src
 
 Archivematica installation from its source code repositories.
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+**Table of Contents**
 
 - [Role Variables](#role-variables)
-  - [General](#general)
-  - [Projects](#projects)
-  - [Version](#version)
-  - [Reset](#reset)
-  - [Legacy support](#legacy-support)
-  - [Remote repository](#remote-repository)
-  - [Web server](#web-server)
-    - [SSL](#ssl)
 - [Tags](#tags)
 - [Dependencies](#dependencies)
 - [Example Playbooks](#example-playbooks)
 - [License](#license)
 - [Author Information](#author-information)
 
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 
 Role Variables
 --------------
 
-### General
-
-- `archivematica_src_dir`: location where the source code repositories are cloned (default: /opt/archivematica)
-
-### Projects
-
-- `archivematica_src_install_am`: install pipeline code (default: "yes")
-- `archivematica_src_install_ss`: install storage service (default: "yes")
-- `archivematica_src_install_sample_data`: copy sample data (default: "yes")
-- `archivematica_src_install_devtools`: install archivematica-devtools (default: "no")
-- `archivematica_src_install_automationtools`: install automation-tools (default: "no")
-
-### Version
-
-- `archivematica_src_am_version`: AM branch (tag or commit) to install
-- `archivematica_src_ss_version`: SS branch (tag or commit) to install
-- `archivematica_src_devtools_version`: archivematica-devtools branch (tag or commit) to install (default: master)
-- `archivematica_src_automationtools_version`: automation-tools branch (tag or commit) to install (default: master)
-
-### Reset
-
-- `archivematica_src_reset_mcpdb`: set to true to re-create the MCP database (normally at runtime using `ansible-playbook` `--extra-vars` switch)
-- `archivematica_src_reset_shareddir`: set to true to re-create the shared directory (normally at runtime using `ansible-playbook` `--extra-vars` switch)
-- `archivematica_src_reset_es`: set to true to delete the ElasticSearch indexes (normally at runtime using `ansible-playbook` `--extra-vars` switch)
-- `archivematica_src_reset_am_all`: set to true to re-create the MCP db, clear the shared directory and reset ElasticSearch indexes (normally at runtime using `ansible-playbook` `--extra-vars` switch). If true, it overrides the reset vars above.
-- `archivematica_src_reset_ss_db`: set to true to re-create the SS database (normally at runtime using `ansible-playbook` `--extra-vars` switch)
-
-### Legacy support
-
-- `archivematica_src_ss_run_syncdb`: run SS manage.py syncdb before migrate (for stable/0.7.x and previous branches that use Django 1.5.x) (default: false)
-- `archivematica_src_ss_pip_missing_deps`:  workaround to install missing SS pip dependencies in old SS branches (default: false)
-- `archivematica_src_am_migrate_from_v1_4`: Migrate AM database from v1.4 to v1.5 (default: false)
-- `archivematica_src_ss_migrate_from_v0_7`: Migrate SS database from v0.7 to v0.8 (default: false)
-
-Please note that a playbook using `archivematica_src_am_migrate_from_v1_4` or `archivematica_src_ss_migrate_from_v0_7`  is not idempotent, and it will throw an error if run twice. The two migrate related variables should be removed after a successful migration (an alternative could be to specify the `archivematica_src_am_migrate_from_v1_4` and `archivematica_src_ss_migrate_from_v0_7` at run time using `--extra-vars` instead of putting the variables in the playbook).
-
-### Remote repository
-
-- `archivematica_src_am_repo`: AM repository (default: `"https://github.com/artefactual/archivematica.git"`)
-- `archivematica_src_ss_repo`: SS repository (default: `"https://github.com/artefactual/archivematica-storage-service.git"`)
-
-### Web server
-
-#### SSL
-
-- `archivematica_src_ssl`: configure Storage Service and Dashboard to use SSL (default:`false`)
-- `archivematica_src_ssl_include_acme_chlg_loc`: Include ACME challenge location file (`acmetool-location.conf`) in nginx configuration file, provided by role https://github.com/artefactual-labs/ansible-acmetool (default:`false`)
-- `archivematica_src_ssl_fullchain`:  (no default provided, shall be defined in the playbook or host_vars if SSL enabled)
-- `archivematica_src_ssl_privkey`: (no default provided, shall be defined in the playbook or host_vars if SSL enabled)
+See [`defaults/main.yml`](defaults/main.yml) for a comprehensive list of variables.
 
 
 Tags
@@ -105,10 +45,12 @@ Note that if something is disabled with the [role variables](#role-variables), i
 - `amsrc-devtools`: Archivematica devtools install
 - `amsrc-automationtools`: Automation tools install
 
+
 Dependencies
 ------------
 
 N/A yet.
+
 
 Example Playbooks
 -----------------
@@ -123,13 +65,15 @@ See https://github.com/artefactual/deploy-pub/tree/master/playbooks/archivematic
 
 It is also recommended to take backups of your system (Archivematica and Storage Service databases, AIPS, DIPS, etc) prior to running an upgrade.
 
+
 License
 -------
 
 AGPLv3
 
+
 Author Information
 ------------------
 
 Artefactual Systems Inc.
-http://www.artefactual.com
+https://www.artefactual.com

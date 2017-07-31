@@ -9,8 +9,8 @@
 
     - name: "pipeline-es | Set Elasticsearch connection parameters"
       set_fact:
-        es_host: "{{ archivematica_src_elasticsearch_server | regex_replace('^(?P<host>.+):(?P<port>\\d+)$', '\\g<host>') }}"
-        es_port: "{{ archivematica_src_elasticsearch_server | regex_replace('^(?P<host>.+):(?P<port>\\d+)$', '\\g<port>') }}"
+        es_host: "{{ archivematica_src_am_dashboard_environment['ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER'] | regex_replace('^(?P<host>.+):(?P<port>\\d+)$', '\\g<host>') }}"
+        es_port: "{{ archivematica_src_am_dashboard_environment['ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER'] | regex_replace('^(?P<host>.+):(?P<port>\\d+)$', '\\g<port>') }}"
 
     - name: "pipeline-es | Reset Elasticsearch indexes"
       command: "curator --host={{ es_host }} --port={{ es_port }} delete indices --index='{{ item }}'"

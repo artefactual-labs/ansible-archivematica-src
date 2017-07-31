@@ -24,7 +24,7 @@
     state: "present"
     encoding: "utf8"
     collation: "utf8_unicode_ci"
-  when: 'archivematica_src_am_database_host == "localhost"'
+  when: "archivematica_src_am_create_db|bool"
 
 # TODO: need to change the mysql password for user archivematica
 
@@ -34,7 +34,7 @@
     password: "demo"
     priv: "MCP.*:ALL"
     state: "present"
-  when: 'archivematica_src_am_database_host == "localhost"'
+  when: "archivematica_src_am_create_dbuser|bool"
 
 - include: "pipeline-dbconf-migrate-1_4-to-1_5.yml"
   when: "archivematica_src_am_migrate_from_v1_4|bool"
@@ -42,9 +42,8 @@
 - name: "Run migrations"
   django_manage:
     command: "migrate"
-    app_path: "/usr/share/archivematica/dashboard/"
-    settings: "settings.production"
-    pythonpath: "/usr/lib/archivematica/archivematicaCommon"
-    virtualenv: "/usr/share/python/archivematica-dashboard"
+    app_path: "{{ archivematica_src_am_dashboard_app }}"
+    pythonpath: "{{ archivematica_src_am_common_app }}"
+    virtualenv: "{{ archivematica_src_am_dashboard_virtualenv }}"
   environment: "{{ archivematica_src_am_dashboard_environment }}"
   tags: "amsrc-pipeline-dbconf-syncdb"

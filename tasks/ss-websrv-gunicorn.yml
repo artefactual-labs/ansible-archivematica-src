@@ -15,7 +15,7 @@
 - name: "Copy gunicorn configuration file"
   copy:
     src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/storage-service.gunicorn-config.py"
-    dest: "/etc/archivematica/storage-service.gunicorn-config.py"
+    dest: "{{ archivematica_src_ss_gunicorn_config }}"
     backup: "yes"
     force: "yes"
     remote_src: "yes"
@@ -46,7 +46,7 @@
   when:
     - ansible_service_mgr == "systemd"
 
-- name: "Add storage service gunicorn systemd env file (in {{ systemd_environment_path }})"
+- name: "Add storage service gunicorn systemd env file"
   template:
     src: "etc/sysconfig/archivematica-storage-service.j2"
     dest: "{{ systemd_environment_path }}/archivematica-storage-service"

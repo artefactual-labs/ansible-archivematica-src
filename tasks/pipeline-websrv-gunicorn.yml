@@ -16,14 +16,14 @@
 - name: "Copy gunicorn configuration file"
   copy:
     src: "{{ archivematica_src_dir }}/archivematica/src/dashboard/install/dashboard.gunicorn-config.py"
-    dest: "/etc/archivematica/dashboard.gunicorn-config.py"
+    dest: "{{ archivematica_src_am_dashboard_gunicorn_config }}"
     backup: "yes"
     force: "yes"
     remote_src: "yes"
 
 - name: "set_fact: set gunicorn path to correct value"
   set_fact:
-    dashboard_gunicorn_path: "/usr/share/python/archivematica-dashboard/bin/gunicorn"
+    dashboard_gunicorn_path: "{{ archivematica_src_am_dashboard_virtualenv }}/bin/gunicorn"
 
 - name: "Config dashboard gunicorn upstart (/etc/init)"
   template:
@@ -40,9 +40,14 @@
 
 - name: "Add dashboard gunicorn systemd (/etc/systemd)"
   template:
-    src: "etc/systemd/system/archivematica-dashboard.service.j2"
-    dest: "/etc/systemd/system/archivematica-dashboard.service"
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     backup: "yes"
+  with_items:
+    - src: "etc/systemd/system/archivematica-dashboard.service.j2"
+      dest: "/etc/systemd/system/archivematica-dashboard.service"
+    - src: "etc/sysconfig/archivematica-dashboard.j2"
+      dest: "{{ systemd_environment_path }}/archivematica-dashboard"
   when:
     - ansible_service_mgr == "systemd"
 

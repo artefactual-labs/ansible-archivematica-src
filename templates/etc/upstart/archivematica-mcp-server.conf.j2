@@ -1,4 +1,4 @@
-# this file is managed by ansible
+# {{ ansible_managed }}
 
 description "Archivematica MCP Server"
 author "Artefactual Systems"
@@ -6,9 +6,11 @@ author "Artefactual Systems"
 start on (runlevel [2345] and filesystem)
 stop on runlevel [016]
 
-env LOCATION="{{ mcp_server_python_path }} /usr/lib/archivematica/MCPServer/archivematicaMCP.py"
-env PYTHONPATH=/usr/lib/archivematica/archivematicaCommon/:/usr/share/archivematica/dashboard/
-env DJANGO_SETTINGS_MODULE=settings.production
+env PYTHONPATH={{ archivematica_src_am_common_app }}:{{ archivematica_src_am_dashboard_app }}
+
+{% for key, value in archivematica_src_am_mcpserver_environment.iteritems() %}
+env {{ key }}={{ value }}
+{% endfor %}
 
 setuid archivematica
 setgid archivematica
@@ -23,7 +25,7 @@ pre-start script
     done
     gearadmin --getpid || exit 1
 
-    {% if archivematica_src_am_database_host == "localhost" %}
+    {% if archivematica_src_am_wait_mysql|bool %}
     # Wait for mysql to start - timeout eventually
     for i in $(seq 1 10)
     do
@@ -39,7 +41,6 @@ end script
 
 script
 
-    # Run
-    $LOCATION
+    {{ archivematica_src_am_mcpserver_virtualenv }}/bin/python {{ archivematica_src_am_mcpserver_app }}/archivematicaMCP.py
 
 end script

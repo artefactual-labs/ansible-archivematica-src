@@ -1,4 +1,5 @@
-# This file is managed with ansible
+# {{ ansible_managed }}
+
 description "Celery worker for Archivematica Storage Service"
 author "Artefactual Systems"
 
@@ -26,12 +27,12 @@ env LOGLEVEL={{ 'DEBUG' if is_dev else 'INFO' }}
 # Celery's specific app definition
 env APP=storage_service
 
-chdir /usr/lib/archivematica/storage-service
+chdir {{ archviematica_src_ss_app }}
 
 post-start script
    echo "archivematica storage service - Celery workers started"
 end script
 
 script
-    exec /usr/share/python/archivematica-storage-service/bin/celery --app=${APP} worker --loglevel=${LOGLEVEL} {{ '--autoreload' if is_dev else '' }} -E --concurrency=4
+    exec {{ archivematica_src_ss_virtualenv }}/bin/celery --app=${APP} worker --loglevel=${LOGLEVEL} {{ '--autoreload' if is_dev else '' }} -E --concurrency=4
 end script
