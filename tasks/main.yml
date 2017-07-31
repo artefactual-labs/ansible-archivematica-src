@@ -127,6 +127,12 @@
     - "amsrc-pipeline-dbconf"
   when: "archivematica_src_install_am|bool"
 
+- include: "pipeline-es.yml"
+  tags:
+    - "amsrc-pipeline"
+    - "amsrc-pipeline-es"
+  when: "archivematica_src_install_am|bool"
+
 - include: "pipeline-websrv-gunicorn.yml"
   tags:
     - "amsrc-pipeline"

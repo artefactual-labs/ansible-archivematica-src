@@ -1,0 +1,21 @@
+---
+
+- block:
+
+    - name: "pipeline-es | Install elasticsearch-curator"
+      pip:
+        name: "elasticsearch-curator"
+        version: "3.5.1"
+
+    - name: "pipeline-es | Set Elasticsearch connection parameters"
+      set_fact:
+        es_host: "{{ archivematica_src_elasticsearch_server | regex_replace('^(?P<host>.+):(?P<port>\\d+)$', '\\g<host>') }}"
+        es_port: "{{ archivematica_src_elasticsearch_server | regex_replace('^(?P<host>.+):(?P<port>\\d+)$', '\\g<port>') }}"
+
+    - name: "pipeline-es | Reset Elasticsearch indexes"
+      command: "curator --host={{ es_host }} --port={{ es_port }} delete indices --index='{{ item }}'"
+      with_items:
+        - "transfers"
+        - "aips"
+
+  when: "archivematica_src_reset_es|bool or archivematica_src_reset_am_all|bool"
