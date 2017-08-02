@@ -27,7 +27,7 @@
 
 - name: "Config dashboard gunicorn upstart (/etc/init)"
   template:
-    src: "etc/init/archivematica-dashboard.conf.j2"
+    src: "etc/upstart/archivematica-dashboard.conf.j2"
     dest: "/etc/init/archivematica-dashboard.conf"
     backup: "yes"
   when:

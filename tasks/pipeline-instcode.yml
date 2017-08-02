@@ -40,9 +40,9 @@
   when:
     - "ansible_service_mgr == 'upstart'"
   with_items:
-    - src: "etc/init/archivematica-mcp-server.conf.j2"
+    - src: "etc/upstart/archivematica-mcp-server.conf.j2"
       dest: "/etc/init/archivematica-mcp-server.conf"
-    - src: "etc/init/archivematica-mcp-client.conf.j2"
+    - src: "etc/upstart/archivematica-mcp-client.conf.j2"
       dest: "/etc/init/archivematica-mcp-client.conf"
 
 - name: "Reload Upstart configuration"
