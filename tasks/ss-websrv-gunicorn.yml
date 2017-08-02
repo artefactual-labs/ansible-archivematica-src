@@ -23,7 +23,7 @@
 
 - name: "Config storage service gunicorn upstart (/etc/init)"
   template:
-    src: "etc/init/archivematica-storage-service.conf.j2"
+    src: "etc/upstart/archivematica-storage-service.conf.j2"
     dest: "/etc/init/archivematica-storage-service.conf"
     backup: "yes"
   tags: "amsrc-ss-websrv"
