@@ -191,3 +191,16 @@
   tags:
     - "amsrc-acceptancetests"
   when: "archivematica_src_install_acceptance_tests|bool"
+
+#
+# Wait for git to finish sampledata clone
+#
+- name: "Wait for sampledata download completion"
+  async_status:
+    jid: "{{ sampledata_clone.ansible_job_id }}"
+  when: "archivematica_src_install_sample_data|bool"
+  register: "sampledata_clone_result"
+  until: "sampledata_clone_result.finished"
+  delay: 60
+  retries: "{{ ( archivematica_src_install_sample_data_timeout / 60 )|int|abs }}"
+  become: "no"

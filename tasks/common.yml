@@ -78,4 +78,7 @@
     update: "no"
     depth: 1
   when: "archivematica_src_install_sample_data|bool"
+  async: "{{ archivematica_src_install_sample_data_timeout }}"
+  poll: 0
+  register: "sampledata_clone"
   become: "no"

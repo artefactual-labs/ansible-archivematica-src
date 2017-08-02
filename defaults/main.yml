@@ -16,6 +16,7 @@ archivematica_src_install_am: "yes"
 archivematica_src_install_ss: "yes"
 archivematica_src_install_devtools: "no"
 archivematica_src_install_appraisaltab: "no"
+archivematica_src_install_sample_data_timeout: "3600"
 
 # Define the type of environment: "production" or "development". The latter
 # will deploy some extra stuff to make the development workflow easier.
