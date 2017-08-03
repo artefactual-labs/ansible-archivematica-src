@@ -25,7 +25,7 @@ pre-start script
     done
     gearadmin --getpid || exit 1
 
-    {% if archivematica_src_am_wait_mysql|bool %}
+    {% if archivematica_src_am_wait_local_mysql|bool %}
     # Wait for mysql to start - timeout eventually
     for i in $(seq 1 10)
     do
