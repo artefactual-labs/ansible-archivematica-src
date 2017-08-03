@@ -202,5 +202,5 @@
   register: "sampledata_clone_result"
   until: "sampledata_clone_result.finished"
   delay: 60
-  retries: "{{ ( archivematica_src_install_sample_data_timeout / 60 )|int|abs }}"
+  retries: "{{ ( archivematica_src_install_sample_data_timeout|int / 60 )|int|abs }}"
   become: "no"
