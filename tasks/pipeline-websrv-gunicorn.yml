@@ -9,38 +9,28 @@
 
 - name: "Template dashboard nginx sites-available config file"
   template:
-    src: "etc_nginx_sites_dashboard-gunicorn.conf.j2"
+    src: "etc/nginx/sites-available/dashboard.conf.j2"
     dest: "/etc/nginx/sites-available/dashboard.conf"
     backup: "yes"
 
-- name: "Template gunicorn configuration file"
-  template:
-    src: "etc_archivematica_dashboard.gunicorn-config.py.j2"
-    dest: "/etc/archivematica/dashboard.gunicorn-config.py"
+- name: "Copy gunicorn configuration file"
+  copy:
+    src: "{{ archivematica_src_dir }}/archivematica/src/dashboard/install/dashboard.gunicorn-config.py"
+    dest: "{{ archivematica_src_am_dashboard_gunicorn_config }}"
     backup: "yes"
+    force: "yes"
+    remote_src: "yes"
 
-- name: "set_fact: set gunicorn path to correct value when multi_venvs is true"
+- name: "set_fact: set gunicorn path to correct value"
   set_fact:
-    dashboard_gunicorn_path: "/usr/share/python/archivematica-dashboard/bin/gunicorn"
-  when: "archivematica_src_am_multi_venvs|bool"
-
-- name: "Get location of the gunicorn executable for dashboard when multi_venvs is false"
-  command: "which gunicorn"
-  register: dgp
-  when: "not archivematica_src_am_multi_venvs|bool"
-
-
-- name: "set_fact: set gunicorn path to correct value when multi_venvs is false"
-  set_fact:
-    dashboard_gunicorn_path: "{{ dgp.stdout }}"
-  when: "not archivematica_src_am_multi_venvs|bool"
+    dashboard_gunicorn_path: "{{ archivematica_src_am_dashboard_virtualenv }}/bin/gunicorn"
 
 - name: "Config dashboard gunicorn upstart (/etc/init)"
   template:
-    src: "etc_init_archivematica-dashboard.conf.j2"
+    src: "etc/upstart/archivematica-dashboard.conf.j2"
     dest: "/etc/init/archivematica-dashboard.conf"
     backup: "yes"
-  when: 
+  when:
      - ansible_service_mgr == "upstart"
 
 - name: "Reload Upstart configuration"
@@ -50,9 +40,14 @@
 
 - name: "Add dashboard gunicorn systemd (/etc/systemd)"
   template:
-    src: "etc/systemd/system/archivematica-dashboard.service.j2"
-    dest: "/etc/systemd/system/archivematica-dashboard.service"
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     backup: "yes"
+  with_items:
+    - src: "etc/systemd/system/archivematica-dashboard.service.j2"
+      dest: "/etc/systemd/system/archivematica-dashboard.service"
+    - src: "etc/sysconfig/archivematica-dashboard.j2"
+      dest: "{{ systemd_environment_path }}/archivematica-dashboard"
   when:
     - ansible_service_mgr == "systemd"
 
@@ -78,7 +73,7 @@
 # SSL configuration tasks - begin
 - name: "Template nginx ssl config file"
   template:
-    src: "etc_nginx_sites_dashboard-ssl-gunicorn.conf.j2"
+    src: "etc/nginx/sites-available/dashboard-ssl.conf.j2"
     dest: "/etc/nginx/sites-available/dashboard-ssl.conf"
     backup: "yes"
   when: "archivematica_src_ssl|bool"
@@ -123,4 +118,3 @@
     - "nginx"
   when:
     - ansible_service_mgr == "systemd"
-

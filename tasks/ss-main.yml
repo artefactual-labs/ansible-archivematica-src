@@ -29,7 +29,7 @@
 
 
 ###########################################################
-#   1- OS package dependencies 
+#   1- OS package dependencies
 ###########################################################
 
 - name: "include ss-osdeps.yml"
@@ -64,7 +64,7 @@
   pip:
     name: "pip"
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
     state: "latest"
   tags: "amsrc-ss-pydep"
 
@@ -76,7 +76,7 @@
 #   pip:
 #     name: "setuptools"
 #     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-#     virtualenv: "/usr/share/python/archivematica-storage-service"
+#     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
 #     state: "absent"
 #   tags: "amsrc-ss-pydep"
 
@@ -84,39 +84,21 @@
 #   pip:
 #     name: "setuptools"
 #     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-#     virtualenv: "/usr/share/python/archivematica-storage-service"
+#     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
 #     state: "latest"
 #   tags: "amsrc-ss-pydep"
 
 - name: "Create virtualenv for archivematica-storage-service, pip install requirements"
   pip:
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt'}}"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
+    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt' }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
     extra_args: "{{ ss_pip_install_extra_args }}"
     state: "latest"
   tags: "amsrc-ss-pydep"
-
-- name: "Work around to install pip deps commented out in old SS branches"
-  pip:
-    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
-    extra_args: "{{ ss_pip_install_extra_args }}"
-    state: "latest"
-    name: "{{ item }}"
-  with_items:
-    - "python-swiftclient"
-    - "python-keystoneclient"
-    - "sword2"
-    - "pyopenssl"
-    - "ndg-httpsclient"
-    - "pyasn1"
-  when: "archivematica_src_ss_pip_missing_deps|bool"
-  tags: "amsrc-ss-pydep"
-
 
 ###########################################################
-#   3- OS configuration (user/directory/file creation/permissions/ownership )
+#   3- OS configuration (user/directory/file creation/permissions/ownership)
 ###########################################################
 
 - name: "Create subdirectory for archivematica-storage-service source files"
@@ -145,34 +127,10 @@
     - "/etc/archivematica"
   tags: "amsrc-ss-osconf"
 
-- name: "Create archivematica-storage-service log directories"
-  file:
-    dest: "{{ item }}"
-    state: "directory"
-    owner: "archivematica"
-    group: "archivematica"
-    mode: "g+s"
-  with_items:
-    - "/var/log/archivematica/storage-service"
-  tags: "amsrc-ss-osconf"
-
-- name: "Touch SS log files"
-  file:
-    path: "/var/log/archivematica/storage-service/{{ item }}"
-    owner: "archivematica"
-    group: "archivematica"
-    state: "touch"
-  with_items:
-    - "storage_service.log"
-    - "storage_service_debug.log"
-  tags: "amsrc-ss-osconf"
-
 
 ###########################################################
 #   4- SS code install
 ###########################################################
-
-# storage service base dir:  /usr/lib/archivematica/storage-service
 
 - name: "Copy archivematica-storage-service source files"
   file:
@@ -181,14 +139,14 @@
     state: "link"
   with_items:
     - src: "{{ archivematica_src_dir }}/archivematica-storage-service/storage_service"
-      dest: "/usr/lib/archivematica/storage-service"
+      dest: "{{ archviematica_src_ss_app }}"
   tags: "amsrc-ss-code"
 
 - name: "Run SS django collectstatic"
   django_manage:
     command: "collectstatic"
-    app_path: "/usr/lib/archivematica/storage-service"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
+    app_path: "{{ archviematica_src_ss_app }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
   environment: "{{ archivematica_src_ss_environment }}"
   tags: ["amsrc-ss-code", "amsrc-ss-code-collectstatic"]
 
@@ -233,7 +191,7 @@
 
 - name: "Template celery upstart file if required"
   template:
-    src: "etc_init_archivematica-storage-service-worker.conf.j2"
+    src: "etc/upstart/archivematica-storage-service-worker.conf.j2"
     dest: "/etc/init/archivematica-storage-service-worker.conf"
     backup: "yes"
   when: "ss_worker|bool"

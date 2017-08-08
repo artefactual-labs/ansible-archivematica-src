@@ -2,7 +2,7 @@
 
 upstream archivematica_dashboard_backend {
 
-    server {{ archivematica_src_am_dashboard_bind }};
+    server {{ archivematica_src_am_dashboard_nginx_bind }};
 
 }
 
@@ -29,7 +29,7 @@ server {
     # dev environment: disable sendfile when serving static files (work around vagrant vboxsf issue)
     sendfile off;
 {% endif %}
-    alias /usr/share/archivematica/dashboard/media;
+    alias {{ archivematica_src_am_dashboard_app }}/media;
   }
 
 }

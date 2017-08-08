@@ -4,6 +4,10 @@
 # Common tasks
 #
 
+- name: "Load OS-specific vars"
+  include_vars: "{{ ansible_os_family }}.yml"
+  tags:
+    - "always" # inocuous to use always here
 
 - name: "Set fact: type of environment"
   set_fact:
@@ -11,50 +15,21 @@
     is_prod: "{{ archivematica_src_environment_type == 'production' }}"
   tags: "always" # inocuous to use always here
 
-- name: "Set fact: environment vars"
-  set_fact:
-    archivematica_src_am_dashboard_environment:
-      DJANGO_SETTINGS_MODULE: "{{ 'settings.local' if is_dev else 'settings.common' }}"
-      ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_ALLOWED_HOSTS: "{{ archivematica_src_am_env_django_allowed_hosts }}"
-      ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY: "{{ archivematica_src_am_env_django_secret_key }}"
-      ARCHIVEMATICA_DASHBOARD_DASHBOARD_SHIBBOLETH_AUTHENTICATION: "{{ archivematica_src_shibboleth_authentication }}"
-    archivematica_src_ss_environment:
-      DJANGO_SECRET_KEY: "{{ archivematica_src_ss_env_django_secret_key }}"
-      DJANGO_SETTINGS_MODULE: "{{ archivematica_src_ss_env_django_setings_module }}"
-      DJANGO_STATIC_ROOT: "{{ archivematica_src_ss_env_django_static_root }}"
-      EMAIL_HOST: "{{ archivematica_src_ss_env_email_host }}"
-      EMAIL_HOST_PASSWORD: "{{ archivematica_src_ss_env_email_host_password }}"
-      EMAIL_HOST_USER: "{{ archivematica_src_ss_env_email_host_user }}"
-      EMAIL_PORT: "{{ archivematica_src_ss_env_email_port }}"
-      SS_DB_HOST: "{{ archivematica_src_ss_env_ss_db_host }}"
-      SS_DB_NAME: "{{ archivematica_src_ss_env_ss_db_name }}"
-      SS_DB_PASSWORD: "{{ archivematica_src_ss_env_ss_db_password }}"
-      SS_DB_USER: "{{ archivematica_src_ss_env_ss_db_user }}"
-      SS_SHIBBOLETH_AUTHENTICATION: "{{ archivematica_src_shibboleth_authentication }}"
+- name: "Install necessary packages required by this role"
+  package:
+    name: "{{ item }}"
+    state: "latest"
+  with_items: "{{ ansible_deps }}"
   tags: "always" # inocuous to use always here
 
-- name: "initialize systemd folder"
-  set_fact:
-    systemd_environment_path: "/etc/default"
-  tags: "always" # inocuous to use always here
-
-- name: "initialize systemd folder (RedHat)"
-  set_fact:
-    systemd_environment_path: "/etc/sysconfig"
-  when:
-     - ansible_os_family == "RedHat" and ansible_service_mgr == "systemd"
-  tags: "always" # inocuous to use always here
-
-- name: "include common.yml common tasks for all components"
+- name: "Include common.yml common tasks for all components"
   include: "common.yml"
   tags: # do not use "always" tag in role, to avoid issues when including other roles in a playbook
-  - "amsrc-common"
-  - "amsrc-ss"
-  - "amsrc-pipeline"
-  - "amsrc-devtools"
-  - "amsrc-automationtools"
-  - "amsrc-appraisaltab"
-
+    - "amsrc-common"
+    - "amsrc-ss"
+    - "amsrc-pipeline"
+    - "amsrc-devtools"
+    - "amsrc-automationtools"
 
 
 #
@@ -63,31 +38,27 @@
 
 - include: "ss-main.yml"
   tags:
-   - "amsrc-ss"
+    - "amsrc-ss"
   when: "archivematica_src_install_ss|bool"
 
 - include: "ss-db.yml"
   tags:
-   - "amsrc-ss"
-   - "amsrc-ss-db"
+    - "amsrc-ss"
+    - "amsrc-ss-db"
   when: "archivematica_src_install_ss|bool"
-
-- include: "ss-websrv-uwsgi.yml"
-  tags:
-   - "amsrc-ss"
-   - "amsrc-ss-websrv"
-  when: "archivematica_src_install_ss|bool and not(archivematica_src_ss_gunicorn|bool)"
 
 - include: "ss-websrv-gunicorn.yml"
   tags:
-   - "amsrc-ss"
-   - "amsrc-ss-websrv"
-  when: "archivematica_src_install_ss|bool and archivematica_src_ss_gunicorn|bool"
+    - "amsrc-ss"
+    - "amsrc-ss-websrv"
+  when: "archivematica_src_install_ss|bool"
 
 
 #
-# archivematica pipeline install
-#    (dashboard, MCP server, client)
+# Pipeline:
+# - archivematica-dashboard
+# - archivematica-mcp-server
+# - archivematica-mcp-client
 #
 #   0- Clone source repo
 #   1- OS dependencies (debian packages)
@@ -109,23 +80,11 @@
     - "amsrc-pipeline-osdeps"
   when: "archivematica_src_install_am|bool"
 
-# - include: "pipeline-clamav.yml"
-#   tags:
-#     - "amsrc-pipeline"
-#     - "amsrc-pipeline-clamav"
-#   when: "archivematica_src_install_am|bool"
-
-- include: "pipeline-pipdeps.yml"
+- include: "pipeline-pip-deps.yml"
   tags:
     - "amsrc-pipeline"
     - "amsrc-pipeline-pipdeps"
-  when: "archivematica_src_install_am|bool and not(archivematica_src_am_multi_venvs|bool)"
-
-- include: "pipeline-pipdeps-multi-venvs.yml"
-  tags:
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-pipdeps"
-  when: "archivematica_src_install_am|bool and archivematica_src_am_multi_venvs|bool"
+  when: "archivematica_src_install_am|bool"
 
 - include: "pipeline-osconf.yml"
   tags:
@@ -145,19 +104,31 @@
     - "amsrc-pipeline-dbconf"
   when: "archivematica_src_install_am|bool"
 
-- include: "pipeline-websrv-modwsgi.yml"
+- include: "pipeline-es.yml"
   tags:
-   - "amsrc-pipeline"
-   - "amsrc-pipeline-websrv"
-  when: "archivematica_src_install_am|bool and not(archivematica_src_am_dashboard_gunicorn|bool)"
+    - "amsrc-pipeline"
+    - "amsrc-pipeline-es"
+  when: "archivematica_src_install_am|bool"
 
 - include: "pipeline-websrv-gunicorn.yml"
   tags:
-   - "amsrc-pipeline"
-   - "amsrc-pipeline-websrv"
-  when: "archivematica_src_install_am|bool and archivematica_src_am_dashboard_gunicorn|bool"
+    - "amsrc-pipeline"
+    - "amsrc-pipeline-websrv"
+  when: "archivematica_src_install_am|bool"
 
 
+#
+# archivematica-sampledata
+#
+
+- name: "Checkout out archivematica-sampledata repository"
+  git:
+    repo: "https://github.com/artefactual/archivematica-sampledata.git"
+    dest: "~/archivematica-sampledata"
+    update: "no"
+    depth: 1
+  when: "archivematica_src_install_sample_data|bool"
+  become: "no"
 
 
 #
@@ -169,6 +140,7 @@
     - "amsrc-devtools"
   when: "archivematica_src_install_devtools|bool"
 
+
 #
 # automation-tools
 #
@@ -178,14 +150,6 @@
     - "amsrc-automationtools"
   when: "archivematica_src_install_automationtools|bool"
 
-#
-# appraisal-tab
-#
-
-- include: "appraisal-tab.yml"
-  tags:
-    - "amsrc-appraisaltab"
-  when: "archivematica_src_install_appraisaltab|bool"
 
 #
 # acceptance-tests

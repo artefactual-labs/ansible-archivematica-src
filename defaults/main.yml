@@ -1,162 +1,117 @@
 ---
-# default values for role variables
-# playbook will use these defaults if not overriden in the playbook
-# (or host_vars, group_vars, etc)
 
-
-# directory to install source code
+# Directory to install source code
 archivematica_src_dir: "/opt/archivematica"
 
-# shared directory for processing, etc
+# Shared directory for processing, etc
 archivematica_src_shareddir: "/var/archivematica/sharedDirectory"
 
 # Components to install
-archivematica_src_install_sample_data: "yes"
 archivematica_src_install_am: "yes"
 archivematica_src_install_ss: "yes"
+archivematica_src_install_sample_data: "yes"
 archivematica_src_install_devtools: "no"
-archivematica_src_install_appraisaltab: "no"
+archivematica_src_install_automationtools: "no"
+archivematica_src_install_acceptance_tests: "no"
 
-# Define the type of environment: "production" or "development". The latter
-# will deploy some extra stuff to make the development workflow easier.
+# Define the type of environment: "production" or "development". The latter will deploy some extra stuff to make the development workflow easier.
 archivematica_src_environment_type: "production"
 
 # Repositories
 archivematica_src_am_repo: "https://github.com/artefactual/archivematica.git"
 archivematica_src_ss_repo: "https://github.com/artefactual/archivematica-storage-service.git"
 
-# Moving external dependencies repo information out of the role
-# These are fallback values to try to avoid breaking things when deploying legacy branches
-## Repositories for external packages (defaulting to externals repo for stable/1.5.x)
-### externals package server url or ppa (http://<server>/<repository> or ppa:<name>)
-archivematica_src_externals_repo: "http://packages.archivematica.org/1.5.x/ubuntu-externals" 
-### repository key id and url (ignored for ppa)
-archivematica_src_externals_repo_key_id: "0x5236CA08"
-archivematica_src_externals_repo_key_url: "https://packages.archivematica.org/GPG-KEY-archivematica"
-
 # Branches
 archivematica_src_am_version: "qa/1.x"
 archivematica_src_ss_version: "qa/0.x"
 archivematica_src_devtools_version: "master"
-
-archivematica_src_am_env_django_secret_key: "CHANGE_ME_WITH_A_SECRET_KEY"
-archivematica_src_am_env_django_allowed_hosts: "*"
-
-# SS django environment variables
-# DJANGO_SECRET_KEY shall be changed for every install
-#     (override the value in the playboook, do not change here)
-archivematica_src_ss_env_django_secret_key: "CHANGE_ME_WITH_A_SECRET_KEY"
-archivematica_src_ss_env_django_setings_module: "storage_service.settings.production"
-archivematica_src_ss_env_django_static_root: "/usr/lib/archivematica/storage-service/assets"
-archivematica_src_ss_env_email_host: "localhost"
-archivematica_src_ss_env_email_host_password: ""
-archivematica_src_ss_env_email_host_user: ""
-archivematica_src_ss_env_email_port: "25"
-archivematica_src_ss_env_ss_db_host: ""
-archivematica_src_ss_env_ss_db_name: "/var/archivematica/storage-service/storage.db"
-archivematica_src_ss_env_ss_db_password: ""
-archivematica_src_ss_env_ss_db_user: ""
-
-
-# database settings
-archivematica_src_am_database_name: "MCP"
-archivematica_src_am_database_user: "archivematica"
-archivematica_src_am_database_host: "localhost"
-archivematica_src_am_database_password: "demo"
-# reset the MCP database (CAUTION: if true, will lose existing MCP database data)
-archivematica_src_reset_mcpdb: "false"
-# delete the existing shared directory
-archivematica_src_reset_shareddir: "false"
-
-#Gearman server
-archivematica_src_gearman_server: "localhost:4730"
-
-#ElasticSearch server configuration
-archivematica_src_elasticsearch_server: "localhost:9200"
-archivematica_src_elasticsearch_timeout: 10
-# Delete ElasticSearch indexes
-archivematica_src_reset_es: "false"
-
-# reset the AM database (MCP), delete AM shared dir and reset ElasticSearch indexes (if true, it overrides the three reset vars above)
-archivematica_src_reset_am_all: "false"
-
-# Reset the SS database
-archivematica_src_reset_ss_db: "false"
-
-## Migrations related
-# Migrate AM database from v1.4 to v1.5
-archivematica_src_am_migrate_from_v1_4: "false"
-# Migrate SS database from v0.7 to v0.8
-archivematica_src_ss_migrate_from_v0_7: "false"
-
-## backwards compatibility
-# run SS manage.py syncdb before migrate (for stable/0.7.x and previous branches that use Django 1.5.x)
-archivematica_src_ss_run_syncdb: "false"
-# workaround to install missing SS pip dependencies in old SS branches
-# (some old branches of SS such as qa/0.7.2 commented out some dependencies
-#  in the requirements file and installed in the debian postinst
-#  to work around launchpad building issues)
-# this flag works around such workaround :-) by running a separate pip install for these deps
-archivematica_src_ss_pip_missing_deps: "false"
-
-# dependencies (see vars files)
-archivematica_src_am_common_pkgdeps: "{{ archivematica_src_am_common_pkgdeps_v1_4 }}"
-archivematica_src_am_dashboard_pkgdeps: "{{ archivematica_src_am_dashboard_pkgdeps_v1_4 }}"
-archivematica_src_am_mcpserver_pkgdeps: "{{ archivematica_src_am_mcpserver_pkgdeps_v1_4 }}"
-archivematica_src_am_mcpclient_pkgdeps: "{{ archivematica_src_am_mcpclient_pkgdeps_v1_4 }}"
-
-# SS: use gunicorn instead of uwsgi (from SS 0.8.x)
-archivematica_src_ss_gunicorn: "false"
-## SS nginx gunicorn parameters
-### in both nginx and gunicorn config files
-archivematica_src_ss_bind: "127.0.0.1:8001"
-## in nginx config file
-archivematica_src_ss_nginx_proxy_read_timeout: "172800s"
-### in gunicorn config file
-archivematica_src_ss_gunicorn_workers: "4"
-archivematica_src_ss_gunicorn_timeout: "172800"
-archivematica_src_ss_gunicorn_sendfile: "True"
-
-# dashboard: use gunicorn instead of apache (from AM 1.5.x)
-archivematica_src_am_dashboard_gunicorn: "false"
-## dashboard nginx gunicorn related parameters
-###   use of unix sockets breaks AM API whitelisting that relies on REMOTE_ADDR so using tcp sockets instead
-###   ( https://github.com/benoitc/gunicorn/issues/797 )
-### in both nginx and gunicorn config files
-archivematica_src_am_dashboard_bind: "127.0.0.1:8002"
-### in nginx config file
-archivematica_src_am_dashboard_nginx_proxy_read_timeout: "172800s"
-### in gunicorn config file
-archivematica_src_am_dashboard_gunicorn_workers: "4"
-archivematica_src_am_dashboard_gunicorn_timeout: "172800"
-
-## SSL configuration (for nginx/gunicorn configuration only)
-# enable SSL
-archivematica_src_ssl: "false"
-# include acmetool challenge location in dashboard nginx configuration
-# (ref.  https://github.com/artefactual-labs/ansible-acmetool )
-archivematica_src_ssl_include_acme_chlg_loc: "false"
-# the following vars need to be defined in the playbook or host_vars
-#   archivematica_src_ssl_fullchain: "/var/lib/acme/live/mysite.org/fullchain"
-#   archivematica_src_ssl_privkey: "/var/lib/acme/live/mysite.org/privkey"
-
-# pipeline: create separate virtualenvs for each pipeline component
-#           (dashboard, MCPServer, MCPClient)
-#           default: no (no virtualenv created for pipeline, legacy config)
-archivematica_src_am_multi_venvs: "no"
-
-# automation tools
-archivematica_src_install_automationtools: "no"
 archivematica_src_automationtools_version: "master"
+archivematica_src_acceptance_tests_version: "master"
+
+# Reset data options
+archivematica_src_reset_mcpdb: "false"           # Reset AM MCP database
+archivematica_src_reset_shareddir: "false"       # Reset AM shared directory
+archivematica_src_reset_es: "false"              # Reset AM Elasticsearch indices
+archivematica_src_reset_am_all: "false"          # Reset AM Elasticsearch indices, shared directory, MCP database (overrides previous settings)
+archivematica_src_reset_ss_db: "false"           # Reset the SS database
+
+# Database options
+archivematica_src_am_migrate_from_v1_4: "false"  # Migrate AM database from v1.4 to v1.5
+archivematica_src_ss_migrate_from_v0_7: "false"  # Migrate AM database from v1.4 to v1.5
+archivematica_src_am_create_db: "true"           # Create database (uses root's credentials in ~/.my.cnf)
+archivematica_src_am_create_dbuser: "true"       # Create user database (uses root's credentials in ~/.my.cnf)
+archivematica_src_am_wait_local_mysql: "true"    # MCPServer upstart service to wait until MySQL is locally available
+
+# Please note that a playbook using `archivematica_src_am_migrate_from_v1_4` or `archivematica_src_ss_migrate_from_v0_7`  is not idempotent, and it will throw an error if run twice. The two migrate related variables should be removed after a successful migration (an alternative could be to specify the `archivematica_src_am_migrate_from_v1_4` and `archivematica_src_ss_migrate_from_v0_7` at run time using `--extra-vars` instead of putting the variables in the playbook).
+
+
+#
+# Environment strings
+#
+
+# Archivematica Dashboard
+# This list only includes mandatory strings.
+archivematica_src_am_dashboard_environment:
+  DJANGO_SETTINGS_MODULE: "settings.production"
+  ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_ALLOWED_HOSTS: "*"
+  ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY: "CHANGE_ME_WITH_A_SECRET_KEY"
+  # Not mandatory:
+  ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER: "127.0.0.1:9200"  # Needed by pipeline-es.yml
+  AM_GUNICORN_BIND: "127.0.0.1:8002"
+
+# Archivematica MCPServer
+# This list only includes mandatory strings.
+archivematica_src_am_mcpserver_environment:
+  DJANGO_SETTINGS_MODULE: "settings.common"
+
+# Archivematica MCPClient
+# This list only includes mandatory strings.
+archivematica_src_am_mcpclient_environment:
+  DJANGO_SETTINGS_MODULE: "settings.common"
+
+# Archivematica Storage Service
+# This list only includes mandatory strings.
+archivematica_src_ss_environment:
+  DJANGO_SETTINGS_MODULE: "storage_service.settings.production"
+  DJANGO_ALLOWED_HOSTS: "*"
+  DJANGO_SECRET_KEY: "CHANGE_ME_WITH_A_SECRET_KEY"
+  SS_DB_HOST: ""
+  SS_DB_NAME: "/var/archivematica/storage-service/storage.db"  # Needed by ss-db.yml
+  SS_DB_PASSWORD: ""
+  SS_DB_USER: ""
+  # Not mandatory:
+  SS_GUNICORN_BIND: "127.0.0.1:8001"
+
+
+#
+# Nginx
+#
+
+# Use of UNIX sockets breaks AM API whitelisting that relis on REMOTE_ADDR. Using TCP sockets instead. See https://github.com/benoitc/gunicorn/issues/797 for more details.
+
+archivematica_src_am_dashboard_nginx_bind: "127.0.0.1:8002"
+archivematica_src_am_dashboard_nginx_proxy_read_timeout: "172800s"
+archivematica_src_ss_nginx_bind: "127.0.0.1:8001"
+archivematica_src_ss_nginx_proxy_read_timeout: "172800s"
+
+# SSL settings
+archivematica_src_ssl: "false"
+# Include acmetool challenge location in dashboard nginx configuration (see https://github.com/artefactual-labs/ansible-acmetool for more details).
+archivematica_src_ssl_include_acme_chlg_loc: "false"
+# The following vars need to be defined in the playbook or host_vars:
+# archivematica_src_ssl_fullchain: "/var/lib/acme/live/mysite.org/fullchain"
+# archivematica_src_ssl_privkey: "/var/lib/acme/live/mysite.org/privkey"
+
+
+#
+# Other components
+#
+
+# Automation tools
 archivematica_src_automationtools_transfers_logfile: "/var/log/archivematica/automation-tools/transfers.log"
 archivematica_src_automationtools_transfers_databasefile: "/var/archivematica/automation-tools/transfers.db"
 archivematica_src_automationtools_transfers_pidfile: "/var/archivematica/automation-tools/transfers-pid.lck"
 
-# acceptance tests
-archivematica_src_install_acceptance_tests: "no"
-archivematica_src_acceptance_tests_version: "master"
+# Acceptance tests
 archivematica_src_acceptance_tests_browser_list: [ "Chrome" , "Firefox" ]
 archivematica_src_acceptance_tests_chromedriver_version: "2.29"
-
-# Shibboleth authentication
-archivematica_src_shibboleth_authentication: "false"

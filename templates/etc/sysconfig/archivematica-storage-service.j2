@@ -1,5 +1,9 @@
-# this file is managed by ansible
+# {{ ansible_managed }}
 
 LANG="en_US.UTF-8"
 LC_ALL="en_US.UTF-8"
 LC_LANG="en_US.UTF-8"
+
+{% for key, value in archivematica_src_ss_environment.iteritems() %}
+{{ key }}={{ value }}
+{% endfor %}

@@ -6,31 +6,29 @@
 #######################################################################
 #  Notes:
 #  - Recent archivematica branches to include osdeps file per component
-#    (e.g., src/archivematicaCommon/osdeps/Ubuntu-14.yml, 
+#    (e.g., src/archivematicaCommon/osdeps/Ubuntu-14.yml,
 #     src/dashboard/osdeps/Ubuntu-14.yml)
-#  - "Component" refer to any of archivematicaCommon, dashboard, 
-#    MCPServer, MCPClient 
+#  - "Component" refer to any of archivematicaCommon, dashboard,
+#    MCPServer, MCPClient
 #  - osdeps files contains the following information
 #      - repository keys
 #      - repository names
 #      - packages
-#  - If this role finds osdeps files for the OS of the target VM 
-#    (matching distribution and version), it will configure 
-#    dependencies according to these files 
-#  - If this role doesn't find any osdeps file for the OS, it 
-#    will use the role defaults 
+#  - If this role finds osdeps files for the OS of the target VM
+#    (matching distribution and version), it will configure
+#    dependencies according to these files
 ############################################################
 
 # osdeps filenames in the archivematica repo are something like "Ubuntu-14.04.json"
-- set_fact: 
+- set_fact:
     osdeps_file: "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.json"
     tmpdirname: "/tmp/amsrc-{{ ansible_date_time.date }}-{{ ansible_date_time.epoch }}"
     comps: "[ 'archivematicaCommon', 'MCPServer', 'MCPClient', 'dashboard' ]"
 
-# become: false is required in tasks delegated to localhost 
+# become: false is required in tasks delegated to localhost
 # (to avoid "sudo: a password is required" error)
 - name: "create temp directory in local machine to store osdeps files"
-  file: 
+  file:
     path: "{{ tmpdirname }}/osdeps"
     state: "directory"
   become: false
@@ -40,7 +38,7 @@
   fetch:
     src: "{{ archivematica_src_dir }}/archivematica/src/{{ item }}/osdeps/{{ osdeps_file }}"
     dest: "{{ tmpdirname }}/osdeps/{{ item }}/{{ osdeps_file }}"
-    flat: "yes" 
+    flat: "yes"
   with_items: "{{ comps }}"
 
 # determine which components have osdeps files
@@ -61,17 +59,17 @@
 
 # create a namespace for each component that has a dependencies file
 - name: "include variables from retrieved dependencies files"
-  include_vars: 
+  include_vars:
     file: "{{ tmpdirname }}/osdeps/{{ item }}/{{ osdeps_file }}"
     name: "{{ item }}"
   with_items: "{{ comps_osdeps }}"
 
 #######################################################################
-# Install dependencies according to osdeps files in the archivematica 
+# Install dependencies according to osdeps files in the archivematica
 # source code repository
 #######################################################################
 
-# (Couldn't find a way to loop within components for tasks below, 
+# (Couldn't find a way to loop within components for tasks below,
 #  can't use ansible nested loops for this case)
 
 - name: "include pipeline-osdeps-archivematicaCommon"
@@ -94,28 +92,9 @@
   static: no
   when: dashboard is defined
 
-#######################################################################
-# if no osdeps files, fallback to legacy tasks 
-# (install dependencies using the default values in this role)
-#######################################################################
-
-# run fallback tasks if comps_osdeps is empty 
-# (i.e., no osdeps json file found for any component, for the target OS, in the AM source repo)
-# only for ubuntu 14, error if not
-- name: "include pipeline-osdeps-fallback"
-  include: "pipeline-osdeps-fallback.yml"
-  static: no
-  when: 
-    - not comps_osdeps
-    - ansible_distribution=="Ubuntu" and ansible_distribution_major_version=="14"
-
-## error if no osdeps file and not ubuntu 14
-- name: "error if no osdeps and no fallback"
-  fail: 
-    msg: "Error: no osdeps and no fallback for this distro version"
-  when: 
-    - not comps_osdeps 
-    - not (ansible_distribution=="Ubuntu" and ansible_distribution_major_version=="14")
+#
+# FITS via Nailgun
+#
 
 - name: "Enable and start fits (Ubuntu)"
   service:
@@ -127,7 +106,7 @@
 
 - name: Create systemd init file for fits (Ubuntu 16.04)
   template:
-     src: "etc/systemd/system/fits-nailgun.service.xenial" 
+     src: "etc/systemd/system/fits-nailgun.service.j2"
      dest: "/etc/systemd/system/fits-nailgun.service"
   when:
     - ansible_service_mgr == "systemd" and ansible_distribution == "Ubuntu"

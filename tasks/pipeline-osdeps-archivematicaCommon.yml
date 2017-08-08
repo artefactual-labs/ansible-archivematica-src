@@ -38,8 +38,8 @@
         name: "{{ item['name'] }}"
         description: "{{ item['description'] }}"
         baseurl: "{{ item['baseurl'] }}"
-        gpgcheck: "{{ item['gpgcheck']}}"
-        enabled: "{{ item['enabled']}}"
+        gpgcheck: "{{ item['gpgcheck'] }}"
+        enabled: "{{ item['enabled'] }}"
       with_items: "{{ archivematicaCommon.osdeps_repos }}"
       when:
         - archivematicaCommon.osdeps_repos
@@ -48,7 +48,7 @@
       yum: 
         name: "{{ item['name'] }}"
         state: "{{ item['state'] }}"
-      with_items: "{{ archivematicaCommon.osdeps_packages }}  "
+      with_items: "{{ archivematicaCommon.osdeps_packages }}"
       when:
         - archivematicaCommon.osdeps_packages is defined and archivematicaCommon.osdeps_packages
 
@@ -56,7 +56,7 @@
       yum: 
         name: "{{ item['name'] }}"
         state: "{{ item['state'] }}"
-      with_items: "{{ archivematicaCommon.osdeps_packages_2 }}  "
+      with_items: "{{ archivematicaCommon.osdeps_packages_2 }}"
       when:
         - archivematicaCommon.osdeps_packages_2 is defined and archivematicaCommon.osdeps_packages_2 
 
@@ -64,10 +64,9 @@
       yum: 
         name: "{{ item['name'] }}"
         state: "{{ item['state'] }}"
-      with_items: "{{ archivematicaCommon.osdeps_packages_3 }}  "
+      with_items: "{{ archivematicaCommon.osdeps_packages_3 }}"
       when:
         - archivematicaCommon.osdeps_packages_3 is defined and archivematicaCommon.osdeps_packages_3 
-
 
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"

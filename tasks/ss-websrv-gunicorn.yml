@@ -7,32 +7,33 @@
 
 - name: "set nginx sites-available config file"
   template:
-    src: "etc_nginx_sites_storage-gunicorn.conf.j2"
+    src: "etc/nginx/sites-available/storage.conf.j2"
     dest: "/etc/nginx/sites-available/storage.conf"
     backup: "yes"
   tags: "amsrc-ss-websrv"
 
-- name: "Template gunicorn configuration file"
-  template:
-    src: "etc_archivematica_storage-service.gunicorn-config.py.j2"
-    dest: "/etc/archivematica/storage-service.gunicorn-config.py"
+- name: "Copy gunicorn configuration file"
+  copy:
+    src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/storage-service.gunicorn-config.py"
+    dest: "{{ archivematica_src_ss_gunicorn_config }}"
     backup: "yes"
+    force: "yes"
+    remote_src: "yes"
   tags: "amsrc-ss-websrv"
-
 
 - name: "Config storage service gunicorn upstart (/etc/init)"
   template:
-    src: "etc_init_archivematica-storage-service.conf.j2"
+    src: "etc/upstart/archivematica-storage-service.conf.j2"
     dest: "/etc/init/archivematica-storage-service.conf"
     backup: "yes"
   tags: "amsrc-ss-websrv"
-  when: 
+  when:
     - ansible_service_mgr == "upstart"
 
 - name: "Reload Upstart configuration"
   command: "initctl reload-configuration"
   tags: "amsrc-ss-websrv"
-  when: 
+  when:
     - ansible_service_mgr == "upstart"
 
 
@@ -42,16 +43,16 @@
     dest: "/etc/systemd/system/archivematica-storage-service.service"
     backup: "yes"
   tags: "amsrc-ss-websrv"
-  when: 
+  when:
     - ansible_service_mgr == "systemd"
 
-- name: "Add storage service gunicorn systemd env file (in {{ systemd_environment_path }})"
+- name: "Add storage service gunicorn systemd env file"
   template:
     src: "etc/sysconfig/archivematica-storage-service.j2"
     dest: "{{ systemd_environment_path }}/archivematica-storage-service"
     backup: "yes"
   tags: "amsrc-ss-websrv"
-  when: 
+  when:
     - ansible_service_mgr == "systemd"
 
 - name: "Disable Nginx default server config"
@@ -73,7 +74,7 @@
 # SSL configuration tasks - begin
 - name: "Template nginx sites-available ssl config file"
   template:
-    src: "etc_nginx_sites_storage-ssl-gunicorn.conf.j2"
+    src: "etc/nginx/sites-available/storage-ssl.conf.j2"
     dest: "/etc/nginx/sites-available/storage-ssl.conf"
     backup: "yes"
   when: "archivematica_src_ssl|bool"
@@ -119,4 +120,3 @@
   when:
     - ansible_service_mgr == "systemd"
   tags: "amsrc-ss-websrv"
-

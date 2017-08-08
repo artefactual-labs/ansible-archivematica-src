@@ -1,0 +1,39 @@
+---
+
+- name: "virtualenv | Set `virtualenvs` variable"
+  set_fact:
+    virtualenvs:
+      - name: "Archivematica MCPServer"
+        path: "{{ archivematica_src_am_mcpserver_virtualenv }}"
+        requirements_dir:
+          - "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon"
+          - "{{ archivematica_src_dir }}/archivematica/src/MCPServer"
+          - "{{ archivematica_src_dir }}/archivematica/src/dashboard/src"
+      - name: "Archivematica MCPClient"
+        path: "{{ archivematica_src_am_mcpclient_virtualenv }}"
+        requirements_dir:
+          - "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon"
+          - "{{ archivematica_src_dir }}/archivematica/src/MCPClient"
+          - "{{ archivematica_src_dir }}/archivematica/src/dashboard/src"
+      - name: "Archivematica Dashboard"
+        path: "{{ archivematica_src_am_dashboard_virtualenv }}"
+        requirements_dir:
+          - "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon"
+          - "{{ archivematica_src_dir }}/archivematica/src/dashboard/src"
+
+- name: "virtualenv | Create environment and install a recent version of pip"
+  pip:
+    name: "pip"
+    virtualenv: "{{ item.path }}"
+    state: "latest"
+  with_items: "{{ virtualenvs }}"
+
+- name: "virtualenv | Install requirements"
+  pip:
+    chdir: "{{ item.1 }}"
+    virtualenv: "{{ item.0.path }}"
+    state: "latest"
+    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt' }}"
+  with_subelements:
+    - "{{ virtualenvs }}"
+    - "requirements_dir"

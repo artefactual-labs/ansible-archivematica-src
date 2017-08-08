@@ -2,7 +2,7 @@
 
 upstream archivematica_storage_service_backend {
 
-    server {{ archivematica_src_ss_bind }};
+    server {{ archivematica_src_ss_nginx_bind }};
 
 }
 
@@ -31,7 +31,7 @@ server {
         # dev environment: disable sendfile when serving static files (work around vagrant vboxsf issue)
         sendfile off;
 {% endif %}
-        alias /usr/lib/archivematica/storage-service/assets;
+        alias {{ archviematica_src_ss_app }}/assets;
     }
 
     location / {

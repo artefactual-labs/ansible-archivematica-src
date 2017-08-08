@@ -38,8 +38,8 @@
         name: "{{ item['name'] }}"
         description: "{{ item['description'] }}"
         baseurl: "{{ item['baseurl'] }}"
-        gpgcheck: "{{ item['gpgcheck']}}"
-        enabled: "{{ item['enabled']}}"
+        gpgcheck: "{{ item['gpgcheck'] }}"
+        enabled: "{{ item['enabled'] }}"
       with_items: "{{ MCPServer.osdeps_repos }}"
       when:
         - MCPServer.osdeps_repos
@@ -64,7 +64,7 @@
       yum: 
         name: "{{ item['name'] }}"
         state: "{{ item['state'] }}"
-      with_items: "{{ MCPServer.osdeps_packages_3 }}  "
+      with_items: "{{ MCPServer.osdeps_packages_3 }}"
       when:
         - MCPServer.osdeps_packages_3 is defined and MCPServer.osdeps_packages_3 
 

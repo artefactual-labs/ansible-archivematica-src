@@ -6,16 +6,8 @@
 - name: "Remove SS DB"
   file:
     state: "absent"
-    path: "{{ archivematica_src_ss_env_ss_db_name }}"
+    path: "{{ archivematica_src_ss_environment['SS_DB_NAME'] }}"
   when: "archivematica_src_reset_ss_db|bool"
-
-- name: "Run SS django manage syncdb"
-  django_manage:
-    command: "syncdb"
-    app_path: "/usr/lib/archivematica/storage-service"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
-  environment: "{{ archivematica_src_ss_environment }}"
-  when: "archivematica_src_ss_run_syncdb|bool"
 
 - include: "ss-db-migrate-0_7-to-0_8.yml"
   when: "archivematica_src_ss_migrate_from_v0_7|bool"
@@ -23,13 +15,13 @@
 - name: "Run SS django database migrations"
   django_manage:
     command: "migrate"
-    app_path: "/usr/lib/archivematica/storage-service"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
+    app_path: "{{ archviematica_src_ss_app }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
   environment: "{{ archivematica_src_ss_environment }}"
 
 - name: "Fix DB permissions"
   file:
-    dest: "{{ archivematica_src_ss_env_ss_db_name }}"
+    dest: "{{ archivematica_src_ss_environment['SS_DB_NAME'] }}"
     owner: "archivematica"
     group: "archivematica"
     mode: "u=rwX,g=rwX,o=rX"
@@ -37,6 +29,6 @@
 - name: "Back create API keys for old users"
   django_manage:
     command: "backfill_api_keys"
-    app_path: "/usr/lib/archivematica/storage-service"
-    virtualenv: "/usr/share/python/archivematica-storage-service"
+    app_path: "{{ archviematica_src_ss_app }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
   environment: "{{ archivematica_src_ss_environment }}"

@@ -2,7 +2,7 @@
 
 upstream archivematica_dashboard_backend {
 
-    server {{ archivematica_src_am_dashboard_bind }};
+    server {{ archivematica_src_am_dashboard_nginx_bind }};
 
 }
 
@@ -48,7 +48,7 @@ server {
   client_max_body_size 256M;
 
 {% if archivematica_src_ssl_include_acme_chlg_loc|bool %}
-  # location for acme challenge 
+  # location for acme challenge
   include /etc/nginx/acmetool-location.conf;
 {% endif %}
 
@@ -66,7 +66,7 @@ server {
     # dev environment: disable sendfile when serving static files (work around vagrant vboxsf issue)
     sendfile off;
 {% endif %}
-    alias /usr/share/archivematica/dashboard/media;
+    alias {{ archivematica_src_am_dashboard_app }}/media;
   }
 
 }
