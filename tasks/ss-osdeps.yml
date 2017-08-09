@@ -74,3 +74,28 @@
     - storage_service is defined 
     - storage_service.osdeps_packages_3 is defined
     - storage_service.osdeps_packages_3
+
+- name: "Configure rng-tools"
+  lineinfile:
+    dest: "/etc/default/rng-tools"
+    line: "HRNGDEVICE=/dev/urandom"
+    insertafter: "^#HRNGDEVICE"
+    state: "present"
+  tags: "rng-tools"
+  become: "yes"
+  when:
+    - osdeps
+    - storage_service is defined
+    - storage_service.osdeps_packages is defined
+    - storage_service.osdeps_packages
+    - ansible_distribution == "Ubuntu"
+
+- name: "Start rng-tools"
+  command: "/etc/init.d/rng-tools start"
+  tags: "rng-tools"
+  when:
+    - osdeps
+    - storage_service is defined
+    - storage_service.osdeps_packages is defined
+    - storage_service.osdeps_packages
+    - ansible_distribution == "Ubuntu"
