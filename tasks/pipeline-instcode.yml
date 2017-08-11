@@ -79,6 +79,21 @@
 
 
 #
+# front-end
+#
+
+- name: "Install front-end dependencies"
+  npm:
+    path: "{{ item }}"
+    state: "present"
+  with_items:
+    - "{{ archivematica_src_dir }}/archivematica/src/dashboard/frontend/appraisal-tab"
+    - "{{ archivematica_src_dir }}/archivematica/src/dashboard/frontend/transfer-browser"
+  when:
+    - "ansible_env.USER != 'vagrant'"
+
+
+#
 # collectstatic
 #
 
@@ -89,4 +104,3 @@
     pythonpath: "{{ archivematica_src_am_common_app }}"
     virtualenv: "{{ archivematica_src_am_dashboard_virtualenv }}"
   environment: "{{ archivematica_src_am_dashboard_environment }}"
-  tags: "amsrc-ss-websrv"
