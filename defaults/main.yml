@@ -20,6 +20,7 @@ archivematica_src_environment_type: "production"
 # Repositories
 archivematica_src_am_repo: "https://github.com/artefactual/archivematica.git"
 archivematica_src_ss_repo: "https://github.com/artefactual/archivematica-storage-service.git"
+archivematica_src_automation_tools_repo: "https://github.com/artefactual/automation-tools.git"
 
 # Branches
 archivematica_src_am_version: "qa/1.x"
