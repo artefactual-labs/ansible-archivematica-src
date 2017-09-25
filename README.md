@@ -6,6 +6,7 @@ Archivematica installation from its source code repositories.
 **Table of Contents**
 
 - [Role Variables](#role-variables)
+- [Environment variables](#environment-variables)
 - [Tags](#tags)
 - [Dependencies](#dependencies)
 - [Example Playbooks](#example-playbooks)
@@ -17,6 +18,35 @@ Role Variables
 --------------
 
 See [`defaults/main.yml`](defaults/main.yml) for a comprehensive list of variables.
+
+
+Environment variables
+---------------------
+
+The following are role variables that can be used to pass dictionaries containing environment variables that will be passed to the different Archivematica components:
+
+- [Dashboard](https://github.com/artefactual/archivematica/tree/qa/1.x/src/dashboard/src/settings): `archivematica_src_am_dashboard_environment`
+- [MCPServer](https://github.com/artefactual/archivematica/tree/qa/1.x/src/MCPServer/lib/settings): `archivematica_src_am_mcpserver_environment`
+- [MCPClient](https://github.com/artefactual/archivematica/tree/qa/1.x/src/MCPClient/lib/settings): `archivematica_src_am_mcpclient_environment`
+- [Storage Service](https://github.com/artefactual/archivematica-storage-service/tree/qa/0.x/storage_service/storage_service/settings): `archivematica_src_ss_environment`
+
+The default environment strings can be found in [`defaults/main.yml`](defaults/main.yml).
+
+The authoritative place to find accurate information about the environment variables supported is the settings module of each Archivematica component. Use the links above to find them.
+
+In the following example we're going to redefine the environment variables of the MCPServer.
+
+```yaml
+---
+archivematica_src_am_mcpserver_environment:
+  DJANGO_SETTINGS_MODULE: "settings.common"
+  ARCHIVEMATICA_MCPSERVER_MCPSERVER_SHAREDDIRECTORY: "/tmp/shared-directory"
+  ARCHIVEMATICA_MCPSERVER_CLIENT_DATABASE: "MCP"
+  ARCHIVEMATICA_MCPSERVER_CLIENT_USER: "am17"
+  ARCHIVEMATICA_MCPSERVER_CLIENT_PASSWORD: "aiX5FoGh0Equ"
+  ARCHIVEMATICA_MCPSERVER_CLIENT_HOST: "192.168.10.11"
+  ARCHIVEMATICA_MCPSERVER_CLIENT_PORT: "3306"
+```
 
 
 Tags
