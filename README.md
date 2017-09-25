@@ -51,7 +51,7 @@ Dependencies
 
 This role doesn't have dependencies with other roles.
 
-It was reported that this role doesn't work with Ansible 2.1, please use a recent version of Ansible. See [#108](https://github.com/artefactual-labs/ansible-archivematica-src/pull/134) for more details.
+Please use Ansible 2.3 or newer with this role.
 
 
 Example Playbooks
