@@ -82,7 +82,20 @@
 # front-end
 #
 
+- name: "Change archivematica-source owner to archivematica"
+  file:
+    dest: "{{ archivematica_src_dir }}"
+    state: "directory"
+    owner: "archivematica"
+    group: "archivematica"
+    recurse: "yes"
+  with_items:
+    - "{{ archivematica_src_dir }}/archivematica/src/dashboard/src/media"
+    - "{{ archivematica_src_dir }}/archivematica/src/dashboard/frontend"
+
 - name: "Install front-end dependencies"
+  become: "yes"
+  become_user: "archivematica"
   npm:
     path: "{{ item }}"
     state: "present"
@@ -90,6 +103,9 @@
     - "{{ archivematica_src_dir }}/archivematica/src/dashboard/frontend/appraisal-tab"
     - "{{ archivematica_src_dir }}/archivematica/src/dashboard/frontend/transfer-browser"
   when:
+    # We're not building the front-ends when using Vagrant because the source
+    # code lives in a shared folder (vboxsf), which is problematic and causes
+    # errors. The developer needs to build the front-ends manually for now.
     - "ansible_env.USER != 'vagrant'"
 
 
