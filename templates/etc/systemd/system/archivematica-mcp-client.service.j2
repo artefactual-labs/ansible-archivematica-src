@@ -9,7 +9,7 @@ Type=simple
 User=archivematica
 Group=archivematica
 EnvironmentFile=-{{ systemd_environment_path }}/archivematica-mcp-client
-ExecStart={{ archivematica_src_am_mcpserver_virtualenv }}/bin/python {{ archivematica_src_am_mcpclient_app }}/archivematicaClient.py
+ExecStart={{ archivematica_src_am_mcpclient_virtualenv }}/bin/python {{ archivematica_src_am_mcpclient_app }}/archivematicaClient.py
 
 [Install]
 WantedBy=multi-user.target
