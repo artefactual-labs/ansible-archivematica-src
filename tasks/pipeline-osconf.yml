@@ -4,7 +4,7 @@
 #   3- OS configuration (user/directory/file creation/permissions/ownership )
 ###########################################################
 
-- name: "Create subdirectories for source files"
+- name: "Create subdirectories for am needed files"
   file:
     dest: "{{ item }}"
     state: "directory"
@@ -12,6 +12,8 @@
     - "/usr/lib/archivematica"
     - "/usr/share/archivematica/archivematicaCommon"
     - "/usr/share/archivematica"
+    - "/etc/archivematica"
+    - "/var/lib/archivematica"
 
 #
 # Shared directory
