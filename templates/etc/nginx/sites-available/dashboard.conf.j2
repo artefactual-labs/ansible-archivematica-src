@@ -24,12 +24,4 @@ server {
     proxy_pass http://archivematica_dashboard_backend;
   }
 
-  location /media {
-{% if is_dev|bool %}
-    # dev environment: disable sendfile when serving static files (work around vagrant vboxsf issue)
-    sendfile off;
-{% endif %}
-    alias {{ archivematica_src_am_dashboard_app }}/media;
-  }
-
 }

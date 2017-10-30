@@ -13,14 +13,6 @@ server {
     # Adjust to taste
     client_max_body_size 256M;
 
-    location /static {
-{% if is_dev|bool %}
-       # dev environment: disable sendfile when serving static files (work around vagrant vboxsf issue)
-       sendfile off;
-{% endif %}
-        alias {{ archviematica_src_ss_app }}/assets;
-    }
-
     location / {
     proxy_set_header Host $http_host;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
