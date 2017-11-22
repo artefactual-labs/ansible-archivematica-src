@@ -88,14 +88,30 @@
 #     state: "latest"
 #   tags: "amsrc-ss-pydep"
 
-- name: "Create virtualenv for archivematica-storage-service, pip install requirements"
+- name: "Install pip requirements for production"
   pip:
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt' }}"
+    requirements: "{{ item }}"
     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
     extra_args: "{{ ss_pip_install_extra_args }}"
     state: "latest"
   tags: "amsrc-ss-pydep"
+  when: "is_prod"
+  with_items:
+    - "requirements/production.txt"
+
+- name: "Install pip requirements for development"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
+    requirements: "{{ item }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+    extra_args: "{{ ss_pip_install_extra_args }}"
+    state: "latest"
+  tags: "amsrc-ss-pydep"
+  when: "is_dev"
+  with_items:
+    - "requirements/local.txt"
+    - "requirements/test.txt"
 
 ###########################################################
 #   3- OS configuration (user/directory/file creation/permissions/ownership)
