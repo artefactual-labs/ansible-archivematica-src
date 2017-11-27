@@ -79,7 +79,12 @@ Note that if something is disabled with the [role variables](#role-variables), i
 Dependencies
 ------------
 
-This role doesn't have dependencies with other roles.
+Role dependencies are listed in `meta/main.yml`. 
+
+Notes regarding role dependencies:
+
+  - `geerlingguy.nodejs`: if having an error on task `Create npm global directory`, please set the `nodejs_install_npm_user` to  `{{ ansible_user_id }}` as a workaround (details in https://github.com/artefactual-labs/ansible-archivematica-src/issues/151)
+
 
 Please use Ansible 2.3 or newer with this role.
 
