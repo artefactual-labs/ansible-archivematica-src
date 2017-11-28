@@ -127,6 +127,8 @@
     dest: "~/archivematica-sampledata"
     update: "no"
     depth: 1
+  tags:
+    - "amsrc-sampledata"
   when: "archivematica_src_install_sample_data|bool"
   become: "no"
 

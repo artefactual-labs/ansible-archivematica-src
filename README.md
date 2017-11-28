@@ -74,6 +74,7 @@ Note that if something is disabled with the [role variables](#role-variables), i
     - `amsrc-pipeline-websrv`: Configure webserver
 - `amsrc-devtools`: Archivematica devtools install
 - `amsrc-automationtools`: Automation tools install
+- `amsrc-sampledata`: Archivematica sample data
 
 
 Dependencies
