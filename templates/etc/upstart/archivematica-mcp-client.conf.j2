@@ -5,7 +5,8 @@ author "Artefactual Systems"
 
 start on (net-device-up
           and local-filesystems
-          and runlevel [2345])
+          and runlevel [2345]
+          {% if is_dev %} and vagrant-mounted {% endif %} )
 stop on runlevel [016]
 
 env PATH={{ archivematica_src_am_mcpclient_virtualenv }}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
