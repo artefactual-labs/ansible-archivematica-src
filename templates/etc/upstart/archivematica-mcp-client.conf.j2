@@ -23,6 +23,7 @@ script
     # Is this still necessary?
     test -f /etc/default/locale && . /etc/default/locale || true
 
+    export $(grep -v ^# /etc/default/archivematica-mcp-client)
     {{ archivematica_src_am_mcpclient_virtualenv }}/bin/python {{ archivematica_src_am_mcpclient_app }}/archivematicaClient.py
 
 end script

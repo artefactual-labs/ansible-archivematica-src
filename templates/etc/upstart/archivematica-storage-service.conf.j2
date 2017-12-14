@@ -6,12 +6,11 @@ author "Artefactual Systems"
 start on (runlevel [2345] and filesystem)
 stop on runlevel [016]
 
-{% for key, value in archivematica_src_ss_environment.iteritems() %}
-env {{ key }}={{ value }}
-{% endfor %}
-
 env LANG="en_US.UTF-8"
 env LC_ALL="en_US.UTF-8"
 env LC_LANG="en_US.UTF-8"
 
-exec {{ archivematica_src_ss_virtualenv }}/bin/gunicorn --config {{ archivematica_src_ss_gunicorn_config }} storage_service.wsgi:application
+script
+  export $(grep -v ^# /etc/default/archivematica-storage-service)
+  exec {{ archivematica_src_ss_virtualenv }}/bin/gunicorn --config {{ archivematica_src_ss_gunicorn_config }} storage_service.wsgi:application
+end script

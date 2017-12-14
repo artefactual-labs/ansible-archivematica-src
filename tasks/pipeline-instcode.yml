@@ -28,6 +28,17 @@
       dest: "{{ archivematica_src_am_mcpclient_app }}"
 
 
+- name: "Configure environment vars"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    backup: "yes"
+  with_items:
+    - src: "etc/sysconfig/archivematica-mcp-server.j2"
+      dest: "{{ systemd_environment_path }}/archivematica-mcp-server"
+    - src: "etc/sysconfig/archivematica-mcp-client.j2"
+      dest: "{{ systemd_environment_path }}/archivematica-mcp-client"
+
 #
 # upstart
 #
@@ -66,10 +77,6 @@
       dest: "/etc/systemd/system/archivematica-mcp-server.service"
     - src: "etc/systemd/system/archivematica-mcp-client.service.j2"
       dest: "/etc/systemd/system/archivematica-mcp-client.service"
-    - src: "etc/sysconfig/archivematica-mcp-server.j2"
-      dest: "{{ systemd_environment_path }}/archivematica-mcp-server"
-    - src: "etc/sysconfig/archivematica-mcp-client.j2"
-      dest: "{{ systemd_environment_path }}/archivematica-mcp-client"
 
 - name: "Reload systemd config"
   command: "systemctl daemon-reload"

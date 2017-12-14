@@ -25,6 +25,15 @@
   set_fact:
     dashboard_gunicorn_path: "{{ archivematica_src_am_dashboard_virtualenv }}/bin/gunicorn"
 
+- name: "Add dashboard environment vars"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    backup: "yes"
+  with_items:
+    - src: "etc/sysconfig/archivematica-dashboard.j2"
+      dest: "{{ systemd_environment_path }}/archivematica-dashboard"
+
 - name: "Config dashboard gunicorn upstart (/etc/init)"
   template:
     src: "etc/upstart/archivematica-dashboard.conf.j2"
@@ -46,8 +55,6 @@
   with_items:
     - src: "etc/systemd/system/archivematica-dashboard.service.j2"
       dest: "/etc/systemd/system/archivematica-dashboard.service"
-    - src: "etc/sysconfig/archivematica-dashboard.j2"
-      dest: "{{ systemd_environment_path }}/archivematica-dashboard"
   when:
     - ansible_service_mgr == "systemd"
 

@@ -52,8 +52,6 @@
     dest: "{{ systemd_environment_path }}/archivematica-storage-service"
     backup: "yes"
   tags: "amsrc-ss-websrv"
-  when:
-    - ansible_service_mgr == "systemd"
 
 - name: "Disable Nginx default server config"
   file:

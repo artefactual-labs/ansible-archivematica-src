@@ -41,6 +41,9 @@ end script
 
 script
 
+    export $(grep -v ^# /etc/default/archivematica-mcp-server)
+
+    # Run MCPServer
     {{ archivematica_src_am_mcpserver_virtualenv }}/bin/python {{ archivematica_src_am_mcpserver_app }}/archivematicaMCP.py
 
 end script
