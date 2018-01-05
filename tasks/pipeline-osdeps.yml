@@ -120,3 +120,16 @@
   when:
     - ansible_service_mgr == "systemd"
 
+- name: "Create symlinks for hashdeep (Ubuntu 16.04)"
+  file:
+    src: "/usr/bin/hashdeep"
+    dest: "/usr/bin/{{ item }}"
+    state: "link"
+  with_items:
+    - md5deep
+    - sha1deep
+    - sha256deep 
+    - tigerdeep
+    - whirlpooldeep
+  when:
+    - ansible_distribution_version == "16.04"
