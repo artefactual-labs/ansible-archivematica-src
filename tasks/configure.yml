@@ -1,0 +1,68 @@
+---
+# ss-configure
+
+# Create api-key if not defined
+- set_fact: archivematica_src_configure_ss_api_key={{ 999999999999999999999 | random | to_uuid | hash('md5') }}
+  when: "archivematica_src_configure_ss_api_key is undefined and archivematica_src_configure_ss|bool"
+
+# Delete default SS superuser test
+- name: "Delete default SS superuser"
+  become: "yes"
+  shell: |
+    source {{ archivematica_src_ss_virtualenv }}/bin/activate;
+    cd {{ archviematica_src_ss_app }}
+    export SS_DB_NAME={{ archivematica_src_ss_environment['SS_DB_NAME'] }}
+    export DJANGO_ALLOWED_HOSTS=\"{{ archivematica_src_ss_environment['DJANGO_ALLOWED_HOSTS'] }}\"
+    export SS_DB_PASSWORD={{ archivematica_src_ss_environment['SS_DB_PASSWORD'] }}
+    export SS_DB_USER={{ archivematica_src_ss_environment['SS_DB_USER'] }}
+    export SS_DB_HOST={{ archivematica_src_ss_environment['SS_DB_HOST'] }}
+    export DJANGO_SETTINGS_MODULE={{ archivematica_src_ss_environment['DJANGO_SETTINGS_MODULE'] }}
+    export DJANGO_SECRET_KEY={{ archivematica_src_ss_environment['DJANGO_SECRET_KEY'] }}
+    export SS_GUNICORN_BIND={{ archivematica_src_ss_environment['SS_GUNICORN_BIND'] }}
+    echo "from django.contrib.auth.models import User;User.objects.get(username='test').delete()" | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py shell
+  args:
+    chdir: "{{ archviematica_src_ss_app }}"
+    executable: /bin/bash
+  when: "archivematica_src_configure_ss|bool"
+
+#source {{ archivematica_src_ss_virtualenv }}/bin/activate;
+#cd {{ archviematica_src_ss_app }}
+#    echo "from django.contrib.auth.models import User;User.objects.get(username='test').delete()" | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py shell  
+
+- name: "Create SS superuser"
+  django_manage:
+    command: > 
+      create_user 
+      --username={{ archivematica_src_configure_ss_user }}
+      --password={{ archivematica_src_configure_ss_password }} 
+      --email={{ archivematica_src_configure_ss_email }} 
+      --api-key={{ archivematica_src_configure_ss_api_key  }} 
+      --superuser
+    app_path: "{{ archviematica_src_ss_app }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+  environment: "{{ archivematica_src_ss_environment }}"
+  when: "archivematica_src_configure_ss|bool"
+
+# dashboard-configure
+
+# Create api-key if not defined
+- set_fact: archivematica_src_configure_am_api_key={{ 999999999999999999998 | random | to_uuid | hash('md5') }}
+  when: archivematica_src_configure_am_api_key is undefined
+
+- name: "Create Dashboard user and register pipeline on SS"
+  django_manage:
+    command: >
+      install --username={{ archivematica_src_configure_am_user }}
+               --password={{ archivematica_src_configure_am_password }}
+               --email={{ archivematica_src_configure_am_email }}
+               --org-name={{ archivematica_src_configure_am_org_name }}
+               --org-id={{ archivematica_src_configure_am_org_id }}
+               --api-key={{ archivematica_src_configure_am_api_key }}
+               --ss-url={{ archivematica_src_configure_ss_url }}
+               --ss-user={{ archivematica_src_configure_ss_user }}
+               --ss-api-key={{ archivematica_src_configure_ss_api_key }}
+               --whitelist={{archivematica_src_configure_am_whitelist}}
+    app_path: "{{ archivematica_src_am_dashboard_app }}"
+    pythonpath: "{{ archivematica_src_am_common_app }}"
+    virtualenv: "{{ archivematica_src_am_dashboard_virtualenv }}"
+  when: "archivematica_src_configure_dashboard|bool"
