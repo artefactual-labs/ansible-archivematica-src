@@ -74,6 +74,9 @@ Note that if something is disabled with the [role variables](#role-variables), i
     - `amsrc-pipeline-websrv`: Configure webserver
 - `amsrc-devtools`: Archivematica devtools install
 - `amsrc-automationtools`: Automation tools install
+- `amsrc-configure-ss-dashboard`: Create dashboard admin & create SS superuser & register pipeline on SS
+- `amsrc-configure-dashboard`: Create dashboard admin & register pipeline on SS
+- `amsrc-configure-ss`: Create SS superuser
 
 
 Dependencies

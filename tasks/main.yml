@@ -159,3 +159,23 @@
   tags:
     - "amsrc-acceptancetests"
   when: "archivematica_src_install_acceptance_tests|bool"
+
+#
+# Configure SS
+#
+
+- include: "ss-configure.yml"
+  tags:
+    - "amsrc-configure-ss-dashboard"
+    - "amsrc-configure-ss"
+  when: "archivematica_src_configure_ss|bool or archivematica_src_configure_ss_dashboard|bool"
+
+#
+# Configure pipeline
+#
+
+- include: "pipeline-configure.yml"
+  tags:
+    - "amsrc-configure-ss-dashboard"
+    - "amsrc-configure-dashboard"
+  when: "archivematica_src_configure_dashboard|bool or archivematica_src_configure_ss_dashboard|bool"
