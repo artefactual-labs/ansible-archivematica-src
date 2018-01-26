@@ -103,9 +103,9 @@
 - name: "Install front-end dependencies"
   become: "yes"
   become_user: "archivematica"
-  npm:
-    path: "{{ item }}"
-    state: "present"
+  command: npm install
+  args:
+    chdir: "{{ item }}"
   with_items:
     - "{{ archivematica_src_dir }}/archivematica/src/dashboard/frontend/appraisal-tab"
     - "{{ archivematica_src_dir }}/archivematica/src/dashboard/frontend/transfer-browser"
