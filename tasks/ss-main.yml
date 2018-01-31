@@ -143,6 +143,41 @@
     - "/etc/archivematica"
   tags: "amsrc-ss-osconf"
 
+- name: "Create archivematica-storage-service log directories"
+  file:
+    dest: "{{ archivematica_src_ss_logdir }}"
+    state: "directory"
+    owner: "archivematica"
+    group: "archivematica"
+    mode: "g+s"
+  tags: "amsrc-ss-osconf"
+  when: "archivematica_src_logging_backward_compatible|bool"
+
+- name: "Touch SS log files"
+  file:
+    path: "{{ archivematica_src_ss_logdir }}/{{ item }}"
+    owner: "archivematica"
+    group: "archivematica"
+    state: "touch"
+  with_items:
+    - "storage_service.log"
+    - "storage_service_debug.log"
+  tags: "amsrc-ss-osconf"
+  when: "archivematica_src_logging_backward_compatible|bool"
+
+- name: "Config SS logging"
+  template:
+    src: "etc/archivematica/storageService.logging.json.j2"
+    dest: "/etc/archivematica/storageService.logging.json"
+    backup: "yes"
+  tags: "amsrc-ss-osconf"
+  when: "archivematica_src_logging_backward_compatible|bool"
+
+- name: "Remove SS backward-compatible logging"
+  file:
+    path: "/etc/archivematica/storageService.logging.json"
+    state: "absent"
+  when: "not archivematica_src_logging_backward_compatible|bool"
 
 ###########################################################
 #   4- SS code install
