@@ -85,6 +85,25 @@ archivematica_src_ss_environment:
 
 
 #
+# Logging settings
+#
+
+archivematica_src_logging_backward_compatible: "yes"
+archivematica_src_dashboard_logdir: "/var/log/archivematica/dashboard"
+archivematica_src_mcpclient_logdir: "/var/log/archivematica/MCPClient"
+archivematica_src_mcpserver_logdir: "/var/log/archivematica/MCPServer"
+archivematica_src_ss_logdir: "/var/log/archivematica/storage-service"
+archivematica_src_dashboard_log_debug_maxbytes: "104857600"   # 100 MBytes
+archivematica_src_mcpclient_log_debug_maxbytes: "4194304"     #   4 Mbytes
+archivematica_src_mcpserver_log_debug_maxbytes: "4194304"     #   4 Mbytes
+archivematica_src_ss_log_debug_maxbytes: "104857600"          # 100 MBytes
+archivematica_src_dashboard_log_maxbytes: "20971520"          #  20 Mbytes
+archivematica_src_mcpclient_log_maxbytes: "4194304"           #   4 Mbytes
+archivematica_src_mcpserver_log_maxbytes: "4194304"           #   4 Mbytes
+archivematica_src_ss_log_maxbytes: "20971520"                 #  20 Mbytes
+
+
+#
 # Nginx
 #
 
