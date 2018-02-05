@@ -7,6 +7,7 @@ Archivematica installation from its source code repositories.
 
 - [Role Variables](#role-variables)
 - [Environment variables](#environment-variables)
+- [Backward-compatible logging](#backward-compatible-logging)
 - [Tags](#tags)
 - [Dependencies](#dependencies)
 - [Example Playbooks](#example-playbooks)
@@ -47,6 +48,13 @@ archivematica_src_am_mcpserver_environment:
   ARCHIVEMATICA_MCPSERVER_CLIENT_HOST: "192.168.10.11"
   ARCHIVEMATICA_MCPSERVER_CLIENT_PORT: "3306"
 ```
+
+Backward-compatible logging
+---------------------------
+
+The default Archivematica 1.7 logging sends the events to the standard streams, which is more convenient when Archivematica is running in a cluster. In order to use the backward-compatible logging, the boolean environment variable `archivematica_src_logging_backward_compatible` has to be enabled, which is the default behaviour.
+
+The log file sizes and the directories to store the logs are configurable for each service. The default values can be found in [`defaults/main.yml`](defaults/main.yml).
 
 
 Tags
