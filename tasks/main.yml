@@ -30,6 +30,7 @@
     - "amsrc-pipeline"
     - "amsrc-devtools"
     - "amsrc-automationtools"
+    - "amsrc-fixity"
 
 
 #
@@ -163,3 +164,13 @@
   tags:
     - "amsrc-acceptancetests"
   when: "archivematica_src_install_acceptance_tests|bool"
+
+
+#
+# fixity
+#
+
+- include: "fixity.yml"
+  tags:
+    - "amsrc-fixity"
+  when: "archivematica_src_install_fixity|bool"

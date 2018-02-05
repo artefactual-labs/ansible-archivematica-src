@@ -13,6 +13,7 @@ archivematica_src_install_sample_data: "yes"
 archivematica_src_install_devtools: "no"
 archivematica_src_install_automationtools: "no"
 archivematica_src_install_acceptance_tests: "no"
+archivematica_src_install_fixity: "no"
 
 # Define the type of environment: "production" or "development". The latter will deploy some extra stuff to make the development workflow easier.
 archivematica_src_environment_type: "production"
@@ -135,3 +136,10 @@ archivematica_src_automationtools_transfers_pidfile: "/var/archivematica/automat
 # Acceptance tests
 archivematica_src_acceptance_tests_browser_list: [ "Chrome" , "Firefox" ]
 archivematica_src_acceptance_tests_chromedriver_version: "2.29"
+
+# Fixity
+archivematica_src_fixity_version: "master"
+archivematica_src_fixity_ss_url: "http://localhost:8000"
+archivematica_src_fixity_ss_user: "test"
+archivematica_src_fixity_ss_apikey: "XXXX"
+

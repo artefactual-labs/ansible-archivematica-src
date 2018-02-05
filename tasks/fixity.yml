@@ -1,0 +1,31 @@
+
+- name: "Download code"
+  git:
+    repo: "https://github.com/artefactual/fixity.git"
+    dest: "{{ archivematica_src_dir }}/fixity"
+    version: "{{ archivematica_src_fixity_version }}"
+    force: "yes"
+
+- name: "Install pip dependencies in virtualenv"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/fixity"
+    requirements: "requirements.txt"
+    virtualenv: "/usr/share/python/fixity"
+    state: latest
+
+- name: "Run setup.py"
+  shell: "/usr/share/python/fixity/bin/python setup.py install"
+  args:
+    chdir: "{{ archivematica_src_dir }}/fixity"
+ 
+- name: "Create symbolic link"
+  file:
+     src: "/usr/share/python/fixity/bin/fixity"
+     dest: "/usr/local/bin/fixity"
+     state: "link"
+     force: "yes"
+
+- name: "Create config file"
+  template:
+     src: "etc/sysconfig/fixity.j2"
+     dest: "{{ systemd_environment_path }}/fixity"
