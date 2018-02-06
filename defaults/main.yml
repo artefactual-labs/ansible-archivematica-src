@@ -14,6 +14,7 @@ archivematica_src_install_devtools: "no"
 archivematica_src_install_automationtools: "no"
 archivematica_src_install_acceptance_tests: "no"
 archivematica_src_install_fixity: "no"
+archivematica_src_search_enabled: "yes"
 
 # Define the type of environment: "production" or "development". The latter will deploy some extra stuff to make the development workflow easier.
 archivematica_src_environment_type: "production"
@@ -57,6 +58,7 @@ archivematica_src_am_dashboard_environment:
   DJANGO_SETTINGS_MODULE: "settings.production"
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_ALLOWED_HOSTS: "*"
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY: "CHANGE_ME_WITH_A_SECRET_KEY"
+  ARCHIVEMATICA_DASHBOARD_DASHBOARD_SEARCH_ENABLED: "{{ archivematica_src_search_enabled }}"
   # Not mandatory:
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER: "127.0.0.1:9200"  # Needed by pipeline-es.yml
   AM_GUNICORN_BIND: "127.0.0.1:8002"
@@ -65,11 +67,13 @@ archivematica_src_am_dashboard_environment:
 # This list only includes mandatory strings.
 archivematica_src_am_mcpserver_environment:
   DJANGO_SETTINGS_MODULE: "settings.common"
+  ARCHIVEMATICA_MCPSERVER_MCPSERVER_SEARCH_ENABLED: "{{ archivematica_src_search_enabled }}"
 
 # Archivematica MCPClient
 # This list only includes mandatory strings.
 archivematica_src_am_mcpclient_environment:
   DJANGO_SETTINGS_MODULE: "settings.common"
+  ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_SEARCH_ENABLED: "{{ archivematica_src_search_enabled }}"
 
 # Archivematica Storage Service
 # This list only includes mandatory strings.

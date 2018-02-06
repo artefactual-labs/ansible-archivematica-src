@@ -56,6 +56,10 @@ The default Archivematica 1.7 logging sends the events to the standard streams, 
 
 The log file sizes and the directories to store the logs are configurable for each service. The default values can be found in [`defaults/main.yml`](defaults/main.yml).
 
+Disable ElasticSearch use
+-------------------------
+
+The default Archivematica install relies on ElasticSearch for different features (Archival storage, Backlog and Appraisal tabs). If you need to disable them, the boolean environment variable `archivematica_src_search_enabled` has to be set to `False`
 
 Tags
 ----
