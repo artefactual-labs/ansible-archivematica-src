@@ -125,11 +125,15 @@
   git:
     repo: "https://github.com/artefactual/archivematica-sampledata.git"
     dest: "~/archivematica-sampledata"
-    update: "no"
+    update: "yes"
     depth: 1
   when: "archivematica_src_install_sample_data|bool"
   become: "no"
 
+- name: "Generate special sampledata transfers"
+  command: "~/archivematica-sampledata/createtransfers.py create-variously-encoded-files"
+  when: "archivematica_src_install_sample_data|bool"
+  become: "no"
 
 #
 # archivematica-devtools
