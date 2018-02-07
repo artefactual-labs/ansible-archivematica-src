@@ -26,14 +26,14 @@ Environment variables
 
 The following are role variables that can be used to pass dictionaries containing environment variables that will be passed to the different Archivematica components:
 
-- [Dashboard](https://github.com/artefactual/archivematica/tree/qa/1.x/src/dashboard/src/settings): `archivematica_src_am_dashboard_environment`
-- [MCPServer](https://github.com/artefactual/archivematica/tree/qa/1.x/src/MCPServer/lib/settings): `archivematica_src_am_mcpserver_environment`
-- [MCPClient](https://github.com/artefactual/archivematica/tree/qa/1.x/src/MCPClient/lib/settings): `archivematica_src_am_mcpclient_environment`
-- [Storage Service](https://github.com/artefactual/archivematica-storage-service/tree/qa/0.x/storage_service/storage_service/settings): `archivematica_src_ss_environment`
+- [Dashboard](https://github.com/artefactual/archivematica/tree/stable/1.7.x/src/dashboard/install/README.md): `archivematica_src_am_dashboard_environment`
+- [MCPServer](https://github.com/artefactual/archivematica/tree/stable/1.7.x/src/MCPServer/install/README.md): `archivematica_src_am_mcpserver_environment`
+- [MCPClient](https://github.com/artefactual/archivematica/tree/stable/1.7.x/src/MCPClient/install/README.md): `archivematica_src_am_mcpclient_environment`
+- [Storage Service](https://github.com/artefactual/archivematica-storage-service/tree/stable/0.11.x/install/README.md): `archivematica_src_ss_environment`
 
 The default environment strings can be found in [`defaults/main.yml`](defaults/main.yml).
 
-The authoritative place to find accurate information about the environment variables supported is the settings module of each Archivematica component. Use the links above to find them.
+The authoritative place to find accurate information about the environment variables supported is the install/README.md file for each Archivematica component. Use the links above to find them.
 
 In the following example we're going to redefine the environment variables of the MCPServer.
 
@@ -56,10 +56,10 @@ The default Archivematica 1.7 logging sends the events to the standard streams, 
 
 The log file sizes and the directories to store the logs are configurable for each service. The default values can be found in [`defaults/main.yml`](defaults/main.yml).
 
-Disable ElasticSearch use
+Disable Elasticsearch use
 -------------------------
 
-The default Archivematica install relies on ElasticSearch for different features (Archival storage, Backlog and Appraisal tabs). If you need to disable them, the boolean environment variable `archivematica_src_search_enabled` has to be set to `False`
+The default Archivematica install relies on ElasticSearch for different features (Archival storage, Backlog and Appraisal tabs). If you need to disable them, the role variable `archivematica_src_search_enabled` has to be set to `False`
 
 Tags
 ----
