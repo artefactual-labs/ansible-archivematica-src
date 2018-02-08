@@ -113,7 +113,7 @@
     # We're not building the front-ends when using Vagrant because the source
     # code lives in a shared folder (vboxsf), which is problematic and causes
     # errors. The developer needs to build the front-ends manually for now.
-    - "ansible_env.USER != 'vagrant'"
+    - is_prod or (is_dev and "ansible_env.USER != 'vagrant'")
 
 
 #
