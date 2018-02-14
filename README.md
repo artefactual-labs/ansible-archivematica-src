@@ -59,7 +59,7 @@ The log file sizes and the directories to store the logs are configurable for ea
 Disable Elasticsearch use
 -------------------------
 
-The default Archivematica install relies on ElasticSearch for different features (Archival storage, Backlog and Appraisal tabs). If you need to disable them, the role variable `archivematica_src_search_enabled` has to be set to `False`
+The default Archivematica install relies on Elasticsearch for different features (Archival storage, Backlog and Appraisal tabs). If you need to disable them, the role variable `archivematica_src_search_enabled` has to be set to `False`
 
 Tags
 ----
