@@ -19,6 +19,10 @@
       when:
         - "MCPClient.osdeps_repos"
 
+    - name: "Update APT package manager repositories cache"
+      apt:
+        update_cache: "yes"
+
     - name: "Install MCPClient ext. package deps."
       apt:
         pkg: "{{ item['name'] }}"
