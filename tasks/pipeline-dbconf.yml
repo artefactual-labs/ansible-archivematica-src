@@ -6,7 +6,7 @@
 
 - name: "Drop MCP database"
   mysql_db:
-    name: "MCP"
+    name: "{{ archivematica_src_am_db_name }}"
     state: "absent"
   when: "archivematica_src_reset_mcpdb|bool or archivematica_src_reset_am_all|bool"
 
@@ -20,7 +20,7 @@
 
 - name: "Create MySQL database"
   mysql_db:
-    name: "MCP"
+    name: "{{ archivematica_src_am_db_name }}"
     state: "present"
     encoding: "utf8"
     collation: "utf8_unicode_ci"
@@ -30,9 +30,9 @@
 
 - name: "Create MySQL user"
   mysql_user:
-    name: "archivematica"
-    password: "demo"
-    priv: "MCP.*:ALL"
+    name: "{{ archivematica_src_am_db_user }}"
+    password: "{{ archivematica_src_am_db_password }}"
+    priv: "{{ archivematica_src_am_db_name }}.*:ALL"
     state: "present"
   when: "archivematica_src_am_create_dbuser|bool"
 

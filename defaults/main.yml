@@ -44,6 +44,10 @@ archivematica_src_ss_migrate_from_v0_7: "false"  # Migrate AM database from v1.4
 archivematica_src_am_create_db: "true"           # Create database (uses root's credentials in ~/.my.cnf)
 archivematica_src_am_create_dbuser: "true"       # Create user database (uses root's credentials in ~/.my.cnf)
 archivematica_src_am_wait_local_mysql: "true"    # MCPServer upstart service to wait until MySQL is locally available
+archivematica_src_am_db_host: "localhost"        # Archivematica database host
+archivematica_src_am_db_name: "MCP"              # Archivematica database name
+archivematica_src_am_db_user: "archivematica"    # Archivematica database user
+archivematica_src_am_db_password: "demo"         # Archivematica database password
 
 # Please note that a playbook using `archivematica_src_am_migrate_from_v1_4` or `archivematica_src_ss_migrate_from_v0_7`  is not idempotent, and it will throw an error if run twice. The two migrate related variables should be removed after a successful migration (an alternative could be to specify the `archivematica_src_am_migrate_from_v1_4` and `archivematica_src_ss_migrate_from_v0_7` at run time using `--extra-vars` instead of putting the variables in the playbook).
 
@@ -61,6 +65,10 @@ archivematica_src_am_dashboard_environment:
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_ALLOWED_HOSTS: "*"
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY: "CHANGE_ME_WITH_A_SECRET_KEY"
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_SEARCH_ENABLED: "{{ archivematica_src_search_enabled }}"
+  ARCHIVEMATICA_DASHBOARD_CLIENT_HOST: "{{ archivematica_src_am_db_host }}"
+  ARCHIVEMATICA_DASHBOARD_CLIENT_DATABASE: "{{ archivematica_src_am_db_name }}"
+  ARCHIVEMATICA_DASHBOARD_CLIENT_USER: "{{ archivematica_src_am_db_user }}"
+  ARCHIVEMATICA_DASHBOARD_CLIENT_PASSWORD: "{{ archivematica_src_am_db_password }}"
   # Not mandatory:
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER: "127.0.0.1:9200"  # Needed by pipeline-es.yml
   AM_GUNICORN_BIND: "127.0.0.1:8002"
@@ -70,12 +78,20 @@ archivematica_src_am_dashboard_environment:
 # This list only includes mandatory strings.
 archivematica_src_am_mcpserver_environment:
   DJANGO_SETTINGS_MODULE: "settings.common"
+  ARCHIVEMATICA_MCPSERVER_CLIENT_HOST: "{{ archivematica_src_am_db_host }}"
+  ARCHIVEMATICA_MCPSERVER_CLIENT_DATABASE: "{{ archivematica_src_am_db_name }}"
+  ARCHIVEMATICA_MCPSERVER_CLIENT_USER: "{{ archivematica_src_am_db_user }}"
+  ARCHIVEMATICA_MCPSERVER_CLIENT_PASSWORD: "{{ archivematica_src_am_db_password }}"
   ARCHIVEMATICA_MCPSERVER_MCPSERVER_SEARCH_ENABLED: "{{ archivematica_src_search_enabled }}"
 
 # Archivematica MCPClient
 # This list only includes mandatory strings.
 archivematica_src_am_mcpclient_environment:
   DJANGO_SETTINGS_MODULE: "settings.common"
+  ARCHIVEMATICA_MCPCLIENT_CLIENT_HOST: "{{ archivematica_src_am_db_host }}"
+  ARCHIVEMATICA_MCPCLIENT_CLIENT_DATABASE: "{{ archivematica_src_am_db_name }}"
+  ARCHIVEMATICA_MCPCLIENT_CLIENT_USER: "{{ archivematica_src_am_db_user }}"
+  ARCHIVEMATICA_MCPCLIENT_CLIENT_PASSWORD: "{{ archivematica_src_am_db_password }}"
   ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_SEARCH_ENABLED: "{{ archivematica_src_search_enabled }}"
   REQUEST_CA_BUNDLE: "{{ archivematica_src_ca_custom_bundle }}"
 
