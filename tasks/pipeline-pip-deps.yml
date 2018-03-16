@@ -1,4 +1,13 @@
 ---
+# this task is needed to avoid problems when upgrading python package
+- name: "virtualenv | Remove old virtualenv default dirs"
+  file:
+    state: absent
+    path: "/usr/share/python/{{ item }}/"
+  with_items:
+    - "archivematica-dashboard"
+    - "archivematica-mcp-client"
+    - "archivematica-mcp-server"
 
 - name: "virtualenv | Set `virtualenvs` variable"
   set_fact:
