@@ -56,7 +56,11 @@
   when: "ss_lib_dir_check.stat.isdir is defined and ss_lib_dir_check.stat.isdir"
   tags: "amsrc-ss-pydep"
 
-
+# this task is needed to avoid problems when upgrading python package
+- name: "Remove old SS virtualenv default dir"
+  file:
+    state: absent
+    path: "/usr/share/python/archivematica-storage-service/"
 
 # a separate task to create the virtualenv before install requirements
 # is required to avoid errors
