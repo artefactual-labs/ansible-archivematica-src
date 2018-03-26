@@ -3,6 +3,10 @@
 ###########################################################
 #   5- Database reset (when flag enabled)
 ###########################################################
+# Note that when we are using mysql_db and mysql_user we are assuming that the
+# root user has a local ~/.my.cnf configuration file with the credentials in it
+# for the MySQL user.
+
 
 - name: "Drop MCP database"
   mysql_db:
@@ -10,31 +14,18 @@
     state: "absent"
   when: "archivematica_src_reset_mcpdb|bool or archivematica_src_reset_am_all|bool"
 
-###########################################################
-#   5- Database config
-###########################################################
-
-# Note that when we are using mysql_db and mysql_user we are assuming that the
-# root user has a local ~/.my.cnf configuration file with the credentials in it
-# for the MySQL user.
-
 - name: "Create MySQL database"
   mysql_db:
     name: "{{ archivematica_src_am_db_name }}"
     state: "present"
     encoding: "utf8"
     collation: "utf8_unicode_ci"
-  when: "archivematica_src_am_create_db|bool"
+  when: "archivematica_src_reset_mcpdb|bool or archivematica_src_reset_am_all|bool"
 
-# TODO: need to change the mysql password for user archivematica
 
-- name: "Create MySQL user"
-  mysql_user:
-    name: "{{ archivematica_src_am_db_user }}"
-    password: "{{ archivematica_src_am_db_password }}"
-    priv: "{{ archivematica_src_am_db_name }}.*:ALL"
-    state: "present"
-  when: "archivematica_src_am_create_dbuser|bool"
+###########################################################
+#   6- Database migrations
+###########################################################
 
 - include: "pipeline-dbconf-migrate-1_4-to-1_5.yml"
   when: "archivematica_src_am_migrate_from_v1_4|bool"
