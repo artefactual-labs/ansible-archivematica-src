@@ -56,6 +56,18 @@
     state: "link"
   when: "create_shareddir and archivematica_src_shareddir != '/var/archivematica/sharedDirectory'"
 
+# check if clamav is running with file or tcp socket
+- name: "Check if clamav is running with file or tcp socket"
+  shell: cat /etc/clamav/clamd.conf /etc/clamd.conf 2> /dev/null | grep -Eq "^LocalSocket\ "
+  register: clamavlocalsocket
+  check_mode: no
+  failed_when: clamavlocalsocket.rc > 1
+  changed_when: false
+
+- set_fact:
+    clamav_uses_file_socket: true
+  when: clamavlocalsocket.rc == 0
+
 #
 # Backward-compatible Logging config
 # 

@@ -6,3 +6,7 @@ PYTHONPATH={{ archivematica_src_am_mcpclient_app }}:{{ archivematica_src_am_comm
 {% for key, value in archivematica_src_am_mcpclient_environment.iteritems() %}
 {{ key }}={{ value }}
 {% endfor %}
+
+{% if clamav_uses_file_socket is not defined %}
+ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_CLAMAV_SERVER=localhost:3310
+{% endif %}
