@@ -56,6 +56,18 @@ The default Archivematica 1.7 logging sends the events to the standard streams, 
 
 The log file sizes and the directories to store the logs are configurable for each service. The default values can be found in [`defaults/main.yml`](defaults/main.yml).
 
+Configure ClamAV
+----------------
+
+This role will try to determine whether the ClamAV daemon is running using the TCP or UNIX socket on the same server that the pipeline is being installed or updated on. To configure an external ClamAV daemon server, the following env vars should be set: 
+
+```yaml
+---
+archivematica_src_mcpclient_clamav_use_tcp: "yes"
+archivematica_src_mcpclient_clamav_tcp_ip: "1.2.3.4"
+archivematica_src_mcpclient_clamav_tcp_port: "3310"
+```
+
 Disable Elasticsearch use
 -------------------------
 
