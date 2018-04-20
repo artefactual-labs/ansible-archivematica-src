@@ -110,6 +110,16 @@ archivematica_src_ss_environment:
   REQUEST_CA_BUNDLE: "{{ archivematica_src_ca_custom_bundle }}"
 
 #
+# Clamav settings
+#
+
+# The following variables can be used to disable the Clamav daemon socket check and force the TCP socket configuration. When the Clamav daemon is not running on the same server than the pipeline, these variables have to be set to configure the Clamav daemon in the MCPClient
+
+archivematica_src_mcpclient_clamav_use_tcp: "no"
+archivematica_src_mcpclient_clamav_tcp_ip: "localhost"
+archivematica_src_mcpclient_clamav_tcp_port: "3310"
+
+#
 # Logging settings
 #
 
