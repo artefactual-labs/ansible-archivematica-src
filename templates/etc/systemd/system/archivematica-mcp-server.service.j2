@@ -2,7 +2,7 @@
 
 [Unit]
 Description=Archivematica MCP Server Service
-After=syslog.target network.target
+After=syslog.target network.target mysql.service
 
 [Service]
 Type=simple
