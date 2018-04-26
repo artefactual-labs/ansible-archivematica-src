@@ -19,6 +19,13 @@
       when:
         - "MCPClient.osdeps_repos"
 
+# Issue #176 workaround
+    - name: "Install libgl1-mesa-glx on Ubuntu 14"
+      apt:
+        pkg: "libgl1-mesa-glx"
+        state: "present"
+      when: MCPClient.osdeps_packages and ansible_distribution_release == "trusty"
+
     - name: "Install MCPClient ext. package deps."
       apt:
         pkg: "{{ item['name'] }}"
