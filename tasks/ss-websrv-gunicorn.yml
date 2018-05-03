@@ -102,6 +102,7 @@
   with_items:
     - "archivematica-storage-service"
     - "nginx"
+    - "rng-tools"
   when:
     - ansible_service_mgr == "upstart"
   tags: "amsrc-ss-websrv"

@@ -90,8 +90,11 @@
     - storage_service.osdeps_packages
     - ansible_distribution == "Ubuntu"
 
-- name: "Start rng-tools"
-  command: "/etc/init.d/rng-tools start"
+- name: "Start rng-tools (Ubuntu 16.04)"
+  service:
+    name: "rngd"
+    state: "restarted"
+    enabled: "yes"
   tags: "rng-tools"
   when:
     - osdeps
@@ -99,3 +102,17 @@
     - storage_service.osdeps_packages is defined
     - storage_service.osdeps_packages
     - ansible_distribution == "Ubuntu"
+    - ansible_service_mgr == "systemd"
+
+- name: "Start rng-tools (RedHat)"
+  service:
+    name: "rngd"
+    state: "restarted"
+    enabled: "yes"
+  tags: "rng-tools"
+  when:
+    - osdeps
+    - storage_service is defined
+    - storage_service.osdeps_packages is defined
+    - storage_service.osdeps_packages
+    - ansible_os_family == "RedHat"
