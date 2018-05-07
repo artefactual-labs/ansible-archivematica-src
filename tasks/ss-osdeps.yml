@@ -1,14 +1,14 @@
 ---
 # osdeps filenames named "distribution"-"major_version".json
 #        example: CentOS-7.yml (case sensitive)
-- set_fact: 
+- set_fact:
     osdeps_file: "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.json"
     tmpdirname: "/tmp/amsrc-{{ ansible_date_time.date }}-{{ ansible_date_time.epoch }}"
 
-# become: false is required in tasks delegated to localhost 
+# become: false is required in tasks delegated to localhost
 # (to avoid "sudo: a password is required" error)
 - name: "create temp directory in local machine to store osdeps files"
-  file: 
+  file:
     path: "{{ tmpdirname }}/osdeps"
     state: "directory"
   become: false
@@ -27,13 +27,13 @@
   fetch:
     src: "{{ archivematica_src_dir }}/archivematica-storage-service/osdeps/{{ osdeps_file }}"
     dest: "{{ tmpdirname }}/osdeps/archivematica-storage-service/{{ osdeps_file }}"
-    flat: "yes" 
-  become: false       # ansible recommends to run fetch without become whenever possible 
+    flat: "yes"
+  become: false       # ansible recommends to run fetch without become whenever possible
   when: osdeps
 
 # create a namespace for osdeps file variables
 - name: "include variables from retrieved dependencies files in namespace storage_service"
-  include_vars: 
+  include_vars:
     file: "{{ tmpdirname }}/osdeps/archivematica-storage-service/{{ osdeps_file }}"
     name: "storage_service"
   when: osdeps
@@ -47,9 +47,9 @@
     name: "{{ item.name }}"
     state: "{{ item.state }}"
   with_items: "{{ storage_service.osdeps_packages }}"
-  when: 
-    - osdeps 
-    - storage_service is defined 
+  when:
+    - osdeps
+    - storage_service is defined
     - storage_service.osdeps_packages is defined
     - storage_service.osdeps_packages
 
@@ -58,9 +58,9 @@
     name: "{{ item.name }}"
     state: "{{ item.state }}"
   with_items: "{{ storage_service.osdeps_packages_2 }}"
-  when: 
-    - osdeps 
-    - storage_service is defined 
+  when:
+    - osdeps
+    - storage_service is defined
     - storage_service.osdeps_packages_2 is defined
     - storage_service.osdeps_packages_2
 
@@ -69,9 +69,9 @@
     name: "{{ item.name }}"
     state: "{{ item.state }}"
   with_items: "{{ storage_service.osdeps_packages_3 }}"
-  when: 
-    - osdeps 
-    - storage_service is defined 
+  when:
+    - osdeps
+    - storage_service is defined
     - storage_service.osdeps_packages_3 is defined
     - storage_service.osdeps_packages_3
 
