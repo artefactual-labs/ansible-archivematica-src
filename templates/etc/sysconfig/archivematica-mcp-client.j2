@@ -3,7 +3,7 @@
 PATH={{ archivematica_src_am_mcpclient_virtualenv }}/bin:/usr/local/sbin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
 PYTHONPATH={{ archivematica_src_am_mcpclient_app }}:{{ archivematica_src_am_common_app }}:{{ archivematica_src_am_dashboard_app }}
 
-{% for key, value in archivematica_src_am_mcpclient_environment.iteritems() %}
+{% for key, value in archivematica_src_am_mcpclient_environment.items() %}
 {{ key }}={{ value }}
 {% endfor %}
 

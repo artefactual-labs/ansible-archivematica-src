@@ -17,7 +17,7 @@ respawn limit 20 5
 kill timeout 30
 
 # django ENV settings
-{% for key, value in archivematica_src_ss_environment.iteritems() %}
+{% for key, value in archivematica_src_ss_environment.items() %}
 env {{ key }}={{ value }}
 {% endfor %}
 

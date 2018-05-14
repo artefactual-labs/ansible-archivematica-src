@@ -2,6 +2,6 @@
 
 PYTHONPATH={{ archivematica_src_am_common_app }}:{{ archivematica_src_am_dashboard_app }}
 
-{% for key, value in archivematica_src_am_mcpserver_environment.iteritems() %}
+{% for key, value in archivematica_src_am_mcpserver_environment.items() %}
 {{ key }}={{ value }}
 {% endfor %}
