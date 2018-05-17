@@ -48,6 +48,7 @@ archivematica_src_am_db_host: "localhost"        # Archivematica database host
 archivematica_src_am_db_name: "MCP"              # Archivematica database name
 archivematica_src_am_db_user: "archivematica"    # Archivematica database user
 archivematica_src_am_db_password: "demo"         # Archivematica database password
+archivematica_src_am_es_server: "127.0.0.1:9200" # Archivematica ElasticSearch server
 
 # Please note that a playbook using `archivematica_src_am_migrate_from_v1_4` or `archivematica_src_ss_migrate_from_v0_7`  is not idempotent, and it will throw an error if run twice. The two migrate related variables should be removed after a successful migration (an alternative could be to specify the `archivematica_src_am_migrate_from_v1_4` and `archivematica_src_ss_migrate_from_v0_7` at run time using `--extra-vars` instead of putting the variables in the playbook).
 
@@ -70,7 +71,7 @@ archivematica_src_am_dashboard_environment:
   ARCHIVEMATICA_DASHBOARD_CLIENT_USER: "{{ archivematica_src_am_db_user }}"
   ARCHIVEMATICA_DASHBOARD_CLIENT_PASSWORD: "{{ archivematica_src_am_db_password }}"
   # Not mandatory:
-  ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER: "127.0.0.1:9200"  # Needed by pipeline-es.yml
+  ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER: "{{ archivematica_src_am_es_server }}"  # Needed by pipeline-es.yml
   AM_GUNICORN_BIND: "127.0.0.1:8002"
   REQUEST_CA_BUNDLE: "{{ archivematica_src_ca_custom_bundle }}"
 
