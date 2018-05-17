@@ -72,7 +72,7 @@ archivematica_src_am_dashboard_environment:
   ARCHIVEMATICA_DASHBOARD_CLIENT_PASSWORD: "{{ archivematica_src_am_db_password }}"
   # Not mandatory:
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER: "{{ archivematica_src_am_es_server }}"  # Needed by pipeline-es.yml
-  AM_GUNICORN_BIND: "127.0.0.1:8002"
+  AM_GUNICORN_BIND: "{{ archivematica_src_am_dashboard_nginx_bind }}"
   REQUEST_CA_BUNDLE: "{{ archivematica_src_ca_custom_bundle }}"
 
 # Archivematica MCPServer
@@ -107,7 +107,7 @@ archivematica_src_ss_environment:
   SS_DB_PASSWORD: ""
   SS_DB_USER: ""
   # Not mandatory:
-  SS_GUNICORN_BIND: "127.0.0.1:8001"
+  SS_GUNICORN_BIND: "{{ archivematica_src_ss_nginx_bind }}"
   REQUEST_CA_BUNDLE: "{{ archivematica_src_ca_custom_bundle }}"
 
 #
