@@ -63,15 +63,3 @@
   file:
     state: "directory"
     path: "{{ archivematica_src_dir }}"
-
-#
-# Set archivematica_src_ca_custom_bundle if not defined
-#
-
-- set_fact:
-    archivematica_src_ca_custom_bundle: "/etc/ssl/certs/ca-certificates.crt"
-  when: archivematica_src_ca_custom_bundle is undefined and ansible_os_family == "Debian"
-
-- set_fact:
-    archivematica_src_ca_custom_bundle: "/etc/pki/tls/certs/ca-bundle.crt"
-  when: archivematica_src_ca_custom_bundle is undefined and ansible_os_family == "RedHat"

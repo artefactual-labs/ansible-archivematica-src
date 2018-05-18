@@ -1,0 +1,29 @@
+---
+
+# Defaut environment variable strings provided by this role.
+
+# Base hash for archivematica_src_am_dashboard_environment.
+_archivematica_src_am_dashboard_environment:
+  DJANGO_SETTINGS_MODULE: "settings.production"
+  ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_ALLOWED_HOSTS: "*"
+  ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY: "CHANGE_ME_WITH_A_SECRET_KEY"
+  AM_GUNICORN_BIND: "127.0.0.1:8002"
+
+# Base hash for archivematica_src_am_dashboard_environment.
+_archivematica_src_am_mcpserver_environment:
+  DJANGO_SETTINGS_MODULE: "settings.common"
+
+# Base hash for archivematica_src_am_mcpclient_environment.
+_archivematica_src_am_mcpclient_environment:
+  DJANGO_SETTINGS_MODULE: "settings.common"
+
+# Base hash for archivematica_src_ss_environment.
+_archivematica_src_ss_environment:
+  DJANGO_SETTINGS_MODULE: "storage_service.settings.production"
+  DJANGO_ALLOWED_HOSTS: "*"
+  DJANGO_SECRET_KEY: "CHANGE_ME_WITH_A_SECRET_KEY"
+  SS_DB_HOST: ""
+  SS_DB_NAME: "/var/archivematica/storage-service/storage.db"
+  SS_DB_PASSWORD: ""
+  SS_DB_USER: ""
+  SS_GUNICORN_BIND: "127.0.0.1:8001"

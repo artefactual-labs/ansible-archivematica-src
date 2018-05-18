@@ -1,0 +1,112 @@
+---
+
+- name: "archivematica_src_search_enabled"
+  set_fact:
+    "{{ item.name }}": "{{ item.dict|combine({item.key: archivematica_src_search_enabled}) }}"
+  when: "archivematica_src_search_enabled is defined"
+  with_items:
+    - name: "archivematica_src_am_mcpclient_environment"
+      dict: "{{ archivematica_src_am_mcpclient_environment }}"
+      key: "ARCHIVEMATICA_MCPCLIENT_SEARCH_ENABLED"
+    - name: "archivematica_src_am_mcpserver_environment"
+      dict: "{{ archivematica_src_am_mcpserver_environment }}"
+      key: "ARCHIVEMATICA_MCPSERVER_SEARCH_ENABLED"
+    - name: "archivematica_src_am_dashboard_environment"
+      dict: "{{ archivematica_src_am_dashboard_environment }}"
+      key: "ARCHIVEMATICA_DASHBOARD_SEARCH_ENABLED"
+
+- name: "archivematica_src_am_es_server"
+  set_fact:
+    "{{ item.name }}": "{{ item.dict|combine({item.key: archivematica_src_am_es_server}) }}"
+  when: "archivematica_src_am_es_server is defined"
+  with_items:
+    - name: "archivematica_src_am_mcpclient_environment"
+      dict: "{{ archivematica_src_am_mcpclient_environment }}"
+      key: "ARCHIVEMATICA_MCPCLIENT_ELASTICSEARCH_SERVER"
+    - name: "archivematica_src_am_mcpserver_environment"
+      dict: "{{ archivematica_src_am_mcpserver_environment }}"
+      key: "ARCHIVEMATICA_MCPSERVER_ELASTICSEARCH_SERVER"
+    - name: "archivematica_src_am_dashboard_environment"
+      dict: "{{ archivematica_src_am_dashboard_environment }}"
+      key: "ARCHIVEMATICA_DASHBOARD_ELASTICSEARCH_SERVER"
+
+- name: "Apply archivematica_src_am_db_host"
+  set_fact:
+    "{{ item.name }}": "{{ item.dict|combine({item.key: archivematica_src_am_db_host}) }}"
+  when: "archivematica_src_am_db_host is defined"
+  with_items:
+    - name: "archivematica_src_am_mcpclient_environment"
+      dict: "{{ archivematica_src_am_mcpclient_environment }}"
+      key: "ARCHIVEMATICA_MCPCLIENT_CLIENT_HOST"
+    - name: "archivematica_src_am_mcpserver_environment"
+      dict: "{{ archivematica_src_am_mcpserver_environment }}"
+      key: "ARCHIVEMATICA_MCPSERVER_CLIENT_HOST"
+    - name: "archivematica_src_am_dashboard_environment"
+      dict: "{{ archivematica_src_am_dashboard_environment }}"
+      key: "ARCHIVEMATICA_DASHBOARD_CLIENT_HOST"
+
+- name: "Apply archivematica_src_am_db_name"
+  set_fact:
+    "{{ item.name }}": "{{ item.dict|combine({item.key: archivematica_src_am_db_name}) }}"
+  when: "archivematica_src_am_db_name is defined"
+  with_items:
+    - name: "archivematica_src_am_mcpclient_environment"
+      dict: "{{ archivematica_src_am_mcpclient_environment }}"
+      key: "ARCHIVEMATICA_MCPCLIENT_CLIENT_DATABASE"
+    - name: "archivematica_src_am_mcpserver_environment"
+      dict: "{{ archivematica_src_am_mcpserver_environment }}"
+      key: "ARCHIVEMATICA_MCPSERVER_CLIENT_DATABASE"
+    - name: "archivematica_src_am_dashboard_environment"
+      dict: "{{ archivematica_src_am_dashboard_environment }}"
+      key: "ARCHIVEMATICA_DASHBOARD_CLIENT_DATABASE"
+
+- name: "Apply archivematica_src_am_db_user"
+  set_fact:
+    "{{ item.name }}": "{{ item.dict|combine({item.key: archivematica_src_am_db_user}) }}"
+  when: "archivematica_src_am_db_user is defined"
+  with_items:
+    - name: "archivematica_src_am_mcpclient_environment"
+      dict: "{{ archivematica_src_am_mcpclient_environment }}"
+      key: "ARCHIVEMATICA_MCPCLIENT_CLIENT_USER"
+    - name: "archivematica_src_am_mcpserver_environment"
+      dict: "{{ archivematica_src_am_mcpserver_environment }}"
+      key: "ARCHIVEMATICA_MCPSERVER_CLIENT_USER"
+    - name: "archivematica_src_am_dashboard_environment"
+      dict: "{{ archivematica_src_am_dashboard_environment }}"
+      key: "ARCHIVEMATICA_DASHBOARD_CLIENT_USER"
+
+- name: "Apply archivematica_src_am_db_password"
+  set_fact:
+    "{{ item.name }}": "{{ item.dict|combine({item.key: archivematica_src_am_db_password}) }}"
+  when: "archivematica_src_am_db_password is defined"
+  with_items:
+    - name: "archivematica_src_am_mcpclient_environment"
+      dict: "{{ archivematica_src_am_mcpclient_environment }}"
+      key: "ARCHIVEMATICA_MCPCLIENT_CLIENT_PASSWORD"
+    - name: "archivematica_src_am_mcpserver_environment"
+      dict: "{{ archivematica_src_am_mcpserver_environment }}"
+      key: "ARCHIVEMATICA_MCPSERVER_CLIENT_PASSWORD"
+    - name: "archivematica_src_am_dashboard_environment"
+      dict: "{{ archivematica_src_am_dashboard_environment }}"
+      key: "ARCHIVEMATICA_DASHBOARD_CLIENT_PASSWORD"
+
+- name: "Apply archivematica_src_ca_custom_bundle"
+  set_fact:
+    "{{ item.name }}": "{{
+        item.dict|combine({
+          item.key: archivematica_src_ca_custom_bundle|default(ca_custom_bundle)
+        })
+      }}"
+  with_items:
+    - name: "archivematica_src_am_mcpclient_environment"
+      dict: "{{ archivematica_src_am_mcpclient_environment }}"
+      key: "REQUEST_CA_BUNDLE"
+    - name: "archivematica_src_am_mcpserver_environment"
+      dict: "{{ archivematica_src_am_mcpserver_environment }}"
+      key: "REQUEST_CA_BUNDLE"
+    - name: "archivematica_src_am_dashboard_environment"
+      dict: "{{ archivematica_src_am_dashboard_environment }}"
+      key: "REQUEST_CA_BUNDLE"
+    - name: "archivematica_src_ss_environment"
+      dict: "{{ archivematica_src_ss_environment }}"
+      key: "REQUEST_CA_BUNDLE"
