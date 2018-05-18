@@ -4,3 +4,4 @@ ansible_deps:
   - "python-pycurl"
   - "git"
   - "python-mysqldb" # Required for mysql_db module
+ca_custom_bundle: "/etc/ssl/certs/ca-certificates.crt"

@@ -9,6 +9,44 @@
   tags:
     - "always" # inocuous to use always here
 
+- name: "Load default environment strings"
+  include_vars: "envs.yml"
+  tags: "always"
+
+- name: "Combine environment strings"
+  set_fact:
+    "{{ item.combined }}": "{{ item.defaults|combine(item.provided, recursive=False) }}"
+  with_items:
+    - combined: "archivematica_src_am_dashboard_environment"
+      provided: "{{ archivematica_src_am_dashboard_environment|default({}) }}"
+      defaults: "{{ _archivematica_src_am_dashboard_environment }}"
+    - combined: "archivematica_src_am_mcpserver_environment"
+      provided: "{{ archivematica_src_am_mcpserver_environment|default({}) }}"
+      defaults: "{{ _archivematica_src_am_mcpserver_environment }}"
+    - combined: "archivematica_src_am_mcpclient_environment"
+      provided: "{{ archivematica_src_am_mcpclient_environment|default({}) }}"
+      defaults: "{{ _archivematica_src_am_mcpclient_environment }}"
+    - combined: "archivematica_src_ss_environment"
+      provided: "{{ archivematica_src_ss_environment|default({}) }}"
+      defaults: "{{ _archivematica_src_ss_environment }}"
+  tags: "always"
+
+- include: "envs-patch-backward-compatibility.yml"
+  tags: "always"
+
+# Uncomment if you want to debug the environment strings.
+# - debug:
+#     msg: "{{ item.dict }}"
+#   with_items:
+#     - name: "archivematica_src_am_dashboard_environment"
+#       dict: "{{ archivematica_src_am_dashboard_environment }}"
+#     - name: "archivematica_src_am_mcpserver_environment"
+#       dict: "{{ archivematica_src_am_mcpserver_environment }}"
+#     - name: "archivematica_src_am_mcpclient_environment"
+#       dict: "{{ archivematica_src_am_mcpclient_environment }}"
+#     - name: "archivematica_src_ss_environment"
+#       dict: "{{ archivematica_src_ss_environment }}"
+
 - name: "Set fact: type of environment"
   set_fact:
     is_dev: "{{ archivematica_src_environment_type == 'development' }}"
