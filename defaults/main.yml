@@ -93,8 +93,9 @@ archivematica_src_am_mcpclient_environment:
   ARCHIVEMATICA_MCPCLIENT_CLIENT_DATABASE: "{{ archivematica_src_am_db_name }}"
   ARCHIVEMATICA_MCPCLIENT_CLIENT_USER: "{{ archivematica_src_am_db_user }}"
   ARCHIVEMATICA_MCPCLIENT_CLIENT_PASSWORD: "{{ archivematica_src_am_db_password }}"
+  ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_ELASTICSEARCHSERVER: "{{ archivematica_src_am_es_server }}"
   ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_SEARCH_ENABLED: "{{ archivematica_src_search_enabled }}"
-  REQUEST_CA_BUNDLE: "{{ archivematica_src_ca_custom_bundle }}"
+  REQUEST_CA_BUNDLE: "{{ archivematica_src_ca_custom_bundle }}"
 
 # Archivematica Storage Service
 # This list only includes mandatory strings.
