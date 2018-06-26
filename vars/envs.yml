@@ -8,6 +8,7 @@ _archivematica_src_am_dashboard_environment:
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_ALLOWED_HOSTS: "*"
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY: "CHANGE_ME_WITH_A_SECRET_KEY"
   AM_GUNICORN_BIND: "127.0.0.1:8002"
+  ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER: "127.0.0.1:9200"
 
 # Base hash for archivematica_src_am_dashboard_environment.
 _archivematica_src_am_mcpserver_environment:
