@@ -1,6 +1,26 @@
 ---
 # ss-configure
 
+# Check whether pipeline is registered and dashboard user exists
+
+- name:  Check Dashboard SS url
+  become: "yes"
+  command: mysql {{ archivematica_src_am_db_name }} -Ns -e "select * from DashboardSettings where name='storage_service_url'"
+  register: dashboard_ss_url
+
+- fail:
+    msg: "Aborting: The pipeline is already configured."
+  when: dashboard_ss_url.stdout != "" and archivematica_src_configure_dashboard|bool
+
+- name:  Check Dashboard user
+  become: "yes"
+  command: mysql {{ archivematica_src_am_db_name }} -Ns -e "select * from auth_user where username='{{ archivematica_src_configure_am_user }}'"
+  register: dashboard_user
+
+- fail:
+    msg: "Aborting: The dashboard user {{ archivematica_src_configure_am_user }} is already configured."
+  when: dashboard_user.stdout != "" and archivematica_src_configure_dashboard|bool
+
 # Create api-key if not defined
 - set_fact: archivematica_src_configure_ss_api_key={{ 999999999999999999999 | random | to_uuid | hash('md5') }}
   when: "archivematica_src_configure_ss_api_key is undefined and archivematica_src_configure_ss|bool"
