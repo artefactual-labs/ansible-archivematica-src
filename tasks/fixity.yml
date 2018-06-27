@@ -1,3 +1,11 @@
+- name: "Install required packages"
+  apt:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - "sqlite3"
+    - "moreutils"
+    - "mailutils"
 
 - name: "Download code"
   git:
@@ -10,22 +18,66 @@
   pip:
     chdir: "{{ archivematica_src_dir }}/fixity"
     requirements: "requirements.txt"
-    virtualenv: "/usr/share/python/fixity"
-    state: latest
+    virtualenv: "{{ archivematica_src_fixity_virtualenv }}"
+    state: "latest"
 
 - name: "Run setup.py"
-  shell: "/usr/share/python/fixity/bin/python setup.py install"
+  shell: "{{ archivematica_src_fixity_virtualenv }}/bin/python setup.py install"
   args:
     chdir: "{{ archivematica_src_dir }}/fixity"
- 
-- name: "Create symbolic link"
-  file:
-     src: "/usr/share/python/fixity/bin/fixity"
-     dest: "/usr/local/bin/fixity"
-     state: "link"
-     force: "yes"
 
+- name: "Change virtualenv owner to archivematica"
+  file:
+     path: "{{ archivematica_src_fixity_virtualenv }}"
+     state: "directory"
+     owner: "archivematica"
+     group: "archivematica"
+     recurse: "yes"
+ 
 - name: "Create config file"
   template:
      src: "etc/sysconfig/fixity.j2"
      dest: "{{ systemd_environment_path }}/fixity"
+     mode: 0640
+     owner: "archivematica"
+     group: "archivematica"
+
+- name: "Create log dir"
+  file:
+     path: "/var/log/archivematica/fixity/"
+     state: "directory"
+     mode: 0750
+     owner: "archivematica"
+     group: "archivematica"
+
+
+- name: "Create fixity script"
+  template:
+     src: "bin/{{ item }}"
+     dest: "/usr/local/bin/{{ item }}"
+     mode: 0755
+     owner: "root"
+  with_items:
+    - "fixity"
+    - "fixity-cron"
+
+- name: "Create cron job"
+  cron:
+     name: "Run fixity"
+     job: "/usr/local/bin/fixity-cron"
+     minute: "0"
+     hour: "3"
+     day: "1"
+     month: "*/3"
+     user: "archivematica"
+     cron_file: "fixity"
+     state: "present"
+
+- name: "Create cron job"
+  cron:
+     name: "SHELL"
+     env: yes
+     value: "/bin/bash"
+     cron_file: "fixity"
+     user: "archivematica"
+     state: "present"

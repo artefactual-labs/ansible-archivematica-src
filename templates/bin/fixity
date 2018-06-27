@@ -1,0 +1,4 @@
+#!/bin/bash
+
+source /etc/default/fixity
+/usr/share/archivematica/virtualenvs/fixity//bin/fixity $*

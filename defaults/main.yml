@@ -118,6 +118,7 @@ archivematica_src_acceptance_tests_browser_list: [ "Chrome" , "Firefox" ]
 archivematica_src_acceptance_tests_chromedriver_version: "2.29"
 
 # Fixity
+archivematica_src_fixity_virtualenv: "/usr/share/archivematica/virtualenvs/fixity"
 archivematica_src_fixity_version: "master"
 archivematica_src_fixity_ss_url: "http://localhost:8000"
 archivematica_src_fixity_ss_user: "test"

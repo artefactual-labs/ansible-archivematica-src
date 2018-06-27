@@ -1,0 +1,21 @@
+#!/bin/bash
+
+START_DATE=$(date +%Y%m%d_%H%M)
+REPORTS=/var/log/archivematica/fixity
+EMAILS=$(sqlite3 /var/archivematica/storage-service/storage.db 'select email from auth_user;' | grep -v "x@x")
+
+function run_fixity() {
+echo "Fixity scan starts at $HOSTNAME" | ts '[%Y-%m-%d %H:%M:%S]' > $REPORTS/fixity-$START_DATE.txt
+/usr/local/bin/fixity scanall 2>&1 |ts '[%Y-%m-%d %H:%M:%S]' >> $REPORTS/fixity-$START_DATE.txt
+echo "Fixity scan finished" | ts '[%Y-%m-%d %H:%M:%S]' >> $REPORTS/fixity-$START_DATE.txt
+
+}
+
+run_fixity 2>&1 > /dev/null
+
+
+for i in $EMAILS
+        do
+       cat $REPORTS/fixity-$START_DATE.txt | mail -s "Fixity report from $HOSTNAME" $i
+
+done
