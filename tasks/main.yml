@@ -71,6 +71,19 @@
     - "amsrc-fixity"
 
 
+- name: "Checkout out archivematica-sampledata repository"
+  git:
+    repo: "https://github.com/artefactual/archivematica-sampledata.git"
+    dest: "~/archivematica-sampledata"
+    update: "yes"
+    depth: 1
+  when: "archivematica_src_install_sample_data|bool"
+  async: "{{ archivematica_src_install_sample_data_timeout }}"
+  poll: 0
+  register: "sampledata_clone"
+  become: "no"
+
+
 #
 # archivematica-storage-service
 #
@@ -159,14 +172,15 @@
 #
 # archivematica-sampledata
 #
-
-- name: "Checkout out archivematica-sampledata repository"
-  git:
-    repo: "https://github.com/artefactual/archivematica-sampledata.git"
-    dest: "~/archivematica-sampledata"
-    update: "yes"
-    depth: 1
+# Wait for git to finish sampledata clone
+- name: "Wait for sampledata download completion"
+  async_status:
+    jid: "{{ sampledata_clone.ansible_job_id }}"
   when: "archivematica_src_install_sample_data|bool"
+  register: "sampledata_clone_result"
+  until: "sampledata_clone_result.finished"
+  delay: 60
+  retries: "{{ ( archivematica_src_install_sample_data_timeout|int / 60 )|int|abs }}"
   become: "no"
 
 - name: "Generate special sampledata transfers"

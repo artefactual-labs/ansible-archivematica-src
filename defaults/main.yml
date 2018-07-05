@@ -108,6 +108,9 @@ archivematica_src_ssl_include_acme_chlg_loc: "false"
 # Other components
 #
 
+# Sample data
+archivematica_src_install_sample_data_timeout: "3600"
+
 # Automation tools
 archivematica_src_automationtools_transfers_logfile: "/var/log/archivematica/automation-tools/transfers.log"
 archivematica_src_automationtools_transfers_databasefile: "/var/archivematica/automation-tools/transfers.db"
