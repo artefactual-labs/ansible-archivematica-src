@@ -184,10 +184,9 @@
   become: "no"
 
 - name: "Generate special sampledata transfers"
-  command: "~/archivematica-sampledata/createtransfers/createtransfers.py {{ item }}"
-  with_items:
-    - "create-variously-encoded-files"
-    - "create-deep-transfers"
+  command: "make simple"
+  args:
+    chdir: "~/archivematica-sampledata/"
   when: "archivematica_src_install_sample_data|bool"
   become: "no"
 
