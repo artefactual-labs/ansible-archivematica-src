@@ -74,4 +74,5 @@
     app_path: "{{ archivematica_src_am_dashboard_app }}"
     pythonpath: "{{ archivematica_src_am_common_app }}"
     virtualenv: "{{ archivematica_src_am_dashboard_virtualenv }}"
+  environment: "{{ archivematica_src_am_dashboard_environment }}"
   when: archivematica_src_configure_dashboard|bool and dashboard_user.stdout == "" and  dashboard_user.stdout == ""
