@@ -1,26 +1,6 @@
 ---
 # ss-configure
 
-# Check whether pipeline is registered and dashboard user exists
-
-- name:  Check Dashboard SS url
-  become: "yes"
-  command: mysql {{ archivematica_src_am_db_name }} -Ns -e "select * from DashboardSettings where name='storage_service_url'"
-  register: dashboard_ss_url
-
-- fail:
-    msg: "Aborting: The pipeline is already configured."
-  when: dashboard_ss_url.stdout != "" and archivematica_src_configure_dashboard|bool
-
-- name:  Check Dashboard user
-  become: "yes"
-  command: mysql {{ archivematica_src_am_db_name }} -Ns -e "select * from auth_user where username='{{ archivematica_src_configure_am_user }}'"
-  register: dashboard_user
-
-- fail:
-    msg: "Aborting: The dashboard user {{ archivematica_src_configure_am_user }} is already configured."
-  when: dashboard_user.stdout != "" and archivematica_src_configure_dashboard|bool
-
 # Create api-key if not defined
 - set_fact: archivematica_src_configure_ss_api_key={{ 999999999999999999999 | random | to_uuid | hash('md5') }}
   when: "archivematica_src_configure_ss_api_key is undefined and archivematica_src_configure_ss|bool"
@@ -28,6 +8,7 @@
 # Delete default SS superuser test
 - name: "Delete default SS superuser"
   become: "yes"
+  ignore_errors: "yes"
   shell: echo "from django.contrib.auth.models import User;User.objects.get(username='test').delete()" | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py shell
   args:
     chdir: "{{ archviematica_src_ss_app }}"
@@ -51,6 +32,27 @@
 
 # dashboard-configure
 
+# Check whether pipeline is registered and dashboard user exists
+
+- name:  Check Dashboard SS url
+  become: "yes"
+  command: mysql {{ archivematica_src_am_db_name }} -Ns -e "select * from DashboardSettings where name='storage_service_url'"
+  register: dashboard_ss_url
+
+- debug:
+    msg: "The pipeline is already configured: The dashboard superuser will not be created and the pipeline will not be registered."
+  when: dashboard_ss_url.stdout != "" and archivematica_src_configure_dashboard|bool
+
+- name:  Check Dashboard user
+  become: "yes"
+  command: mysql {{ archivematica_src_am_db_name }} -Ns -e "select * from auth_user where username='{{ archivematica_src_configure_am_user }}'"
+  register: dashboard_user
+
+- debug:
+    msg: "The dashboard user {{ archivematica_src_configure_am_user }} is already configured: The dashboard superuser will not be created and the pipeline will not be registered."
+  when: dashboard_user.stdout != "" and archivematica_src_configure_dashboard|bool
+
+
 # Create api-key if not defined
 - set_fact: archivematica_src_configure_am_api_key={{ 999999999999999999998 | random | to_uuid | hash('md5') }}
   when: archivematica_src_configure_am_api_key is undefined
@@ -58,17 +60,18 @@
 - name: "Create Dashboard user and register pipeline on SS"
   django_manage:
     command: >
-      install --username="{{ archivematica_src_configure_am_user }}"
-               --password="{{ archivematica_src_configure_am_password }}"
-               --email="{{ archivematica_src_configure_am_email }}"
-               --org-name="{{ archivematica_src_configure_am_org_name }}"
-               --org-id="{{ archivematica_src_configure_am_org_id }}"
-               --api-key="{{ archivematica_src_configure_am_api_key }}"
-               --ss-url="{{ archivematica_src_configure_ss_url }}"
-               --ss-user="{{ archivematica_src_configure_ss_user }}"
-               --ss-api-key="{{ archivematica_src_configure_ss_api_key }}"
-               --whitelist="{{archivematica_src_configure_am_whitelist}}"
+      install 
+      --username="{{ archivematica_src_configure_am_user }}"
+      --password="{{ archivematica_src_configure_am_password }}"
+      --email="{{ archivematica_src_configure_am_email }}"
+      --org-name="{{ archivematica_src_configure_am_org_name }}"
+      --org-id="{{ archivematica_src_configure_am_org_id }}"
+      --api-key="{{ archivematica_src_configure_am_api_key }}"
+      --ss-url="{{ archivematica_src_configure_ss_url }}"
+      --ss-user="{{ archivematica_src_configure_ss_user }}"
+      --ss-api-key="{{ archivematica_src_configure_ss_api_key }}"
+      --whitelist="{{archivematica_src_configure_am_whitelist}}"
     app_path: "{{ archivematica_src_am_dashboard_app }}"
     pythonpath: "{{ archivematica_src_am_common_app }}"
     virtualenv: "{{ archivematica_src_am_dashboard_virtualenv }}"
-  when: "archivematica_src_configure_dashboard|bool"
+  when: archivematica_src_configure_dashboard|bool and dashboard_user.stdout == "" and  dashboard_user.stdout == ""
