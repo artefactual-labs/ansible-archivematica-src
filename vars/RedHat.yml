@@ -4,4 +4,5 @@ ansible_deps:
   - "epel-release"
   - "git"
   - "MySQL-python" # Required for mysql_db module
+  - "sqlite"       # Required for am-configure and fixity
 ca_custom_bundle: "/etc/pki/tls/certs/ca-bundle.crt"
