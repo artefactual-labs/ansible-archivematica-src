@@ -4,4 +4,5 @@ ansible_deps:
   - "python-pycurl"
   - "git"
   - "python-mysqldb" # Required for mysql_db module
+  - "sqlite3"        # Required for am-configure and fixity
 ca_custom_bundle: "/etc/ssl/certs/ca-certificates.crt"
