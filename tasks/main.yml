@@ -53,6 +53,10 @@
     is_prod: "{{ archivematica_src_environment_type == 'production' }}"
   tags: "always" # inocuous to use always here
 
+- name: "Include common-RHEL.yml for RHEL"
+  include: "common-RHEL.yml"
+  when: "ansible_distribution == 'RedHat'"
+
 - name: "Install necessary packages required by this role"
   package:
     name: "{{ item }}"

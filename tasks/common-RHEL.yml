@@ -1,0 +1,19 @@
+---
+
+#
+# Install epel-release rpm package
+#
+
+- name: "Install EPEL repository on RHEL"
+  yum:
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    state: "present"
+
+#
+# Install optional and extras repoisitories because EPEL packages may depend on
+# packages from these repositories. 
+# See: https://github.com/artefactual-labs/ansible-archivematica-src/issues/209
+#
+
+- name: "Add rhel-*-optional-rpms repo on RHEL"
+  command: subscription-manager repos --enable "rhel-*-optional-rpms" --enable "rhel-*-extras-rpms"
