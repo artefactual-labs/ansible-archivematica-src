@@ -7,6 +7,8 @@ After=syslog.target network.target
 [Service]
 User=archivematica
 ExecStart=/usr/bin/fits-ngserver.sh /usr/share/maven-repo/com/martiansoftware/nailgun-server/debian/nailgun-server-debian.jar
+Restart=always
+RestartSec=3
 
 [Install]
 WantedBy=multi-user.target
