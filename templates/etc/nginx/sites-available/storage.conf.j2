@@ -21,6 +21,7 @@ server {
 
     proxy_read_timeout {{ archivematica_src_ss_nginx_proxy_read_timeout }};
     proxy_pass http://archivematica_storage_service_backend;
+    proxy_http_version 1.1;
 
     }
 
