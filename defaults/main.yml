@@ -46,8 +46,8 @@ archivematica_src_am_db_password: "demo"         # Archivematica database passwo
 archivematica_src_reset_mcpdb: "false"           # Reset AM MCP database
 archivematica_src_reset_shareddir: "false"       # Reset AM shared directory
 archivematica_src_reset_es: "false"              # Reset AM Elasticsearch indices
-archivematica_src_reset_am_all: "false"          # Reset AM Elasticsearch indices, shared directory, MCP database (overrides previous settings)
 archivematica_src_reset_ss_db: "false"           # Reset the SS database
+archivematica_src_reset_am_all: "false"          # Reset AM Elasticsearch indices, shared directory, MCP and SS databases (overrides previous settings)
 
 # Database options
 archivematica_src_am_migrate_from_v1_4: "false"  # Migrate AM database from v1.4 to v1.5
