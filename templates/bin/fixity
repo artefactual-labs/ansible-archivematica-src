@@ -1,4 +1,4 @@
 #!/bin/bash
 
-source /etc/default/fixity
+source {{ systemd_environment_path }}/fixity
 /usr/share/archivematica/virtualenvs/fixity//bin/fixity $*

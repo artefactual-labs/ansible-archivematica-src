@@ -1,4 +1,4 @@
-- name: "Install required packages"
+- name: "Install required deb packages "
   apt:
     name: "{{ item }}"
     state: installed
@@ -6,6 +6,19 @@
     - "sqlite3"
     - "moreutils"
     - "mailutils"
+  when:
+    - ansible_os_family == "Debian"
+
+- name: "Install required rpm packages"
+  apt:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - "sqlite"
+    - "moreutils"
+    - "mailx"
+  when:
+    - ansible_os_family == "RedHat"
 
 - name: "Download code"
   git:
