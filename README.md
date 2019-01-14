@@ -73,6 +73,15 @@ archivematica_src_mcpclient_clamav_tcp_ip: "1.2.3.4"
 archivematica_src_mcpclient_clamav_tcp_port: "3310"
 ```
 
+Configure users and register pipeline
+-------------------------------------
+
+A Storage Service user can be added with the role variable `archivematica_src_configure_ss` (default `no`).
+
+To create a Dashboard user, configure initial settings and register pipeline on Storage Service, the role variable `archivematica_src_configure_dashboard` can be used (default `no`).
+
+See [`defaults/main.yml`](defaults/main.yml) for a comprehensive list of variables (`# Configure AM` section)
+
 Disable Elasticsearch use
 -------------------------
 
