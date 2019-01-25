@@ -63,3 +63,48 @@
   file:
     state: "directory"
     path: "{{ archivematica_src_dir }}"
+
+#
+# SELinux configuration
+#
+- name: "Install necessary packages required by this ansible role"
+  yum:
+    name: "{{ item }}"
+    state: "latest"
+  with_items:
+    - "libsemanage-python"
+    - "policycoreutils-python"
+  when:
+    - ansible_os_family == "RedHat"
+
+- name: "Configure SELinux httpd permissions "
+  become: "yes"
+  seboolean:
+    name: "{{ item }}"
+    state: "yes"
+    persistent: "yes"
+  with_items:
+    - "httpd_can_network_connect"       # Allow nginx connections to Gunicorn
+    - "httpd_can_network_connect_db"    # Allow nginx to connect to MySQL
+    - "httpd_setrlimit"                 # Allow nginx to change system limits
+  when: 
+    - ansible_selinux.status == "enabled"
+    - ansible_os_family == "RedHat"
+
+- name: "SELinux: Allow nginx to use ports 8000 and 8001"
+  become: "yes"
+  seport:
+    ports: "8000,8001"
+    proto: "tcp"
+    setype: "http_port_t"
+    state: "present"
+  when:
+    - ansible_selinux.status == "enabled"
+    - ansible_os_family == "RedHat"
+
+- name: "Change home dir perms (to make transfer source visible)"
+  command: "chmod 755 $HOME"
+  tags: "homeperms"
+  become: "no"
+  when:
+    - ansible_os_family == "RedHat"
