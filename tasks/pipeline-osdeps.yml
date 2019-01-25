@@ -96,14 +96,6 @@
 # FITS via Nailgun
 #
 
-- name: "Enable and start fits (Ubuntu)"
-  service:
-    name: "fits"
-    state: "started"
-    enabled: "yes"
-  when:
-    - ansible_service_mgr == "upstart"
-
 - name: Create systemd init file for fits (Ubuntu 16.04)
   template:
      src: "etc/systemd/system/fits-nailgun.service.j2"

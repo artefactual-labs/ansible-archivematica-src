@@ -21,22 +21,6 @@
     remote_src: "yes"
   tags: "amsrc-ss-websrv"
 
-- name: "Config storage service gunicorn upstart (/etc/init)"
-  template:
-    src: "etc/upstart/archivematica-storage-service.conf.j2"
-    dest: "/etc/init/archivematica-storage-service.conf"
-    backup: "yes"
-  tags: "amsrc-ss-websrv"
-  when:
-    - ansible_service_mgr == "upstart"
-
-- name: "Reload Upstart configuration"
-  command: "initctl reload-configuration"
-  tags: "amsrc-ss-websrv"
-  when:
-    - ansible_service_mgr == "upstart"
-
-
 - name: "Add storage service gunicorn systemd (/etc/systemd)"
   template:
     src: "etc/systemd/system/archivematica-storage-service.service.j2"
@@ -93,19 +77,6 @@
   when: "archivematica_src_ssl|bool"
   tags: "amsrc-ss-websrv"
 # SSL configuration tasks - end
-
-- name: "Enable services (upstart)"
-  service:
-    name: "{{ item }}"
-    state: "restarted"
-    enabled: "yes"
-  with_items:
-    - "archivematica-storage-service"
-    - "nginx"
-    - "rng-tools"
-  when:
-    - ansible_service_mgr == "upstart"
-  tags: "amsrc-ss-websrv"
 
 - name: "Enable services (systemd)"
   service:

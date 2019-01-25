@@ -40,28 +40,6 @@
       dest: "{{ systemd_environment_path }}/archivematica-mcp-client"
 
 #
-# upstart
-#
-
-- name: "upstart | Install services"
-  template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    backup: "yes"
-  when:
-    - "ansible_service_mgr == 'upstart'"
-  with_items:
-    - src: "etc/upstart/archivematica-mcp-server.conf.j2"
-      dest: "/etc/init/archivematica-mcp-server.conf"
-    - src: "etc/upstart/archivematica-mcp-client.conf.j2"
-      dest: "/etc/init/archivematica-mcp-client.conf"
-
-- name: "Reload Upstart configuration"
-  command: "initctl reload-configuration"
-  when:
-    - "ansible_service_mgr == 'upstart'"
-
-#
 # systemd
 #
 

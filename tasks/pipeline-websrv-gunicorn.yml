@@ -34,19 +34,6 @@
     - src: "etc/sysconfig/archivematica-dashboard.j2"
       dest: "{{ systemd_environment_path }}/archivematica-dashboard"
 
-- name: "Config dashboard gunicorn upstart (/etc/init)"
-  template:
-    src: "etc/upstart/archivematica-dashboard.conf.j2"
-    dest: "/etc/init/archivematica-dashboard.conf"
-    backup: "yes"
-  when:
-     - ansible_service_mgr == "upstart"
-
-- name: "Reload Upstart configuration"
-  command: "initctl reload-configuration"
-  when:
-    - ansible_service_mgr == "upstart"
-
 - name: "Add dashboard gunicorn systemd (/etc/systemd)"
   template:
     src: "{{ item.src }}"
@@ -98,19 +85,6 @@
     state: "link"
   when: "archivematica_src_ssl|bool"
 # SSL configuration tasks - end
-
-- name: "Enable services"
-  service:
-    name: "{{ item }}"
-    state: "restarted"
-    enabled: "yes"
-  with_items:
-    - "archivematica-mcp-server"
-    - "archivematica-mcp-client"
-    - "archivematica-dashboard"
-    - "nginx"
-  when:
-    - ansible_service_mgr == "upstart"
 
 - name: "Enable services"
   systemd:
