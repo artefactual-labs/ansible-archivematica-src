@@ -27,9 +27,6 @@
 #   6- Database migrations
 ###########################################################
 
-- include: "pipeline-dbconf-migrate-1_4-to-1_5.yml"
-  when: "archivematica_src_am_migrate_from_v1_4|bool"
-
 - name: "Run migrations"
   django_manage:
     command: "migrate"
