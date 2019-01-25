@@ -92,3 +92,9 @@
     setype: "http_port_t"
     state: "present"
   when: ansible_selinux.status == "enabled"
+
+- name: "Change home dir perms (to make transfer source visible)"
+  command: "chmod 755 $HOME"·
+  tags: "homeperms"
+  become: "no"
+
