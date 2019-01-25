@@ -8,6 +8,8 @@
     - "epel-release"    
     - "git"
     - "MySQL-python"         # required for mysql_db
+    - "libsemanage-python"   # required for selinux checks
+    - "policycoreutils-python" # required for selinux checks
 
 - name: "Ensure pip, setuptools, virtualenv are not installed from packages"
   package:
@@ -69,3 +71,24 @@
     update: "no"
   when: "archivematica_src_install_sample_data|bool"
   become: "no"
+
+- name: "Configure SELinux httpd permissions "
+  become: "yes"
+  seboolean:
+    name: "{{ item }}"
+    state: "yes"
+    persistent: "yes"
+  with_items:
+    - "httpd_can_network_connect"       # Allow nginx connections to Gunicorn
+    - "httpd_can_network_connect_db"    # Allow nginx to connect to MySQL
+    - "httpd_setrlimit"                 # Allow nginx to change system limits
+  when: ansible_selinux.status == "enabled"
+
+- name: "SELinux: Allow nginx to use ports 8000 and 8001"
+  become: "yes"
+  seport:
+    ports: "8000,8001"
+    proto: "tcp"
+    setype: "http_port_t"
+    state: "present"
+  when: ansible_selinux.status == "enabled"
