@@ -1,12 +1,48 @@
 ---
 
+- name: "pipeline-es | Set Elasticsearch connection parameters"
+  set_fact:
+    es_host: "{{ archivematica_src_am_dashboard_environment['ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER'] | regex_replace('^(?P<host>.+):(?P<port>\\d+)$', '\\g<host>') }}"
+    es_port: "{{ archivematica_src_am_dashboard_environment['ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER'] | regex_replace('^(?P<host>.+):(?P<port>\\d+)$', '\\g<port>') }}"
+  tags: "always"
+
 - block:
+  - name: "pipeline-es | Migrate elasticsearch indexes from remote server"
+    django_manage:
+      command: "reindex_from_remote_cluster -t 60 -s 1 {{ archivematica_src_am_elasticserch_source }}"
+      app_path: "{{ archivematica_src_am_dashboard_app }}"
+      pythonpath: "{{ archivematica_src_am_common_app }}"
+      virtualenv: "{{ archivematica_src_am_dashboard_virtualenv }}"
+    environment: "{{ archivematica_src_am_dashboard_environment }}"
 
-    - name: "pipeline-es | Set Elasticsearch connection parameters"
-      set_fact:
-        es_host: "{{ archivematica_src_am_dashboard_environment['ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER'] | regex_replace('^(?P<host>.+):(?P<port>\\d+)$', '\\g<host>') }}"
-        es_port: "{{ archivematica_src_am_dashboard_environment['ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER'] | regex_replace('^(?P<host>.+):(?P<port>\\d+)$', '\\g<port>') }}"
+  - name: "pipeline-es | Verify aip reindex from remote server (system)"
+    shell: curl -XGET '{{ es_host }}:{{ es_port }}/_cat/indices?v' | grep aip | awk '{ sum+=$7} END {print sum}'
+    register: migrated_aips
 
+  - name: "pipeline-es | Verify aip reindex from remote server (remote)"
+    shell: curl -XGET '{{ archivematica_src_am_elasticserch_source }}/_cat/indices?v' | grep aip | awk '{ print $6}'
+    register: original_aips
+
+  - fail:
+      msg: "The number of aips is different between the original and migrated aips!"
+    when: "original_aips.stdout != migrated_aips.stdout"
+
+  - name: "pipeline-es | Verify transfer reindex from remote server (system)"
+    shell: curl -XGET '{{ es_host }}:{{ es_port }}/_cat/indices?v' | grep transfer | awk '{ sum+=$7} END {print sum}'
+    register: migrated_transfer
+
+  - name: "pipeline-es | Verify transfer reindex from remote server (remote)"
+    shell: curl -XGET '{{ archivematica_src_am_elasticserch_source }}/_cat/indices?v' | grep transfer | awk '{ print $6}'
+    register: original_transfer
+
+  - fail:
+      msg: "The number of transfers is different between the original and migrated aips!"
+    when: "original_transfer.stdout != migrated_transfer.stdout"
+
+  when: "archivematica_src_am_elasticserch_source is defined"
+  tags: "amsrc-pipeline-es-reindex"
+
+- block:
     - name: "pipeline-es | Reset Elasticsearch indexes"
       uri:
         url: "http://{{ es_host }}:{{es_port}}/{{ item }}"
@@ -17,5 +53,4 @@
         - "transferfiles"
         - "aipfiles"
       ignore_errors: True
-
   when: "archivematica_src_reset_es|bool or archivematica_src_reset_am_all|bool"
