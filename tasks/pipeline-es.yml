@@ -16,24 +16,30 @@
     environment: "{{ archivematica_src_am_dashboard_environment }}"
 
   - name: "pipeline-es | Verify aip reindex from remote server (system)"
-    shell: curl -XGET '{{ es_host }}:{{ es_port }}/_cat/indices?v' | grep aip | awk '{ sum+=$7} END {print sum}'
+    shell: curl -s -XGET '{{ es_host }}:{{ es_port }}/_cat/indices?v' | grep aip | awk '{ sum+=$7} END {print sum}'
     register: migrated_aips
 
   - name: "pipeline-es | Verify aip reindex from remote server (remote)"
-    shell: curl -XGET '{{ archivematica_src_am_elasticserch_source }}/_cat/indices?v' | grep aip | awk '{ print $6}'
+    shell: curl -s -XGET '{{ archivematica_src_am_elasticserch_source }}/_cat/indices?v' | grep aip | awk '{ print $6}'
     register: original_aips
+
+  - debug:
+      msg: "Origin AIPs: {{ original_aips.stdout }} || Migrated AIPs {{ migrated_aips.stdout }}"
 
   - fail:
       msg: "The number of aips is different between the original and migrated aips!"
     when: "original_aips.stdout != migrated_aips.stdout"
 
   - name: "pipeline-es | Verify transfer reindex from remote server (system)"
-    shell: curl -XGET '{{ es_host }}:{{ es_port }}/_cat/indices?v' | grep transfer | awk '{ sum+=$7} END {print sum}'
+    shell: curl -s -XGET '{{ es_host }}:{{ es_port }}/_cat/indices?v' | grep transfer | awk '{ sum+=$7} END {print sum}'
     register: migrated_transfer
 
   - name: "pipeline-es | Verify transfer reindex from remote server (remote)"
-    shell: curl -XGET '{{ archivematica_src_am_elasticserch_source }}/_cat/indices?v' | grep transfer | awk '{ print $6}'
+    shell: curl -s -XGET '{{ archivematica_src_am_elasticserch_source }}/_cat/indices?v' | grep transfer | awk '{ print $6}'
     register: original_transfer
+
+  - debug:
+      msg: "Origin transfers: {{ original_transfer.stdout }} || Migrated transfers {{ migrated_transfer.stdout }}"
 
   - fail:
       msg: "The number of transfers is different between the original and migrated aips!"
