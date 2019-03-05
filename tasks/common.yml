@@ -49,7 +49,16 @@
     regexp: "^archivematica ALL\\="
     line: "archivematica ALL=NOPASSWD:/bin/mv,/bin/chown,/bin/chmod,/usr/bin/find,/usr/bin/gs,/usr/bin/inkscape"
     validate: "/usr/sbin/visudo -cf %s"
+  when: archivematica_src_enable_sudoers is defined and archivematica_src_enable_sudoers|bool
 
+- name: "Remove archivematica user permissions in visudo file"
+  lineinfile:
+    dest: "/etc/sudoers"
+    state: "absent"
+    regexp: "^archivematica ALL\\="
+    line: "archivematica ALL=NOPASSWD:/bin/mv,/bin/chown,/bin/chmod,/usr/bin/find,/usr/bin/gs,/usr/bin/inkscape"
+    validate: "/usr/sbin/visudo -cf %s"
+  when: archivematica_src_enable_sudoers is not defined or not archivematica_src_enable_sudoers|bool
 
 #
 # Prepare `archivematica_src_dir`
