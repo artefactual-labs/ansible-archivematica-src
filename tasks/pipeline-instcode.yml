@@ -85,8 +85,7 @@
   args:
     chdir: "{{ item }}"
   with_items:
-    - "{{ archivematica_src_dir }}/archivematica/src/dashboard/frontend/appraisal-tab"
-    - "{{ archivematica_src_dir }}/archivematica/src/dashboard/frontend/transfer-browser"
+    - "{{ archivematica_src_dir }}/archivematica/src/dashboard/frontend"
 
 #
 # collectstatic
