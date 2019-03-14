@@ -55,8 +55,8 @@
     path: "{{ item }}"
     state: "absent"
   with_items:
-    - "/etc/nginx/sites-available/default"
-    - "/etc/nginx/sites-available/default.conf"
+    - "/etc/nginx/sites-enabled/default"
+    - "/etc/nginx/sites-enabled/default.conf"
 
 - name: "Set up Nginx server"
   file:
