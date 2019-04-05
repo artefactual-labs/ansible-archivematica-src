@@ -60,3 +60,71 @@
         - "aipfiles"
       ignore_errors: True
   when: "archivematica_src_reset_es|bool or archivematica_src_reset_am_all|bool"
+
+# needed when upgrading from AM v1.9.0
+# https://github.com/archivematica/Issues/issues/608
+# set index.mapping.total_fields.limit=1000 and index.mapping.depth.limit=1000
+- block:
+  - name: "Check whether aipfiles index exists"
+    shell: curl -s -XGET '{{ es_host }}:{{ es_port }}/aipfiles/_settings/index.mapping.total_fields.limit?pretty=true' 2>&1 | grep index_not_found_exception
+    args:
+      warn: no
+    register: index_aipfiles_exist
+    ignore_errors: true
+
+  - name: "Check aipfiles index.mapping.total_fields.limit value"
+    shell: curl -s -XGET '{{ es_host }}:{{ es_port }}/aipfiles/_settings/index.mapping.total_fields.limit?pretty=true' 2>&1 | grep limit
+    args:
+      warn: no
+    register: aipfiles_index_mapping_total_fields_limit
+    ignore_errors: true
+    when: index_aipfiles_exist.rc != 0
+
+  - name: "Check whether transferfiles index exists"
+    shell: curl -s -XGET '{{ es_host }}:{{ es_port }}/transferfiles/_settings/index.mapping.total_fields.limit?pretty=true' 2>&1 | grep index_not_found_exception
+    args:
+      warn: no
+    register: index_transferfiles_exist
+    ignore_errors: true
+
+  - name: "Check transferfiles index.mapping.total_fields.limit value"
+    shell: curl -s -XGET '{{ es_host }}:{{ es_port }}/transferfiles/_settings/index.mapping.total_fields.limit?pretty=true' 2>&1 | grep limit
+    args:
+      warn: no
+    register: transferfiles_index_mapping_total_fields_limit
+    ignore_errors: true
+    when: index_transferfiles_exist.rc != 0
+
+    # Set index mapping settings when aipfiles index exists and default settings
+  - name: "Set index.mapping.total_fields.limit=1000 and index.mapping.depth.limit=1000"
+    uri:
+      url: "http://{{ es_host }}:{{ es_port }}/aips,aipfiles/_settings"
+      method: PUT
+      body: "{ \"index.mapping.total_fields.limit\": 10000, \"index.mapping.depth.limit\": 1000 }"
+      body_format: json
+      headers:
+        Content-Type: "application/json"
+    when:  
+      - index_aipfiles_exist.rc != 0
+      - aipfiles_index_mapping_total_fields_limit is defined
+      - aipfiles_index_mapping_total_fields_limit.rc != 0
+
+    # Set index mapping settings when transferfiles index exists and default settings
+  - name: "Set index.mapping.total_fields.limit=1000 and index.mapping.depth.limit=1000 for transfer indices"
+    uri:
+      url: "http://{{ es_host }}:{{ es_port }}/transfers,transferfiles/_settings"
+      method: PUT
+      body: "{ \"index.mapping.total_fields.limit\": 10000, \"index.mapping.depth.limit\": 1000 }"
+      body_format: json
+      headers:
+        Content-Type: "application/json"
+    when:  
+      - index_transferfiles_exist.rc != 0
+      - transferfiles_index_mapping_total_fields_limit is defined
+      - transferfiles_index_mapping_total_fields_limit.rc != 0
+  when:
+   - archivematica_src_search_enabled is defined 
+   - archivematica_src_search_enabled|bool or 
+     archivematica_src_search_enabled == "transfers" or
+     archivematica_src_search_enabled == "aips" or
+     archivematica_src_search_enabled == "all"
