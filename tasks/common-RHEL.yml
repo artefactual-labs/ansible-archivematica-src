@@ -10,10 +10,12 @@
     state: "present"
 
 #
-# Install optional and extras repoisitories because EPEL packages may depend on
+# Install optional and extras repositories because EPEL packages may depend on
 # packages from these repositories. 
 # See: https://github.com/artefactual-labs/ansible-archivematica-src/issues/209
+#      https://github.com/artefactual-labs/ansible-archivematica-src/issues/244
 #
 
 - name: "Add rhel-*-optional-rpms repo on RHEL"
   command: subscription-manager repos --enable "rhel-*-optional-rpms" --enable "rhel-*-extras-rpms"
+  ignore_errors: True
