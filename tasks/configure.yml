@@ -107,3 +107,40 @@
     "{{ lookup('dict', archivematica_src_configure_dashboardsettings ,wantlist=True) }}"
   no_log: True
   when: archivematica_src_configure_dashboardsettings is defined
+
+- name: "Create ssh folder"
+  file:
+    path: "/var/lib/archivematica/.ssh/"
+    owner: archivematica
+    group: archivematica
+    state: directory
+    mode: 0755
+  when: archivematica_src_configure_dashboardsettings is defined
+
+- name: "Create ssh key"
+  command: ssh-keygen -q -t rsa -f /var/lib/archivematica/.ssh/id_rsa -C "{{ ansible_host }}" -N ""
+  args:
+    creates: /var/lib/archivematica/.ssh/id_rsa
+  when: archivematica_src_configure_dashboardsettings is defined
+
+- name: "Update permissions for key"
+  file:
+    path: "/var/lib/archivematica/.ssh/{{ item }}"
+    owner: archivematica
+    group: archivematica
+    state: file
+    mode: 0600
+  with_items:
+    - id_rsa
+    - id_rsa.pub
+  when: archivematica_src_configure_dashboardsettings is defined
+
+- name: "Register ssh key"
+  command: cat /var/lib/archivematica/.ssh/id_rsa.pub
+  register: ssh_key
+  when: archivematica_src_configure_dashboardsettings is defined
+
+- name: "Show ssh key"
+  debug: msg={{ ssh_key.stdout_lines }}
+  when: archivematica_src_configure_dashboardsettings is defined
+
