@@ -94,3 +94,16 @@
     virtualenv: "{{ archivematica_src_am_dashboard_virtualenv }}"
   environment: "{{ archivematica_src_am_dashboard_environment }}"
   when: archivematica_src_configure_dashboard|bool and dashboard_user.stdout == "" and dashboard_ss_url.stdout == ""
+
+- name: "Configure Dashboard settings"
+  command: >
+    mysql --user="{{archivematica_src_am_db_user }}"
+          --password="{{ archivematica_src_am_db_password }}"
+          --host="{{ archivematica_src_am_db_host }}"
+          "{{ archivematica_src_am_db_name }}"
+          --batch --skip-column-names
+          --execute="update DashboardSettings set value=\"{{ item.value }}\" where name=\"{{ item.key }}\";"
+  loop:
+    "{{ lookup('dict', archivematica_src_configure_dashboardsettings ,wantlist=True) }}"
+  no_log: True
+  when: archivematica_src_configure_dashboardsettings is defined
