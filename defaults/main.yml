@@ -141,3 +141,15 @@ archivematica_src_configure_am_email: "test@example.com"     # Dashboard admin p
 archivematica_src_configure_am_org_name: "test org"              # Dashboard admin Org name
 archivematica_src_configure_am_org_id: "test id"                # Dashboard admin Org id
 archivematica_src_configure_am_whitelist: '""'               # Dashboard API whitelist, IP address or hostnames separated by blank spaces and inside quotes
+
+
+# Uncomment this to override values from DashboardSettings table.
+#archivematica_src_configure_dashboardsettings:
+#  url: "http://atom.url/"                                  # AtoM URL
+#  rsync_target: "atom.ip:/tmp"                             # AtoM rsync target
+#  email: "user@example.com"                                # AtoM user
+#  password: "atom.password"                                # AtoM password
+#  base_url: "http://aspace.url:port"                       # ASpace URL
+#  user: "aspace.user"                                      # ASpace user
+#  uri_prefix: "http://amurl"                               # ASpace uri_prefix
+
