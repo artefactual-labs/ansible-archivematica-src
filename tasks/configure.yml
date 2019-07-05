@@ -108,32 +108,20 @@
   no_log: True
   when: archivematica_src_configure_dashboardsettings is defined
 
-- name: "Create ssh folder"
-  file:
-    path: "/var/lib/archivematica/.ssh/"
-    owner: archivematica
-    group: archivematica
-    state: directory
-    mode: 0755
-  when: archivematica_src_configure_dashboardsettings is defined
-
 - name: "Create ssh key"
   command: ssh-keygen -q -t rsa -f /var/lib/archivematica/.ssh/id_rsa -C "{{ ansible_host }}" -N ""
   args:
     creates: /var/lib/archivematica/.ssh/id_rsa
+  register: created_key
   when: archivematica_src_configure_dashboardsettings is defined
+  become_user: archivematica
 
-- name: "Update permissions for key"
-  file:
-    path: "/var/lib/archivematica/.ssh/{{ item }}"
-    owner: archivematica
-    group: archivematica
-    state: file
-    mode: 0600
-  with_items:
-    - id_rsa
-    - id_rsa.pub
-  when: archivematica_src_configure_dashboardsettings is defined
+- name: "Populate atom server key"
+  command:
+     timeout 2s ssh -o StrictHostKeyChecking=false {{ archivematica_src_configure_dashboardsettings["url"]|urlsplit('hostname') }}
+  ignore_errors: true
+  become_user: archivematica
+  when: created_key.changed
 
 - name: "Register ssh key"
   command: cat /var/lib/archivematica/.ssh/id_rsa.pub
@@ -144,3 +132,14 @@
   debug: msg={{ ssh_key.stdout_lines }}
   when: archivematica_src_configure_dashboardsettings is defined
 
+#- name: "Wait for ssh key to be added to atom server"
+#  shell: echo {{ ssh_key.stdout }} | timeout 5s ssh archivematica@{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') }} 'tee -a /home/archivematica/.ssh/authorized_keys' 
+#  delegate_to: localhost
+  #when: created_key.changed
+
+- name: "Add ssh key to be added to atom server"
+  pause:
+    seconds: 10
+    prompt: "Run the following command to populate ssh key: \n
+            echo {{ ssh_key.stdout }} | ssh archivematica@{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') }} \"tee -a  /home/archivematica/.ssh/authorized_keys\" \n"
+  when: created_key.changed
