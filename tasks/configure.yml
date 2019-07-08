@@ -131,14 +131,9 @@
   debug: msg={{ ssh_key.stdout_lines }}
   when: archivematica_src_configure_dashboardsettings is defined
 
-#- name: "Wait for ssh key to be added to atom server"
-#  shell: echo {{ ssh_key.stdout }} | timeout 5s ssh archivematica@{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') }} 'tee -a /home/archivematica/.ssh/authorized_keys' 
-#  delegate_to: localhost
-  #when: created_key.changed
-
-- name: "Add ssh key to be added to atom server"
-  pause:
-    seconds: 10
-    prompt: "Run the following command to populate ssh key: \n
-            echo {{ ssh_key.stdout }} | ssh archivematica@{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') }} \"tee -a  /home/archivematica/.ssh/authorized_keys\" \n"
+- name: "Add ssh key to AtoM server"
+  shell: echo {{ ssh_key.stdout }} >> ~/.ssh/authorized_keys
+  delegate_to: "{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') }}"
+  remote_user: "{{ archivematica_src_configure_atomuser | default('archivematica') }}"
+  become: false
   when: created_key.changed
