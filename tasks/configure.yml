@@ -103,8 +103,7 @@
           "{{ archivematica_src_am_db_name }}"
           --batch --skip-column-names
           --execute="update DashboardSettings set value=\"{{ item.value }}\" where name=\"{{ item.key }}\";"
-  loop:
-    "{{ lookup('dict', archivematica_src_configure_dashboardsettings ,wantlist=True) }}"
+  with_dict: "{{ archivematica_src_configure_dashboardsettings }}"
   no_log: True
   when: archivematica_src_configure_dashboardsettings is defined
 
