@@ -1,0 +1,13 @@
+%echo Generating a basic OpenPGP key
+Key-Type: RSA
+Key-Length: 4096
+Subkey-Type: ELG-E
+Subkey-Length: 4096
+Name-Real: {{ archivematica_src_configure_gpg.key_user }}
+Name-Comment: {{ archivematica_src_configure_gpg.key_comment }}
+Name-Email: {{ archivematica_src_configure_gpg.key_mail }}
+Expire-Date: 0
+Passphrase: {{ archivematica_src_configure_gpg.key_passphrase }}
+# Do a commit here, so that we can later print "done" :-)
+%commit
+%echo done

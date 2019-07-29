@@ -142,6 +142,20 @@ archivematica_src_configure_am_org_name: "test org"              # Dashboard adm
 archivematica_src_configure_am_org_id: "test id"                # Dashboard admin Org id
 archivematica_src_configure_am_whitelist: '""'               # Dashboard API whitelist, IP address or hostnames separated by blank spaces and inside quotes
 
+# Configure GPG
+# Uncomment this to add GPG AIPs Store and Backlog locations.
+#archivematica_src_configure_gpg:
+#  gpg_home_directory: "/var/archivematica/storage_service"
+#  binary: "gpg"
+#  key_user: "{{ archivematica_src_configure_ss_user }}"
+#  key_passphrase: "passphrase"
+#  key_comment: "Ansible Generated"
+#  key_mail: "{{ archivematica_src_configure_ss_email }}"
+#  space_staging_directory: "/var/archivematica/storage_service"
+#  aipstore_path: "/var/archivematica/sharedDirectory/www/GPG_AIPsStore"
+#  aipstore_description: "GPG AIPsStore"
+#  backlog_path: "/var/archivematica/sharedDirectory/www/GPG_transferBacklog"
+#  backlog_description: "GPG TransferBacklog"
 
 # Uncomment this to override values from DashboardSettings table.
 #archivematica_src_configure_dashboardsettings:
