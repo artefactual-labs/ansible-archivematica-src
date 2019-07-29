@@ -1,0 +1,165 @@
+---
+
+# check when GPG Space already exists
+
+- name: "Get GPG Spaces from API"
+  uri:
+    url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/?access_protocol=GPG"
+    headers:
+      Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+    status_code: 200
+    method: GET
+  register: gpg_list_gpg_spaces
+
+# add GPG space and locations when there is no GPG space already configured
+- name: "Add GPG space and locations"
+  block:
+
+    - name: "Set gpg binary name"
+      set_fact:
+        gpg_binary: "gpg1"
+      when: "ansible_distribution_version | version_compare('18.04', '>=')"
+
+    - name: "Create batch file for GPG key"
+      template:
+        src: "gpg/gpg-batch-file.j2"
+        dest: "/tmp/gpg-batch-file"
+      become: "yes"
+
+    - name: "Check whether GPG already exists"
+      shell: >
+        {{ archivematica_src_configure_gpg.binary }}
+        --no-tty
+        --homedir={{ archivematica_src_configure_gpg.gpg_home_directory }}
+        --quiet
+        --list-secret-keys
+        --fingerprint {{ archivematica_src_configure_gpg.key_user }}
+      args:
+        executable: "/bin/bash"
+      register: "gpg_key_already_exist"
+      become: "yes"
+      become_user: "archivematica"
+      ignore_errors: "yes"
+
+    - name: "Create GPG key when doesn't exist"
+      shell: >
+        {{ archivematica_src_configure_gpg.binary }}
+        --batch
+        --no-tty
+        --homedir={{ archivematica_src_configure_gpg.gpg_home_directory }}
+        --quiet
+        --gen-key
+        /tmp/gpg-batch-file
+      args:
+        executable: "/bin/bash"
+      become: "yes"
+      become_user: "archivematica"
+      when: gpg_key_already_exist.rc != 0
+      ignore_errors: "yes"
+
+    - name: "Delete GPG tmp file"
+      file:
+        state: absent
+        path: "/tmp/gpg-batch-file"
+      become: "yes"
+
+    - name: "Get gpg key fingerprint"
+      shell: >
+        {{ archivematica_src_configure_gpg.binary }}
+        --no-tty
+        --homedir={{ archivematica_src_configure_gpg.gpg_home_directory }}
+        --quiet
+        --list-secret-keys
+        --fingerprint {{ archivematica_src_configure_gpg.key_user }}
+        | grep "Key fingerprint"
+        | awk -F= '{ print $2}'
+        | tail -n1
+        | sed 's/\s//g'
+      args:
+        executable: "/bin/bash"
+      register: "gpg_fingerprint"
+      become: "yes"
+      become_user: "archivematica"
+
+    - name: "Create GPG Space"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/"
+        headers:
+          Content-Type: "application/json"
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+        body:
+          access_protocol: "GPG"
+          path: "/"
+          staging_path: "{{ archivematica_src_configure_gpg.space_staging_directory }}"
+          key: "{{ gpg_fingerprint.stdout }}"
+        body_format: json
+        status_code: 201
+        method: POST
+
+    - name: "List GPG Spaces from API"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/?access_protocol=GPG"
+        headers:
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+        status_code: 200
+        method: GET
+      register: gpg_list_gpg_spaces_again
+
+    - name: "List pipelines from API"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/pipeline/"
+        headers:
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+        status_code: 200
+        method: GET
+      register: gpg_list_pipelines
+
+    - name: "Create directories for GPG locations"
+      file:
+        path: "{{ item }}"
+        owner: "archivematica"
+        group: "archivematica"
+        mode: "0755"
+        state: "directory"
+      become: "yes"
+      with_items:
+        - "{{ archivematica_src_configure_gpg.aipstore_path }}"
+        - "{{ archivematica_src_configure_gpg.backlog_path }}"
+
+    - name: "Create GPG AIPs Storage"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/location/"
+        headers:
+          Content-Type: "application/json"
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+        body:
+          pipeline: ["/api/v2/pipeline/{{ gpg_list_pipelines.json|json_query('objects[*].uuid')|first }}/"]
+          purpose: "AS"
+          relative_path: "{{ archivematica_src_configure_gpg.aipstore_path | regex_replace('^\\/', '') }}"
+          description: "{{ archivematica_src_configure_gpg.aipstore_description }}"
+          default: "false"
+          space: "/api/v2/space/{{ gpg_list_gpg_spaces_again.json|json_query('objects[*].uuid')|first }}/"
+        body_format: json
+        status_code: 201
+        method: POST
+      when: gpg_list_gpg_spaces.json is defined and gpg_list_pipelines.json is defined
+      
+    - name: "Create GPG Transfer Backlog"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/location/"
+        headers:
+          Content-Type: "application/json"
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+        body:
+          pipeline: ["/api/v2/pipeline/{{ gpg_list_pipelines.json|json_query('objects[*].uuid')|first }}/"]
+          purpose: "BL"
+          relative_path: "{{ archivematica_src_configure_gpg.aipstore_path | regex_replace('^\\/', '') }}"
+          description: "{{ archivematica_src_configure_gpg.aipstore_description }}"
+          default: "false"
+          space: "/api/v2/space/{{ gpg_list_gpg_spaces_again.json|json_query('objects[*].uuid')|first }}/"
+        body_format: json
+        status_code: 201
+        method: POST
+      when: gpg_list_gpg_spaces.json is defined and gpg_list_pipelines.json is defined
+
+  when: gpg_list_gpg_spaces.json|json_query('meta.total_count') == 0
