@@ -110,7 +110,10 @@
     tags:
       - "amsrc-ss"
       - "amsrc-ss-db"
-
+  - include: "ss-osconf.yml"
+    tags:
+      - "amsrc-ss"
+      - "amsrc-ss-osconf"
   - include: "ss-websrv-gunicorn.yml"
     tags:
       - "amsrc-ss"
