@@ -1,78 +1,82 @@
 ---
 
-#
-# Prepare pip
-#
+- name: "Expand archivematica_src_dir"
+  set_fact:
+    archivematica_src_dir: "{{ archivematica_src_dir|expanduser }}"
 
-- name: "Ensure pip is not installed from packages"
-  package:
-    name: "{{ item }}"
-    state: "absent"
-  with_items:
-    - "python-pip"
-    - "python2-pip"
 
-- name: "Download get-pip.py"
-  get_url:
-    url: "https://bootstrap.pypa.io/get-pip.py"
-    dest: "/root/get-pip.py"
+- name: "Common configuration for source installs"
+  block:
 
-- name: "Install pip with get-pip.py"
-  command: "python get-pip.py"
-  args:
-    chdir: "/root/"
+  #
+  # Prepare pip
+  #
 
-- name: "Install virtualenv with pip"
-  pip:
-    name: "{{ item }}"
-    state: "latest"
-  with_items:
-    - "virtualenv"
+  - name: "Ensure pip is not installed from packages"
+    package:
+      name: "{{ item }}"
+      state: "absent"
+    with_items:
+      - "python-pip"
+      - "python2-pip"
+
+  - name: "Download get-pip.py"
+    get_url:
+      url: "https://bootstrap.pypa.io/get-pip.py"
+      dest: "/root/get-pip.py"
+
+  - name: "Install pip with get-pip.py"
+    command: "python get-pip.py"
+    args:
+      chdir: "/root/"
+
+  - name: "Install virtualenv with pip"
+    pip:
+      name: "{{ item }}"
+      state: "latest"
+    with_items:
+      - "virtualenv"
 
 
 #
 # Create `archivematica` user
 #
 
-- name: "Create user archivematica"
-  user:
-    name: "archivematica"
-    uid: "333"
-    system: "yes"
-    groups: "audio"
-    home: "/var/lib/archivematica"
+  - name: "Create user archivematica"
+    user:
+      name: "archivematica"
+      uid: "333"
+      system: "yes"
+      groups: "audio"
+      home: "/var/lib/archivematica"
 
-- name: "Add archivematica user permissions in visudo file"
-  lineinfile:
-    dest: "/etc/sudoers"
-    state: "present"
-    regexp: "^archivematica ALL\\="
-    line: "archivematica ALL=NOPASSWD:/bin/mv,/bin/chown,/bin/chmod,/usr/bin/find,/usr/bin/gs,/usr/bin/inkscape"
-    validate: "/usr/sbin/visudo -cf %s"
-  when: archivematica_src_enable_sudoers is defined and archivematica_src_enable_sudoers|bool
+  - name: "Add archivematica user permissions in visudo file"
+    lineinfile:
+      dest: "/etc/sudoers"
+      state: "present"
+      regexp: "^archivematica ALL\\="
+      line: "archivematica ALL=NOPASSWD:/bin/mv,/bin/chown,/bin/chmod,/usr/bin/find,/usr/bin/gs,/usr/bin/inkscape"
+      validate: "/usr/sbin/visudo -cf %s"
+    when: archivematica_src_enable_sudoers is defined and archivematica_src_enable_sudoers|bool
 
-- name: "Remove archivematica user permissions in visudo file"
-  lineinfile:
-    dest: "/etc/sudoers"
-    state: "absent"
-    regexp: "^archivematica ALL\\="
-    line: "archivematica ALL=NOPASSWD:/bin/mv,/bin/chown,/bin/chmod,/usr/bin/find,/usr/bin/gs,/usr/bin/inkscape"
-    validate: "/usr/sbin/visudo -cf %s"
-  when: archivematica_src_enable_sudoers is not defined or not archivematica_src_enable_sudoers|bool
+  - name: "Remove archivematica user permissions in visudo file"
+    lineinfile:
+      dest: "/etc/sudoers"
+      state: "absent"
+      regexp: "^archivematica ALL\\="
+      line: "archivematica ALL=NOPASSWD:/bin/mv,/bin/chown,/bin/chmod,/usr/bin/find,/usr/bin/gs,/usr/bin/inkscape"
+      validate: "/usr/sbin/visudo -cf %s"
+    when: archivematica_src_enable_sudoers is not defined or not archivematica_src_enable_sudoers|bool
 
 #
 # Prepare `archivematica_src_dir`
 #
 
-- name: "Expand archivematica_src_dir"
-  set_fact:
-    archivematica_src_dir: "{{ archivematica_src_dir|expanduser }}"
-
-- name: "Create archivematica_src_dir"
-  file:
-    state: "directory"
-    path: "{{ archivematica_src_dir }}"
-
+  - name: "Create archivematica_src_dir"
+    file:
+      state: "directory"
+      path: "{{ archivematica_src_dir }}"
+  when: (archivematica_src_install_am|bool or archivematica_src_install_ss|bool)
 #
 # SELinux configuration
 #

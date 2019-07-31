@@ -19,8 +19,8 @@ archivematica_src_install_fixity: "no"
 archivematica_src_search_enabled: "yes"
 
 #Components to configure
-archivematica_src_configure_dashboard: "no"
-archivematica_src_configure_ss: "no"
+archivematica_src_configure_dashboard: "yes"
+archivematica_src_configure_ss: "yes"
 
 # Define the type of environment: "production" or "development". The latter will deploy some extra stuff to make the development workflow easier.
 archivematica_src_environment_type: "production"
