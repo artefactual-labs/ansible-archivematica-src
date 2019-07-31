@@ -5,6 +5,13 @@
   set_fact:
     dashboard_gunicorn_path: "{{ archivematica_src_am_dashboard_virtualenv }}/bin/gunicorn"
 
+- name: "Ensure 7z is present (RedHat)"
+  file:
+    src: /usr/bin/7za
+    dest: /usr/bin/7z
+    state: link
+  when: ansible_os_family == 'RedHat'
+
 - name: "Configure environment vars"
   template:
     src: "{{ item.src }}"
