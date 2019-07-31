@@ -191,6 +191,8 @@
   command: "make simple"
   args:
     chdir: "~/archivematica-sampledata/"
+  environment:
+    LC_ALL: "en_US.utf8"
   when: "archivematica_src_install_sample_data|bool"
   become: "no"
 
