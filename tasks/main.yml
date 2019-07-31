@@ -175,15 +175,16 @@
       - "amsrc-pipeline"
       - "amsrc-pipeline-dbconf"
 
+  - include: "pipeline-es.yml"
+    tags:
+      - "amsrc-pipeline"
+      - "amsrc-pipeline-es"
+
   - include: "pipeline-environment.yml"
     tags:
       - "amsrc-pipeline"
       - "amsrc-pipeline-environment"
  
-  - include: "pipeline-es.yml"
-    tags:
-      - "amsrc-pipeline"
-      - "amsrc-pipeline-es"
 
   - include: "pipeline-websrv-gunicorn.yml"
     tags:
