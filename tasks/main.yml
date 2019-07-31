@@ -97,17 +97,25 @@
     - "amsrc-ss"
   when: "archivematica_src_install_ss|bool"
 
-- include: "ss-db.yml"
-  tags:
-    - "amsrc-ss"
-    - "amsrc-ss-db"
-  when: "archivematica_src_install_ss|bool"
+- name: "Install archivematica storage service rpm"
+  yum:
+    name: archivematica-storage-service
+    state: present
+    disable_gpg_check: yes
+  when: "archivematica_rpm_install_ss| bool"
 
-- include: "ss-websrv-gunicorn.yml"
-  tags:
-    - "amsrc-ss"
-    - "amsrc-ss-websrv"
-  when: "archivematica_src_install_ss|bool"
+- name: "Configure storage service"
+  block:
+  - include: "ss-db.yml"
+    tags:
+      - "amsrc-ss"
+      - "amsrc-ss-db"
+
+  - include: "ss-websrv-gunicorn.yml"
+    tags:
+      - "amsrc-ss"
+      - "amsrc-ss-websrv"
+  when: "archivematica_src_configure_ss|bool"
 
 
 #
@@ -123,56 +131,62 @@
 #   4- Code install
 #   5- Database config
 #   6- web server config
+- name: "Install from source"
+  block: 
+  - include: "pipeline-clonecode.yml"
+    tags:
+      - "amsrc-pipeline"
+      - "amsrc-pipeline-clonecode"
 
-- include: "pipeline-clonecode.yml"
-  tags:
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-clonecode"
+  - include: "pipeline-osdeps.yml"
+    tags:
+      - "amsrc-pipeline"
+      - "amsrc-pipeline-osdeps"
+
+  - include: "pipeline-pip-deps.yml"
+    tags:
+      - "amsrc-pipeline"
+      - "amsrc-pipeline-pipdeps"
+  - include: "pipeline-osconf.yml"
+    tags:
+      - "amsrc-pipeline"
+      - "amsrc-pipeline-osconf"
+
+  - include: "pipeline-instcode.yml"
+    tags:
+      - "amsrc-pipeline"
+      - "amsrc-pipeline-instcode"
   when: "archivematica_src_install_am|bool"
 
-- include: "pipeline-osdeps.yml"
-  tags:
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-osdeps"
-  when: "archivematica_src_install_am|bool"
+- name: "Install archivematica packages"
+  yum:
+    name: archivematica-dashboard,archivematica-mcp-server,archivematica-mcp-client
+    state: present
+    disable_gpg_check: yes
 
-- include: "pipeline-pip-deps.yml"
-  tags:
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-pipdeps"
-  when: "archivematica_src_install_am|bool"
+- name: "Configure AM environment" 
+  block:
+  - include: "pipeline-dbconf.yml"
+    tags:
+      - "amsrc-pipeline"
+      - "amsrc-pipeline-dbconf"
 
-- include: "pipeline-osconf.yml"
-  tags:
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-osconf"
-  when: "archivematica_src_install_am|bool"
+  - include: "pipeline-environment.yml"
+    tags:
+      - "amsrc-pipeline"
+      - "amsrc-pipeline-environment"
+ 
+  - include: "pipeline-es.yml"
+    tags:
+      - "amsrc-pipeline"
+      - "amsrc-pipeline-es"
 
-- include: "pipeline-instcode.yml"
-  tags:
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-instcode"
-  when: "archivematica_src_install_am|bool"
+  - include: "pipeline-websrv-gunicorn.yml"
+    tags:
+      - "amsrc-pipeline"
+      - "amsrc-pipeline-websrv"
 
-- include: "pipeline-dbconf.yml"
-  tags:
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-dbconf"
-  when: "archivematica_src_install_am|bool"
-
-- include: "pipeline-es.yml"
-  tags:
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-es"
-  when: "archivematica_src_install_am|bool"
-
-- include: "pipeline-websrv-gunicorn.yml"
-  tags:
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-websrv"
-  when: "archivematica_src_install_am|bool"
-
-
+  when: "archivematica_src_configure_dashboard|bool"
 #
 # archivematica-sampledata
 #
