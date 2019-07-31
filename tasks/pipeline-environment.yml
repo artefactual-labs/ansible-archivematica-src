@@ -82,3 +82,18 @@
   when:
     - ansible_service_mgr == "systemd"
 
+#- name: "Configure extra mcp-clients"
+#  template:
+#    src: "etc/systemd/system/archivematica-mcp-client.service.j2"
+#    dest: "/etc/systemd/system/{{ 'archivematica-mcp-client-%02x' | format(item) }}.service"
+#  loop: "{{ range(1, 4 + 1, 1)|list }}"
+
+#- name: "Enable services"
+#  systemd:
+#    name: "{{ 'archivematica-mcp-client-%02x' | format(item) }}"
+#    state: "restarted"
+#    enabled: "yes"
+#    daemon_reload: "yes"
+#  loop: "{{ range(1, 4 + 1, 1)|list }}"
+#  when:
+#    - ansible_service_mgr == "systemd"
