@@ -126,23 +126,11 @@
   block:
   - name: "Add AM repos"
     yum_repository: 
-      name: "archivematica"
-      description: "archivematica-main"
-      baseurl: "http://jenkins-ci.archivematica.org/repos/am-packbuild/1.10.0/centos7/"
-      repo_gpgcheck: "no"
-  - name: "Add AM repos"
-    yum_repository: 
-      name: "archivematica-ss"
-      description: "archivematica-ss"
-      baseurl: "http://jenkins-ci.archivematica.org/repos/am-packbuild/0.15.0/centos7/"
-      repo_gpgcheck: "no"
-
-  - name: "Add AM repos"
-    yum_repository: 
-      name: "archivematica-extras"
-      description: "archivematica-extras"
-      baseurl: "https://packages.archivematica.org/1.10.x/centos-extras"
-      repo_gpgcheck: "no"
+      name: "{{ item.key }}"
+      description: "{{ item.key }}"
+      baseurl: "{{ item.value.baseurl }}"
+      repo_gpgcheck: "{{ item.value.gpgcheck }}"
+    loop: "{{ lookup('dict',archivematica_src_rpm_repositories) }}"
   when: "(archivematica_src_install_am_rpm|bool or archivematica_src_install_ss_rpm|bool)"
 
 
