@@ -4,133 +4,97 @@
 ###########################################################
 #   0- Clone source repo
 ###########################################################
-- name: Install from source
-  block: 
-  - name: "Checkout archivematica-storage-service code"
-    git:
-      repo: "{{ archivematica_src_ss_repo }}"
-      dest: "{{ archivematica_src_dir }}/archivematica-storage-service"
-      version: "{{ archivematica_src_ss_version }}"
-      force: "yes"
-      accept_hostkey: "yes"
-    tags: "amsrc-ss-clone"
+- name: "Checkout archivematica-storage-service code"
+  git:
+    repo: "{{ archivematica_src_ss_repo }}"
+    dest: "{{ archivematica_src_dir }}/archivematica-storage-service"
+    version: "{{ archivematica_src_ss_version }}"
+    force: "yes"
+    accept_hostkey: "yes"
+  tags: "amsrc-ss-clone"
 
 # For some reason, some dirs in the cloned source code
 # are not sometimes readable by all. Add a task to fix it
 # For some other reason this task does not always work
 # blame ansible  :-/
 # Update: this problem may have been fixed with postinst removal
-  - name: "Ensure the source code is readable by all"
-    file:
-      path: "{{ archivematica_src_dir }}/archivematica-storage-service"
-      mode: "o+rX"
-      recurse: "yes"
-    become: "yes"
-    tags: "amsrc-ss-clone"
+- name: "Ensure the source code is readable by all"
+  file:
+    path: "{{ archivematica_src_dir }}/archivematica-storage-service"
+    mode: "o+rX"
+    recurse: "yes"
+  become: "yes"
+  tags: "amsrc-ss-clone"
 
 
 ###########################################################
 #   1- OS package dependencies
 ###########################################################
 
-  - name: "include ss-osdeps.yml"
-    include: "ss-osdeps.yml"
-    tags: "amsrc-ss-osdeps"
-    static: no
+- name: "include ss-osdeps.yml"
+  include: "ss-osdeps.yml"
+  tags: "amsrc-ss-osdeps"
+  static: no
 
 
 ###########################################################
 #   2- Python dependencies (pip packages)
 ###########################################################
 
-  - stat:
-      path: "{{ archivematica_src_dir }}/archivematica-storage-service/lib"
-    register: "ss_lib_dir_check"
-    tags: "amsrc-ss-pydep"
+- stat:
+    path: "{{ archivematica_src_dir }}/archivematica-storage-service/lib"
+  register: "ss_lib_dir_check"
+  tags: "amsrc-ss-pydep"
 
-  - set_fact:
-      ss_pip_install_extra_args: ""
-    tags: "amsrc-ss-pydep"
+- set_fact:
+    ss_pip_install_extra_args: ""
+  tags: "amsrc-ss-pydep"
 
-  - set_fact:
-      ss_pip_install_extra_args: "--find-links lib"
-    when: "ss_lib_dir_check.stat.isdir is defined and ss_lib_dir_check.stat.isdir"
-    tags: "amsrc-ss-pydep"
+- set_fact:
+    ss_pip_install_extra_args: "--find-links lib"
+  when: "ss_lib_dir_check.stat.isdir is defined and ss_lib_dir_check.stat.isdir"
+  tags: "amsrc-ss-pydep"
 
 # this task is needed to avoid problems when upgrading python package
-  - name: "Remove old SS virtualenv default dir"
-    file:
-      state: absent
-      path: "/usr/share/python/archivematica-storage-service/"
+- name: "Remove old SS virtualenv default dir"
+  file:
+    state: absent
+    path: "/usr/share/python/archivematica-storage-service/"
 
 # a separate task to create the virtualenv before install requirements
 # is required to avoid errors
-  - name: "Create virtualenv for archivematica-storage-service"
-    pip:
-      name: "pip"
-      chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-      virtualenv: "{{ archivematica_src_ss_virtualenv }}"
-      state: "latest"
-    tags: "amsrc-ss-pydep"
+- name: "Create virtualenv for archivematica-storage-service"
+  pip:
+    name: "pip"
+    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+    state: "latest"
+  tags: "amsrc-ss-pydep"
 
-  - name: "Install pip requirements for production"
-    pip:
-      chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-      requirements: "{{ item }}"
-      virtualenv: "{{ archivematica_src_ss_virtualenv }}"
-      extra_args: "{{ ss_pip_install_extra_args }}"
-      state: "latest"
-    tags: "amsrc-ss-pydep"
-    when: "is_prod"
-    with_items:
-      - "requirements/production.txt"
+- name: "Install pip requirements for production"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
+    requirements: "{{ item }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+    extra_args: "{{ ss_pip_install_extra_args }}"
+    state: "latest"
+  tags: "amsrc-ss-pydep"
+  when: "is_prod"
+  with_items:
+    - "requirements/production.txt"
 
-  - name: "Install pip requirements for development"
-    pip:
-      chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-      requirements: "{{ item }}"
-      virtualenv: "{{ archivematica_src_ss_virtualenv }}"
-      extra_args: "{{ ss_pip_install_extra_args }}"
-      state: "latest"
-    tags: "amsrc-ss-pydep"
-    when: "is_dev"
-    with_items:
-      - "requirements/local.txt"
-      - "requirements/test.txt"
-
-###########################################################
-#   4- SS code install
-###########################################################
-
-  - name: "Copy archivematica-storage-service source files"
-    file:
-      src: "{{ item.src }}"
-      dest: "{{ item.dest }}"
-      state: "link"
-    with_items:
-      - src: "{{ archivematica_src_dir }}/archivematica-storage-service/storage_service"
-        dest: "{{ archviematica_src_ss_app }}"
-    tags: "amsrc-ss-code"
-
-  - name: "Run SS django collectstatic"
-    django_manage:
-      command: "collectstatic"
-      app_path: "{{ archviematica_src_ss_app }}"
-      virtualenv: "{{ archivematica_src_ss_virtualenv }}"
-    environment: "{{ archivematica_src_ss_environment }}"
-    tags: ["amsrc-ss-code", "amsrc-ss-code-collectstatic"]
-
-  - name: "Copy gunicorn configuration file"
-    copy:
-      src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/storage-service.gunicorn-config.py"
-      dest: "{{ archivematica_src_ss_gunicorn_config }}"
-      backup: "yes"
-      force: "yes"
-      remote_src: "yes"
-    tags: "amsrc-ss-websrv"
-
-  when: "archivematica_src_install_ss|bool is true"
-
+- name: "Install pip requirements for development"
+  pip:
+    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
+    requirements: "{{ item }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+    extra_args: "{{ ss_pip_install_extra_args }}"
+    state: "latest"
+  tags: "amsrc-ss-pydep"
+  when: "is_dev"
+  with_items:
+    - "requirements/local.txt"
+    - "requirements/test.txt"
 
 ###########################################################
 #   3- OS configuration (user/directory/file creation/permissions/ownership)
@@ -184,18 +148,34 @@
   tags: "amsrc-ss-osconf"
   when: "archivematica_src_logging_backward_compatible|bool"
 
-- name: "Config SS logging"
-  template:
-    src: "etc/archivematica/storageService.logging.json.j2"
-    dest: "/etc/archivematica/storageService.logging.json"
-    backup: "yes"
-  tags: "amsrc-ss-osconf"
-  when: "archivematica_src_logging_backward_compatible|bool"
 
-- name: "Remove SS backward-compatible logging"
+###########################################################
+#   4- SS code install
+###########################################################
+
+- name: "Copy archivematica-storage-service source files"
   file:
-    path: "/etc/archivematica/storageService.logging.json"
-    state: "absent"
-  when: "not archivematica_src_logging_backward_compatible|bool"
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: "link"
+  with_items:
+    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/storage_service"
+      dest: "{{ archviematica_src_ss_app }}"
+  tags: "amsrc-ss-code"
 
+- name: "Run SS django collectstatic"
+  django_manage:
+    command: "collectstatic"
+    app_path: "{{ archviematica_src_ss_app }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+  environment: "{{ archivematica_src_ss_environment }}"
+  tags: ["amsrc-ss-code", "amsrc-ss-code-collectstatic"]
 
+- name: "Copy gunicorn configuration file"
+  copy:
+    src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/storage-service.gunicorn-config.py"
+    dest: "{{ archivematica_src_ss_gunicorn_config }}"
+    backup: "yes"
+    force: "yes"
+    remote_src: "yes"
+  tags: "amsrc-ss-websrv"

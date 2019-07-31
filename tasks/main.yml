@@ -102,7 +102,7 @@
     name: archivematica-storage-service
     state: present
     disable_gpg_check: yes
-  when: "archivematica_rpm_install_ss| bool"
+  when: "archivematica_rpm_install_ss|bool"
 
 - name: "Configure storage service"
   block:
@@ -163,9 +163,10 @@
 
 - name: "Install archivematica packages"
   yum:
-    name: archivematica-dashboard,archivematica-mcp-server,archivematica-mcp-client
-    state: present
-    disable_gpg_check: yes
+    name: "archivematica-dashboard,archivematica-mcp-server,archivematica-mcp-client"
+    state: "present"
+    disable_gpg_check: "yes"
+  when: "archivematica_rpm_install_am|bool"
 
 - name: "Configure AM environment" 
   block:

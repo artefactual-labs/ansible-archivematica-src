@@ -18,6 +18,32 @@
     - src: "etc/sysconfig/archivematica-dashboard.j2"
       dest: "{{ systemd_environment_path }}/archivematica-dashboard"
 
+
+#
+# logging
+#
+
+- name: "Configure backward-compatible logging"
+  template:
+    src: "{{ item }}"
+    dest: /etc/archivematica/{{ item | basename | regex_replace('\.j2','') }}
+    backup: "yes"
+  with_items:
+    - "etc/archivematica/dashboard.logging.json.j2"
+    - "etc/archivematica/clientConfig.logging.json.j2"
+    - "etc/archivematica/serverConfig.logging.json.j2"
+  when: "archivematica_src_logging_backward_compatible|bool"
+
+- name: "Remove backward-compatible logging"
+  file:
+    path: "{{ item }}"
+    state: "absent"
+  with_items:
+    - "/etc/archivematica/dashboard.logging.json"
+    - "/etc/archivematica/clientConfig.logging.json"
+    - "/etc/archivematica/serverConfig.logging.json"
+  when: "not archivematica_src_logging_backward_compatible|bool"
+
 #
 # systemd
 #

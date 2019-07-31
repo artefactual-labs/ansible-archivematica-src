@@ -6,7 +6,7 @@
     src: "etc/systemd/system/archivematica-storage-service.service.j2"
     dest: "/etc/systemd/system/archivematica-storage-service.service"
     backup: "yes"
-  tags: "amsrc-ss-websrv"
+  tags: "amsrc-ss-osconf"
   when:
     - ansible_service_mgr == "systemd"
 
@@ -15,9 +15,21 @@
     src: "etc/sysconfig/archivematica-storage-service.j2"
     dest: "{{ systemd_environment_path }}/archivematica-storage-service"
     backup: "yes"
-  tags: "amsrc-ss-websrv"
+  tags: "amsrc-ss-osconf"
 
+- name: "Config SS logging"
+  template:
+    src: "etc/archivematica/storageService.logging.json.j2"
+    dest: "/etc/archivematica/storageService.logging.json"
+    backup: "yes"
+  tags: "amsrc-ss-osconf"
+  when: "archivematica_src_logging_backward_compatible|bool"
 
+- name: "Remove SS backward-compatible logging"
+  file:
+    path: "/etc/archivematica/storageService.logging.json"
+    state: "absent"
+  when: "not archivematica_src_logging_backward_compatible|bool"
 
 - name: "Configure rng-tools"
   lineinfile:
@@ -48,7 +60,7 @@
   when:
     - ansible_os_family == "RedHat"
 
-- name: "Enable services (systemd)"
+- name: "Enable SS services (systemd)"
   service:
     name: "{{ item }}"
     state: "restarted"
@@ -56,7 +68,6 @@
     daemon_reload: "yes"
   with_items:
     - "archivematica-storage-service"
-    - "nginx"
   when:
     - ansible_service_mgr == "systemd"
-  tags: "amsrc-ss-websrv"
+  tags: "amsrc-ss-osconf"
