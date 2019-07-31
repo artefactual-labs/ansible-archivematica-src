@@ -1,0 +1,58 @@
+---
+
+
+- name: "set_fact: set gunicorn path to correct value"
+  set_fact:
+    dashboard_gunicorn_path: "{{ archivematica_src_am_dashboard_virtualenv }}/bin/gunicorn"
+
+- name: "Configure environment vars"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    backup: "yes"
+  with_items:
+    - src: "etc/sysconfig/archivematica-mcp-server.j2"
+      dest: "{{ systemd_environment_path }}/archivematica-mcp-server"
+    - src: "etc/sysconfig/archivematica-mcp-client.j2"
+      dest: "{{ systemd_environment_path }}/archivematica-mcp-client"
+    - src: "etc/sysconfig/archivematica-dashboard.j2"
+      dest: "{{ systemd_environment_path }}/archivematica-dashboard"
+
+#
+# systemd
+#
+
+- name: "systemd | Install configuration files"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    backup: "yes"
+  when:
+    - "ansible_service_mgr == 'systemd'"
+  with_items:
+    - src: "etc/systemd/system/archivematica-mcp-server.service.j2"
+      dest: "/etc/systemd/system/archivematica-mcp-server.service"
+    - src: "etc/systemd/system/archivematica-mcp-client.service.j2"
+      dest: "/etc/systemd/system/archivematica-mcp-client.service"
+    - src: "etc/systemd/system/archivematica-dashboard.service.j2"
+      dest: "/etc/systemd/system/archivematica-dashboard.service"
+
+- name: "Reload systemd config"
+  command: "systemctl daemon-reload"
+  when:
+    - "ansible_service_mgr == 'systemd'"
+
+- name: "Enable services"
+  systemd:
+    name: "{{ item }}"
+    state: "restarted"
+    enabled: "yes"
+    daemon_reload: "yes"
+  with_items:
+    - "archivematica-mcp-server"
+    - "archivematica-mcp-client"
+    - "archivematica-dashboard"
+    - "fits-nailgun"
+  when:
+    - ansible_service_mgr == "systemd"
+
