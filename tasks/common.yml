@@ -121,3 +121,29 @@
   become: "no"
   when:
     - ansible_os_family == "RedHat"
+
+#TODO: Use dict
+- name: "Add Archivematica RPM repositories"
+  block:
+  - name: "Add AM repos"
+    yum_repository: 
+      name: "archivematica"
+      description: "archivematica-main"
+      baseurl: "http://jenkins-ci.archivematica.org/repos/am-packbuild/1.10.0/centos7/"
+      repo_gpgcheck: "no"
+  - name: "Add AM repos"
+    yum_repository: 
+      name: "archivematica-ss"
+      description: "archivematica-ss"
+      baseurl: "http://jenkins-ci.archivematica.org/repos/am-packbuild/0.15.0/centos7/"
+      repo_gpgcheck: "no"
+
+  - name: "Add AM repos"
+    yum_repository: 
+      name: "archivematica-extras"
+      description: "archivematica-extras"
+      baseurl: "https://packages.archivematica.org/1.10.x/centos-extras"
+      repo_gpgcheck: "no"
+  when: "(archivematica_rpm_install_am|bool or archivematica_rpm_install_ss|bool)"
+
+
