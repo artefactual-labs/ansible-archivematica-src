@@ -5,20 +5,17 @@
 # Note: the playbook assumes the use of /etc/nginx/{sites-available|sites-enabled}
 #       directories for site config files, even on CentOS/RedHat
 
+- name: "Remove rpm provided nginx config"
+  file: 
+    state: "absent"
+    path: "/etc/nginx/conf.d/archivematica-storage-service.conf"
+  when: "archivematica_rpm_install_ss"
+
 - name: "set nginx sites-available config file"
   template:
     src: "etc/nginx/sites-available/storage.conf.j2"
     dest: "/etc/nginx/sites-available/storage.conf"
     backup: "yes"
-  tags: "amsrc-ss-websrv"
-
-- name: "Copy gunicorn configuration file"
-  copy:
-    src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/storage-service.gunicorn-config.py"
-    dest: "{{ archivematica_src_ss_gunicorn_config }}"
-    backup: "yes"
-    force: "yes"
-    remote_src: "yes"
   tags: "amsrc-ss-websrv"
 
 - name: "Add storage service gunicorn systemd (/etc/systemd)"
