@@ -9,7 +9,7 @@
   file: 
     state: "absent"
     path: "/etc/nginx/conf.d/archivematica-storage-service.conf"
-  when: "archivematica_rpm_install_ss_rpm"
+  when: "archivematica_src_install_ss_rpm|bool"
 
 - name: "set nginx sites-available config file"
   template:
