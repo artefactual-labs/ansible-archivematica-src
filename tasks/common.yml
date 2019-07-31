@@ -4,6 +4,17 @@
   set_fact:
     archivematica_src_dir: "{{ archivematica_src_dir|expanduser }}"
 
+#
+# Create `archivematica` user
+#
+
+- name: "Create user archivematica"
+  user:
+    name: "archivematica"
+    uid: "333"
+    system: "yes"
+    groups: "audio"
+    home: "/var/lib/archivematica"
 
 - name: "Common configuration for source installs"
   block:
@@ -37,18 +48,6 @@
     with_items:
       - "virtualenv"
 
-
-#
-# Create `archivematica` user
-#
-
-  - name: "Create user archivematica"
-    user:
-      name: "archivematica"
-      uid: "333"
-      system: "yes"
-      groups: "audio"
-      home: "/var/lib/archivematica"
 
   - name: "Add archivematica user permissions in visudo file"
     lineinfile:
