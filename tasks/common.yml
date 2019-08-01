@@ -19,35 +19,32 @@
 #
 # Prepare pip
 #
-
-- name: "Ensure pip is not installed from packages"
-  package:
-    name: "{{ item }}"
-    state: "absent"
-  with_items:
-    - "python-pip"
-    - "python2-pip"
-
-- name: "Download get-pip.py"
-  get_url:
-    url: "https://bootstrap.pypa.io/get-pip.py"
-    dest: "/root/get-pip.py"
-
-- name: "Install pip with get-pip.py"
-  command: "python get-pip.py"
-  args:
-    chdir: "/root/"
-
-- name: "Install virtualenv with pip"
-  pip:
-    name: "{{ item }}"
-    state: "latest"
-  with_items:
-    - "virtualenv"
-
-
 - name: "Common configuration for source installs"
   block:
+  - name: "Ensure pip is not installed from packages"
+    package:
+      name: "{{ item }}"
+      state: "absent"
+    with_items:
+      - "python-pip"
+      - "python2-pip"
+
+  - name: "Download get-pip.py"
+    get_url:
+      url: "https://bootstrap.pypa.io/get-pip.py"
+      dest: "/root/get-pip.py"
+
+  - name: "Install pip with get-pip.py"
+    command: "python get-pip.py"
+    args:
+      chdir: "/root/"
+
+  - name: "Install virtualenv with pip"
+    pip:
+      name: "{{ item }}"
+      state: "latest"
+    with_items:
+      - "virtualenv"
 
   - name: "Add archivematica user permissions in visudo file"
     lineinfile:
@@ -76,9 +73,21 @@
       state: "directory"
       path: "{{ archivematica_src_dir }}"
   when: (archivematica_src_install_am|bool or archivematica_src_install_ss|bool)
+
+  
 #
 # SELinux configuration
 #
+- name: "Install necessary packages required by rpms"
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - "python-virtualenv"
+    - "python-pip"
+  when: "archivematica_src_install_am_rpm|bool"
+
+
 - name: "Install necessary packages required by this ansible role"
   yum:
     name: "{{ item }}"
