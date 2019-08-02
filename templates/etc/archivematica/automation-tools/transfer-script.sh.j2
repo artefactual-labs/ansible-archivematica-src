@@ -1,4 +1,12 @@
 #!/bin/bash
 # transfer script example
 cd /usr/lib/archivematica/automation-tools/
-/usr/share/python/automation-tools/bin/python -m transfers.transfer --user <user>  --api-key <apikey> --transfer-source <transfer_source_uuid> --config-file <config_file> --ss-user <ss-user> --ss-api-key <ss-key>
+/usr/share/archivematica/virtualenvs/automation-tools/bin/python -m transfers.transfer \
+   --am-url=http://localhost \
+   --user={{ archivematica_src_configure_am_user }} \
+   --api-key={{ archivematica_src_configure_am_api_key }} \
+   --ss-url={{ archivematica_src_configure_ss_url }} \
+   --ss-user={{ archivematica_src_configure_ss_user }} \
+   --ss-api-key={{ archivematica_src_configure_ss_api_key }} \
+   --transfer-source={{ transfer_sources.json|json_query('objects[*].uuid')|first }} \
+   --config-file=/etc/archivematica/automation-tools/transfers.conf

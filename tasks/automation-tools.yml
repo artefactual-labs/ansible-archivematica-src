@@ -39,6 +39,16 @@
   with_items:
     - "/etc/archivematica/automation-tools"
 
+
+- name: "Get transfer source uuid"
+  uri: 
+    url: "{{ archivematica_src_configure_ss_url }}/api/v2/location/?purpose=TS"
+    headers:
+      Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+    status_code: 200
+    method: GET
+  register: transfer_sources
+
 - name: "Template automation tools /etc configuration"
   template:
     src: "{{ item }}.j2"
