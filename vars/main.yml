@@ -17,14 +17,3 @@ archivematica_src_ss_virtualenv: "/usr/share/archivematica/virtualenvs/archivema
 archviematica_src_ss_app: "/usr/lib/archivematica/storage-service"
 archivematica_src_ss_gunicorn_config: "/etc/archivematica/storage-service.gunicorn-config.py"
 
-archivematica_src_rpm_repositories:
-  archivematica-extras:
-    baseurl: "https://packages.archivematica.org/1.10.x/centos-extras"
-    gpgcheck: "no"
-  archivematica-ss:
-    baseurl: "http://jenkins-ci.archivematica.org/repos/am-packbuild/0.15.0/centos7/"
-    gpgcheck: "no"
-  archivematica-dashboard:
-    baseurl: "http://jenkins-ci.archivematica.org/repos/am-packbuild/1.10.0/centos7/"
-    gpgcheck: "no"
-

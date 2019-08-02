@@ -169,3 +169,14 @@ archivematica_src_configure_am_whitelist: '""'               # Dashboard API whi
 #  user: "aspace.user"                                      # ASpace user
 #  uri_prefix: "http://amurl"                               # ASpace uri_prefix
 
+
+archivematica_src_rpm_repositories:
+  archivematica-extras:
+    baseurl: "https://packages.archivematica.org/1.10.x/centos-extras"
+    gpgcheck: "no"
+  archivematica-ss:
+    baseurl: "http://jenkins-ci.archivematica.org/repos/am-packbuild/0.15.0/centos7/"
+    gpgcheck: "no"
+  archivematica-dashboard:
+    baseurl: "http://jenkins-ci.archivematica.org/repos/am-packbuild/1.10.0/centos7/"
+    gpgcheck: "no"
