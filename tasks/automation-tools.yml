@@ -53,7 +53,11 @@
   template:
     src: "{{ item }}.j2"
     dest: "/{{ item }}"
+    owner: "archivematica"
+    mode: "0755"
     backup: "yes"
   with_items:
     - "etc/archivematica/automation-tools/transfers.conf"
     - "etc/archivematica/automation-tools/transfer-script.sh"
+    - "etc/archivematica/automation-tools/transfer-daemon.sh"
+    - "etc/systemd/system/automation-tools.service"

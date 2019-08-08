@@ -1,0 +1,12 @@
+[Unit]
+Description=archivematica automation-tools
+After=network.target
+
+[Service]
+Type=simple
+Restart=on-failure
+User=archivematica
+ExecStart=/etc/archivematica/automation-tools/transfer-daemon.sh
+
+[Install]
+WantedBy=multi-user.target
