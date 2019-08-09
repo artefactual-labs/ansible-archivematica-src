@@ -5,6 +5,20 @@
   set_fact:
     dashboard_gunicorn_path: "{{ archivematica_src_am_dashboard_virtualenv }}/bin/gunicorn"
 
+- name: "Clear shared directory"
+  file:
+    dest: "{{ archivematica_src_shareddir }}"
+    state: "absent"
+  when: "archivematica_src_reset_shareddir|bool or archivematica_src_reset_am_all|bool"
+
+- name: "Clear automation-tools db"
+  file:
+    dest: "/var/archivematica/automation-tools/transfers.db"
+    state: "absent"
+  when:
+    - "archivematica_src_reset_shareddir|bool or archivematica_src_reset_am_all|bool"
+    - "archivematica_src_install_automationtools|bool"
+
 - name: "Ensure 7z is present (RedHat)"
   file:
     src: /usr/bin/7za
