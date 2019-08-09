@@ -11,10 +11,10 @@
     state: "absent"
   when: "archivematica_src_reset_shareddir|bool or archivematica_src_reset_am_all|bool"
 
-- name: "Clear shared directory"
+- name: "Create shared directory"
   file:
     dest: "{{ archivematica_src_shareddir }}"
-    state: "present"
+    state: "directory"
     owner: "archivematica"
     group: "archivematica"
     mode: "0755"
