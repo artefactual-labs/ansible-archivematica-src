@@ -137,7 +137,7 @@
           purpose: "AS"
           relative_path: "{{ archivematica_src_configure_gpg.aipstore_path | regex_replace('^\\/', '') }}"
           description: "{{ archivematica_src_configure_gpg.aipstore_description }}"
-          default: "false"
+          default: false
           space: "/api/v2/space/{{ gpg_list_gpg_spaces_again.json|json_query('objects[*].uuid')|first }}/"
         body_format: json
         status_code: 201
@@ -155,7 +155,7 @@
           purpose: "BL"
           relative_path: "{{ archivematica_src_configure_gpg.aipstore_path | regex_replace('^\\/', '') }}"
           description: "{{ archivematica_src_configure_gpg.aipstore_description }}"
-          default: "false"
+          default: false
           space: "/api/v2/space/{{ gpg_list_gpg_spaces_again.json|json_query('objects[*].uuid')|first }}/"
         body_format: json
         status_code: 201
