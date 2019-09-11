@@ -10,7 +10,7 @@
     - ansible_os_family == "Debian"
 
 - name: "Install required rpm packages"
-  apt:
+  yum:
     name: "{{ item }}"
     state: installed
   with_items:
@@ -46,7 +46,7 @@
      owner: "archivematica"
      group: "archivematica"
      recurse: "yes"
- 
+
 - name: "Create config file"
   template:
      src: "etc/sysconfig/fixity.j2"
