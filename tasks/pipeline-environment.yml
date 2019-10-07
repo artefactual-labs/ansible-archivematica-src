@@ -28,13 +28,6 @@
     - "archivematica_src_reset_shareddir|bool or archivematica_src_reset_am_all|bool"
     - "archivematica_src_install_automationtools|bool"
 
-- name: "Ensure 7z is present (RedHat)"
-  file:
-    src: /usr/bin/7za
-    dest: /usr/bin/7z
-    state: link
-  when: ansible_os_family == 'RedHat'
-
 - name: "Configure environment vars"
   template:
     src: "{{ item.src }}"
