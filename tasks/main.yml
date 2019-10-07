@@ -95,7 +95,10 @@
 - include: "ss-main.yml"
   tags:
     - "amsrc-ss"
-  when: "archivematica_src_install_ss|bool"
+  when:
+    - "archivematica_src_install_ss|bool"
+    - "not archivematica_src_install_ss_rpm|bool"
+
 
 - name: "Install archivematica storage service rpm"
   yum:
@@ -159,7 +162,9 @@
     tags:
       - "amsrc-pipeline"
       - "amsrc-pipeline-instcode"
-  when: "archivematica_src_install_am|bool"
+  when: 
+    - "archivematica_src_install_am|bool"
+    - "not archivematica_src_install_am_rpm|bool"
 
 - name: "Install archivematica packages"
   yum:
