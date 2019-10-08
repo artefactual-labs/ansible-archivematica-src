@@ -1,34 +1,8 @@
 ---
 
-#
-# Prepare pip
-#
-
-- name: "Ensure pip is not installed from packages"
-  package:
-    name: "{{ item }}"
-    state: "absent"
-  with_items:
-    - "python-pip"
-    - "python2-pip"
-
-- name: "Download get-pip.py"
-  get_url:
-    url: "https://bootstrap.pypa.io/get-pip.py"
-    dest: "/root/get-pip.py"
-
-- name: "Install pip with get-pip.py"
-  command: "python get-pip.py"
-  args:
-    chdir: "/root/"
-
-- name: "Install virtualenv with pip"
-  pip:
-    name: "{{ item }}"
-    state: "latest"
-  with_items:
-    - "virtualenv"
-
+- name: "Expand archivematica_src_dir"
+  set_fact:
+    archivematica_src_dir: "{{ archivematica_src_dir|expanduser }}"
 
 #
 # Create `archivematica` user
@@ -42,40 +16,75 @@
     groups: "audio"
     home: "/var/lib/archivematica"
 
-- name: "Add archivematica user permissions in visudo file"
-  lineinfile:
-    dest: "/etc/sudoers"
-    state: "present"
-    regexp: "^archivematica ALL\\="
-    line: "archivematica ALL=NOPASSWD:/bin/mv,/bin/chown,/bin/chmod,/usr/bin/find,/usr/bin/gs,/usr/bin/inkscape"
-    validate: "/usr/sbin/visudo -cf %s"
-  when: archivematica_src_enable_sudoers is defined and archivematica_src_enable_sudoers|bool
+#
+# Prepare pip
+#
+- name: "Common configuration for source installs"
+  block:
+  - name: "Ensure pip is not installed from packages"
+    package:
+      name: "{{ item }}"
+      state: "absent"
+    with_items:
+      - "python-pip"
+      - "python2-pip"
 
-- name: "Remove archivematica user permissions in visudo file"
-  lineinfile:
-    dest: "/etc/sudoers"
-    state: "absent"
-    regexp: "^archivematica ALL\\="
-    line: "archivematica ALL=NOPASSWD:/bin/mv,/bin/chown,/bin/chmod,/usr/bin/find,/usr/bin/gs,/usr/bin/inkscape"
-    validate: "/usr/sbin/visudo -cf %s"
-  when: archivematica_src_enable_sudoers is not defined or not archivematica_src_enable_sudoers|bool
+  - name: "Download get-pip.py"
+    get_url:
+      url: "https://bootstrap.pypa.io/get-pip.py"
+      dest: "/root/get-pip.py"
 
+  - name: "Install pip with get-pip.py"
+    command: "python get-pip.py"
+    args:
+      chdir: "/root/"
+
+  - name: "Install virtualenv with pip"
+    pip:
+      name: "{{ item }}"
+      state: "latest"
+    with_items:
+      - "virtualenv"
 #
 # Prepare `archivematica_src_dir`
 #
 
-- name: "Expand archivematica_src_dir"
-  set_fact:
-    archivematica_src_dir: "{{ archivematica_src_dir|expanduser }}"
+  - name: "Create archivematica_src_dir"
+    file:
+      state: "directory"
+      path: "{{ archivematica_src_dir }}"
+  when:
+    - (archivematica_src_install_am|bool or archivematica_src_install_ss|bool)
 
-- name: "Create archivematica_src_dir"
-  file:
-    state: "directory"
-    path: "{{ archivematica_src_dir }}"
+#
+# Configure RPM repositories and dependencies
+#
+
+- name: "Configure rpm-install dependencies"
+  block:
+
+  - name: "Install necessary packages required by rpms"
+    yum:
+      name: "{{ item }}"
+      state: "present"
+    with_items:
+      - "python-virtualenv"
+      - "python-pip"
+
+  - name: "Add AM repos"
+    yum_repository:
+      name: "{{ item.key }}"
+      description: "{{ item.key }}"
+      baseurl: "{{ item.value.baseurl }}"
+      repo_gpgcheck: "{{ item.value.gpgcheck }}"
+    loop: "{{ lookup('dict',archivematica_src_rpm_repositories) }}"
+
+  when: (archivematica_src_install_am == "rpm" or archivematica_src_install_ss == "rpm")
 
 #
 # SELinux configuration
 #
+
 - name: "Install necessary packages required by this ansible role"
   yum:
     name: "{{ item }}"
