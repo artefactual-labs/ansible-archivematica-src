@@ -205,6 +205,15 @@
   environment: "{{ archivematica_src_ss_environment }}"
   tags: ["amsrc-ss-code", "amsrc-ss-code-collectstatic"]
 
+- name: "Copy gunicorn configuration file"
+  copy:
+    src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/storage-service.gunicorn-config.py"
+    dest: "{{ archivematica_src_ss_gunicorn_config }}"
+    backup: "yes"
+    force: "yes"
+    remote_src: "yes"
+  tags: "amsrc-ss-websrv"
+
 
 ###########################################################
 #   5- SS worker - discontinued
