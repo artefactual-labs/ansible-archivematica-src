@@ -13,43 +13,6 @@
     dest: "/etc/nginx/sites-available/dashboard.conf"
     backup: "yes"
 
-- name: "Copy gunicorn configuration file"
-  copy:
-    src: "{{ archivematica_src_dir }}/archivematica/src/dashboard/install/dashboard.gunicorn-config.py"
-    dest: "{{ archivematica_src_am_dashboard_gunicorn_config }}"
-    backup: "yes"
-    force: "yes"
-    remote_src: "yes"
-
-- name: "set_fact: set gunicorn path to correct value"
-  set_fact:
-    dashboard_gunicorn_path: "{{ archivematica_src_am_dashboard_virtualenv }}/bin/gunicorn"
-
-- name: "Add dashboard environment vars"
-  template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    backup: "yes"
-  with_items:
-    - src: "etc/sysconfig/archivematica-dashboard.j2"
-      dest: "{{ systemd_environment_path }}/archivematica-dashboard"
-
-- name: "Add dashboard gunicorn systemd (/etc/systemd)"
-  template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    backup: "yes"
-  with_items:
-    - src: "etc/systemd/system/archivematica-dashboard.service.j2"
-      dest: "/etc/systemd/system/archivematica-dashboard.service"
-  when:
-    - ansible_service_mgr == "systemd"
-
-- name: "Reload systemd config"
-  command: "systemctl daemon-reload"
-  when:
-    - ansible_service_mgr == "systemd"
-
 - name: "Remove Nginx default server"
   file:
     path: "{{ item }}"
@@ -57,6 +20,7 @@
   with_items:
     - "/etc/nginx/sites-enabled/default"
     - "/etc/nginx/sites-enabled/default.conf"
+    - "/etc/nginx/conf.d/archivematica-dashboard.conf" # rpm provided config
 
 - name: "Set up Nginx server"
   file:
@@ -93,9 +57,6 @@
     enabled: "yes"
     daemon_reload: "yes"
   with_items:
-    - "archivematica-mcp-server"
-    - "archivematica-mcp-client"
-    - "archivematica-dashboard"
     - "nginx"
   when:
     - ansible_service_mgr == "systemd"
