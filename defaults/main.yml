@@ -167,3 +167,16 @@ archivematica_src_configure_am_whitelist: '""'               # Dashboard API whi
 #  user: "aspace.user"                                      # ASpace user
 #  uri_prefix: "http://amurl"                               # ASpace uri_prefix
 
+#
+# Configure FPR
+#
+# archivematica_src_configure_fpr:
+#   fpr_fpcommand:
+#     name: 'FITS'
+#     enabled: '0'
+#     field_name: 'description'
+#   fpr_fprule:
+#     name: 'c3b06895-ef9d-401e-8c51-ac585f955655'
+#     enabled: '0'
+#     field_name: 'uuid'
+
