@@ -5,15 +5,20 @@
 - set_fact: archivematica_src_configure_ss_api_key={{ 999999999999999999999 | random | to_uuid | hash('md5') }}
   when: "archivematica_src_configure_ss_api_key is undefined and archivematica_src_configure_ss|bool"
 
-# Check whether SS user exists
-- name:  Check SS default test user
+- name: "Check for default SS user"
   become: "yes"
-  command: sqlite3  "{{archivematica_src_ss_environment['SS_DB_NAME']}}" "select username from auth_user where (id=1 and last_login is NULL and first_name='' and last_name='' and email='x@x.com' and username='test');"
+  shell: echo 'select username from auth_user where (id=1 and last_login is NULL and first_name="" and last_name="" and email="x@x.com" and username="test");'  | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell
+  args:
+    chdir: "{{ archivematica_src_ss_app }}"
+    executable: /bin/bash
+  environment: "{{ archivematica_src_ss_environment }}"
   register: ss_default_test_user
 
 - debug:
     msg: "The SS default test user is already configured and never was used: this user will be deleted."
-  when: ss_default_test_user.stdout != "" and archivematica_src_configure_ss|bool
+  when:
+    - ss_default_test_user.stdout != "" 
+    - archivematica_src_configure_ss|bool
 
 # Delete default SS superuser test
 - name: "Delete default SS superuser"
@@ -26,15 +31,21 @@
   environment: "{{ archivematica_src_ss_environment }}"
   when: archivematica_src_configure_ss|bool and ss_default_test_user.stdout != ""
 
-# Check whether SS user exists
-- name:  Check SS user
+- name: "Check for SS user"
   become: "yes"
-  command: sqlite3  "{{archivematica_src_ss_environment['SS_DB_NAME']}}" "select username from auth_user where username='{{ archivematica_src_configure_ss_user }}';"
+  shell: echo 'select username from auth_user where username="{{ archivematica_src_configure_ss_user }}";'  | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell
+  args:
+    chdir: "{{ archivematica_src_ss_app }}"
+    executable: /bin/bash
+  environment: "{{ archivematica_src_ss_environment }}"
   register: ss_user
 
 - debug:
     msg: "The SS user {{ archivematica_src_configure_ss_user }} is already configured: The SS superuser will not be created."
   when: ss_user.stdout != "" and archivematica_src_configure_ss|bool
+    - (ss_user.stdout != "" or ss_user_my.stdout != "")
+    - archivematica_src_configure_ss|bool
+
 
 - name: "Create SS superuser"
   django_manage:
