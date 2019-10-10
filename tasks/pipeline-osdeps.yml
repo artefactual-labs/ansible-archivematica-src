@@ -73,23 +73,19 @@
 #  can't use ansible nested loops for this case)
 
 - name: "include pipeline-osdeps-archivematicaCommon"
-  include: "pipeline-osdeps-archivematicaCommon.yml"
-  static: no
+  include_tasks: "pipeline-osdeps-archivematicaCommon.yml"
   when: archivematicaCommon is defined
 
 - name: "include pipeline-osdeps-MCPServer"
-  include: "pipeline-osdeps-MCPServer.yml"
-  static: no
+  include_tasks: "pipeline-osdeps-MCPServer.yml"
   when: MCPServer is defined
 
 - name: "include pipeline-osdeps-MCPClient"
-  include: "pipeline-osdeps-MCPClient.yml"
-  static: no
+  include_tasks: "pipeline-osdeps-MCPClient.yml"
   when: MCPClient is defined
 
 - name: "include pipeline-osdeps-dashboard"
-  include: "pipeline-osdeps-dashboard.yml"
-  static: no
+  include_tasks: "pipeline-osdeps-dashboard.yml"
   when: dashboard is defined
 
 #
