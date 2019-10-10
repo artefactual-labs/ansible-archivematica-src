@@ -39,10 +39,12 @@ archivematica_src_acceptance_tests_version: "master"
 archivematica_src_rpm_repositories:
   archivematica:
     baseurl: "https://packages.archivematica.org/1.10.x/centos"
-    gpgcheck: "yes"
+    gpgkey: "https://packages.archivematica.org/1.10.x/key.asc"
+    gpgcheck: 1
   archivematica-extras:
     baseurl: "https://packages.archivematica.org/1.10.x/centos-extras"
-    gpgcheck: "yes"
+    gpgkey: "https://packages.archivematica.org/1.10.x/key.asc"
+    gpgcheck: 1
 
 # Database settings
 archivematica_src_am_db_host: "localhost"        # Archivematica database host
