@@ -101,8 +101,7 @@
 - name: "Install archivematica storage service rpm"
   yum:
     name: archivematica-storage-service
-    state: present
-    disable_gpg_check: yes
+    state: latest
   when:
     - archivematica_src_install_ss == "rpm"
 
@@ -167,8 +166,7 @@
 - name: "Install archivematica using packages"
   yum:
     name: "archivematica-dashboard,archivematica-mcp-server,archivematica-mcp-client"
-    state: "present"
-    disable_gpg_check: "yes"
+    state: "latest"
   when:
     - archivematica_src_install_am == "rpm"
 
