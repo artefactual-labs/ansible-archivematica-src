@@ -15,6 +15,9 @@ WorkingDirectory={{ archivematica_src_am_dashboard_app }}
 ExecStart={{ dashboard_gunicorn_path }} --config {{ archivematica_src_am_dashboard_gunicorn_config }} wsgi:application
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
+{% if archivematica_src_dashboard_systemd_nice is defined %}
+Nice={{ archivematica_src_dashboard_systemd_nice }}
+{% endif %}
 PrivateTmp=true
 Restart=always
 RestartSec=30

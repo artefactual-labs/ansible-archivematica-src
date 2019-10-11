@@ -13,6 +13,9 @@ WorkingDirectory={{ archviematica_src_ss_app }}
 ExecStart={{ archivematica_src_ss_virtualenv }}/bin/gunicorn --config {{ archivematica_src_ss_gunicorn_config }} storage_service.wsgi:application
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
+{% if archivematica_src_storage_service_systemd_nice is defined %}
+Nice={{ archivematica_src_storage_service_systemd_nice }}
+{% endif %}
 PrivateTmp=true
 
 [Install]

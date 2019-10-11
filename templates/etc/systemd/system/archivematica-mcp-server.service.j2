@@ -10,6 +10,9 @@ User=archivematica
 Group=archivematica
 EnvironmentFile=-{{ systemd_environment_path }}/archivematica-mcp-server
 ExecStart={{ archivematica_src_am_mcpserver_virtualenv }}/bin/python {{ archivematica_src_am_mcpserver_app }}/archivematicaMCP.py
+{% if archivematica_src_mcp_server_systemd_nice is defined %}
+Nice={{ archivematica_src_mcp_server_systemd_nice }}
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target
