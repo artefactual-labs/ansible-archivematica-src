@@ -12,7 +12,7 @@
 - name: "Run SS django database migrations"
   django_manage:
     command: "migrate"
-    app_path: "{{ archviematica_src_ss_app }}"
+    app_path: "{{ archivematica_src_ss_app }}"
     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
   environment: "{{ archivematica_src_ss_environment }}"
 
@@ -27,6 +27,6 @@
 - name: "Back create API keys for old users"
   django_manage:
     command: "backfill_api_keys"
-    app_path: "{{ archviematica_src_ss_app }}"
+    app_path: "{{ archivematica_src_ss_app }}"
     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
   environment: "{{ archivematica_src_ss_environment }}"
