@@ -26,7 +26,7 @@
   ignore_errors: "yes"
   shell: echo "from django.contrib.auth.models import User;User.objects.get(username='test').delete()" | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py shell
   args:
-    chdir: "{{ archviematica_src_ss_app }}"
+    chdir: "{{ archivematica_src_ss_app }}"
     executable: /bin/bash
   environment: "{{ archivematica_src_ss_environment }}"
   when: archivematica_src_configure_ss|bool and ss_default_test_user.stdout != ""
@@ -56,7 +56,7 @@
       --email="{{ archivematica_src_configure_ss_email }}"
       --api-key="{{ archivematica_src_configure_ss_api_key }}" 
       --superuser
-    app_path: "{{ archviematica_src_ss_app }}"
+    app_path: "{{ archivematica_src_ss_app }}"
     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
   environment: "{{ archivematica_src_ss_environment }}"
   when: archivematica_src_configure_ss|bool and ss_user.stdout == ""
