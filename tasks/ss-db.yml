@@ -9,6 +9,17 @@
     path: "{{ archivematica_src_ss_environment['SS_DB_NAME'] }}"
   when: "archivematica_src_reset_ss_db|bool"
 
+- name: "Remove SS DB (mysql)"
+  mysql_db:
+    name: "{{ archivematica_src_ss_db_name }}"
+    state: absent
+  when: "archivematica_src_reset_ss_db|bool"
+
+- name: "Create SS DB (mysql)"
+  mysql_db:
+    name: "{{ archivematica_src_ss_db_name }}"
+    state: present
+
 - name: "Run SS django database migrations"
   django_manage:
     command: "migrate"
