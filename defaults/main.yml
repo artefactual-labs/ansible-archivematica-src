@@ -181,13 +181,25 @@ archivematica_src_configure_am_whitelist: '""'               # Dashboard API whi
 #
 # Configure FPR
 #
-# archivematica_src_configure_fpr:
-#   fpr_fpcommand:
-#     name: 'FITS'
+# archivematica_src_configure_fpcommand:
+#   FITS:
 #     enabled: '0'
 #     field_name: 'description'
-#   fpr_fprule:
-#     name: 'c3b06895-ef9d-401e-8c51-ac585f955655'
+#   MediaInfo:
+#     enabled: '0'
+#     field_name: 'description'
+#   FFProbe:
+#     enabled: '0'
+#     field_name: 'description'
+# archivematica_src_configure_fprule:
+#   c3b06895-ef9d-401e-8c51-ac585f955655: #Fits
 #     enabled: '0'
 #     field_name: 'uuid'
+#   114c9525-d676-4fac-9962-4672faa924bb: #MediaInfo
+#     enabled: '0'
+#     field_name: 'command_id'
+#   80314f3c-5d48-4ad1-a9f2-2c0f7c7b229d: #FFprobe
+#     enabled: '0'
+#     field_name: 'command_id'
+
 
