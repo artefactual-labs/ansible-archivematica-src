@@ -62,7 +62,6 @@
     name: "{{ item }}"
     state: "latest"
   with_items: "{{ ansible_deps }}"
-  tags: "always" # inocuous to use always here
 
 - name: "Include common.yml common tasks for all components"
   include: "common.yml"
