@@ -12,11 +12,15 @@
   when:
     - archivematica_src_install_ss == "rpm"
 
-- name: "set nginx sites-available config file"
+- name: "Template nginx sites-available config file"
   template:
-    src: "etc/nginx/sites-available/storage.conf.j2"
+    src: "{{ item }}"
     dest: "/etc/nginx/sites-available/storage.conf"
     backup: "yes"
+  with_first_found:
+    - "templates/{{ inventory_hostname }}/sites-available/storage.conf.j2"
+    - "templates/sites-available/storage.conf.j2"
+    - "etc/nginx/sites-available/storage.conf.j2"
   tags: "amsrc-ss-websrv"
 
 - name: "Disable Nginx default server config"
@@ -38,9 +42,14 @@
 # SSL configuration tasks - begin
 - name: "Template nginx sites-available ssl config file"
   template:
-    src: "etc/nginx/sites-available/storage-ssl.conf.j2"
+    src: "{{ item }}"
     dest: "/etc/nginx/sites-available/storage-ssl.conf"
     backup: "yes"
+  with_first_found:
+    - "templates/{{ inventory_hostname }}/sites-available/storage-ssl.conf.j2"
+    - "templates/sites-available/storage-ssl.conf.j2"
+    - "etc/nginx/sites-available/storage-ssl.conf.j2"
+
   when: "archivematica_src_ssl|bool"
   tags: "amsrc-ss-websrv"
 
