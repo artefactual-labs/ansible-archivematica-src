@@ -7,11 +7,15 @@
 # Note: the playbook assumes the use of /etc/nginx/{sites-available|sites-enabled}
 #       directories for site config files, even on CentOS/RedHat
 
-- name: "Template dashboard nginx sites-available config file"
+- name: "Template dashboard nginx sites-available config file (nossl)"
   template:
-    src: "etc/nginx/sites-available/dashboard.conf.j2"
+    src: "{{ item }}"
     dest: "/etc/nginx/sites-available/dashboard.conf"
     backup: "yes"
+  with_first_found:
+    - "templates/{{ inventory_hostname }}/sites-available/dashboard.conf.j2"
+    - "templates/sites-available/dashboard.conf.j2"
+    - "etc/nginx/sites-available/dashboard.conf.j2"
 
 - name: "Remove Nginx default server"
   file:
@@ -29,11 +33,15 @@
     state: "link"
 
 # SSL configuration tasks - begin
-- name: "Template nginx ssl config file"
+- name: "Template dashboard nginx sites-available config file (ssl)"
   template:
-    src: "etc/nginx/sites-available/dashboard-ssl.conf.j2"
+    src: "{{ item }}"
     dest: "/etc/nginx/sites-available/dashboard-ssl.conf"
     backup: "yes"
+  with_first_found:
+    - "templates/{{ inventory_hostname }}/sites-available/dashboard-ssl.conf.j2"
+    - "templates/sites-available/dashboard-ssl.conf.j2"
+    - "etc/nginx/sites-available/dashboard-ssl.conf.j2"
   when: "archivematica_src_ssl|bool"
 
 - name: "Remove non-ssl config from sites-enabled"
