@@ -168,20 +168,6 @@
   tags: "amsrc-ss-osconf"
   when: "archivematica_src_logging_backward_compatible|bool"
 
-- name: "Config SS logging"
-  template:
-    src: "etc/archivematica/storageService.logging.json.j2"
-    dest: "/etc/archivematica/storageService.logging.json"
-    backup: "yes"
-  tags: "amsrc-ss-osconf"
-  when: "archivematica_src_logging_backward_compatible|bool"
-
-- name: "Remove SS backward-compatible logging"
-  file:
-    path: "/etc/archivematica/storageService.logging.json"
-    state: "absent"
-  when: "not archivematica_src_logging_backward_compatible|bool"
-
 ###########################################################
 #   4- SS code install
 ###########################################################
