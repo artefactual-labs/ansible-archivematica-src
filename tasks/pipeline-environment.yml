@@ -51,16 +51,40 @@
 # logging
 #
 
-- name: "Configure backward-compatible logging"
+- name: "Configure backward-compatible logging (dashboard)"
   template:
     src: "{{ item }}"
     dest: /etc/archivematica/{{ item | basename | regex_replace('\.j2','') }}
     backup: "yes"
-  with_items:
+  with_first_found:
+    - "templates/{{ inventory_hostname }}/dashboard.logging.json.j2"
+    - "templates/dashboard.logging.json.j2"
     - "etc/archivematica/dashboard.logging.json.j2"
-    - "etc/archivematica/clientConfig.logging.json.j2"
+  when: "archivematica_src_logging_backward_compatible|bool"
+
+- name: "Configure backward-compatible logging (MCPServer)"
+  template:
+    src: "{{ item }}"
+    dest: /etc/archivematica/{{ item | basename | regex_replace('\.j2','') }}
+    backup: "yes"
+  with_first_found:
+    - "templates/{{ inventory_hostname }}/serverConfig.logging.json.j2"
+    - "templates/serverConfig.logging.json.j2"
     - "etc/archivematica/serverConfig.logging.json.j2"
   when: "archivematica_src_logging_backward_compatible|bool"
+
+- name: "Configure backward-compatible logging (MCPClient)"
+  template:
+    src: "{{ item }}"
+    dest: /etc/archivematica/{{ item | basename | regex_replace('\.j2','') }}
+    backup: "yes"
+  with_first_found:
+    - "templates/{{ inventory_hostname }}/clientConfig.logging.json.j2"
+    - "templates/clientConfig.logging.json.j2"
+    - "etc/archivematica/clientConfig.logging.json.j2"
+  when: "archivematica_src_logging_backward_compatible|bool"
+
+
 
 - name: "Remove backward-compatible logging"
   file:

@@ -23,9 +23,14 @@
 
 - name: "Config SS logging"
   template:
-    src: "etc/archivematica/storageService.logging.json.j2"
+    src: "{{ item }}"
     dest: "/etc/archivematica/storageService.logging.json"
     backup: "yes"
+  with_first_found:
+    - files:
+        - "templates/{{ inventory_hostname }}/storageService.logging.json.j2"
+        - "templates/storageService.logging.json.j2"
+        - "etc/archivematica/storageService.logging.json.j2"
   tags: "amsrc-ss-osconf"
   when: "archivematica_src_logging_backward_compatible|bool"
 
