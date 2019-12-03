@@ -10,6 +10,10 @@ server {
 
   listen 80;
   server_name _;
+    {% if archivematica_src_syslog_enabled|bool %}
+    error_log syslog:server={{ archivematica_src_syslog_server }},tag=dashboard info;
+    access_log syslog:server={{ archivematica_src_syslog_server }},tag=dashboard combined;
+    {% endif %}
 
   # Adjust to taste
   client_max_body_size 256M;

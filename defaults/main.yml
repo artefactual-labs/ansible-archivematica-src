@@ -178,6 +178,23 @@ archivematica_src_configure_am_whitelist: '""'               # Dashboard API whi
 #  user: "aspace.user"                                      # ASpace user
 #  uri_prefix: "http://amurl"                               # ASpace uri_prefix
 
+
+#
+#  Send logs to syslog
+#
+archivematica_src_syslog_enabled: "false"
+archivematica_src_syslog_server: "localhost"
+archivematica_src_syslog_port: "514"
+archivematica_src_syslog_storageservice_facility: "local0"
+archivematica_src_syslog_storageservice_level: "DEBUG"
+archivematica_src_syslog_dashboard_facility: "local1"
+archivematica_src_syslog_dashboard_level: "DEBUG"
+archivematica_src_syslog_mcpclient_facility: "local2"
+archivematica_src_syslog_mcpclient_level: "DEBUG"
+archivematica_src_syslog_mcpserver_facility: "local3"
+archivematica_src_syslog_mcpserver_level: "DEBUG"
+
+
 #
 # Configure FPR
 #

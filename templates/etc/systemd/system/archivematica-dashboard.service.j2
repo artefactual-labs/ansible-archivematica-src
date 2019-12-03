@@ -11,6 +11,12 @@ PIDFile=/run/archivematica-dashboard_gunicorn.pid
 User=archivematica
 Group=archivematica
 EnvironmentFile=-{{ systemd_environment_path }}/archivematica-dashboard
+{% if archivematica_src_syslog_enabled|bool %}
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=DashboardStdout
+SyslogFacility={{ archivematica_src_syslog_dashboard_facility }}
+{% endif %}
 WorkingDirectory={{ archivematica_src_am_dashboard_app }}
 ExecStart={{ dashboard_gunicorn_path }} --config {{ archivematica_src_am_dashboard_gunicorn_config }} wsgi:application
 ExecReload=/bin/kill -s HUP $MAINPID

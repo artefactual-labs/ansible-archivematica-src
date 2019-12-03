@@ -9,6 +9,12 @@ Type=simple
 User=archivematica
 Group=archivematica
 EnvironmentFile=-{{ systemd_environment_path }}/archivematica-mcp-client
+{% if archivematica_src_syslog_enabled|bool %}
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=MCPClientStdout
+SyslogFacility={{ archivematica_src_syslog_mcpclient_facility }}
+{% endif %}
 ExecStart={{ archivematica_src_am_mcpclient_virtualenv }}/bin/python {{ archivematica_src_am_mcpclient_app }}/archivematicaClient.py
 
 [Install]

@@ -1,12 +1,27 @@
 {
   "disable_existing_loggers": false,
   "formatters": {
+{% if archivematica_src_syslog_enabled|bool %}
+    "syslog": {
+      "datefmt": "%Y-%m-%d %H:%M:%S %z",
+      "format": "{{ inventory_hostname }} MCPClient: [%(asctime)s] [%(process)d] [%(levelname)s]  %(name)s:%(module)s:%(funcName)s:%(lineno)d:  %(message)s"
+    },
+{% endif %}
     "detailed": {
       "datefmt": "%Y-%m-%d %H:%M:%S",
       "format": "%(levelname)-8s  %(asctime)s  %(name)s:%(module)s:%(funcName)s:%(lineno)d:  %(message)s"
     }
   },
   "handlers": {
+{% if archivematica_src_syslog_enabled|bool %}
+    "syslog": {
+      "class": "logging.handlers.SysLogHandler",
+      "address": [ "{{ archivematica_src_syslog_server }}", {{ archivematica_src_syslog_port }} ],
+      "formatter": "syslog",
+      "facility": "{{ archivematica_src_syslog_mcpclient_facility }}",
+      "level": "{{ archivematica_src_syslog_mcpclient_level }}"
+    },
+{% endif %}
     "logfile": {
       "backupCount": 5,
       "class": "custom_handlers.GroupWriteRotatingFileHandler",
@@ -31,6 +46,9 @@
   },
   "root": {
     "handlers": [
+{% if archivematica_src_syslog_enabled|bool %}
+      "syslog",
+{% endif %}
       "logfile",
       "verboselogfile"
     ],
