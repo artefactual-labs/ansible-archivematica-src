@@ -9,6 +9,13 @@ PIDFile=/run/archivematica-storage-service_gunicorn.pid
 User=archivematica
 Group=archivematica
 EnvironmentFile=-{{ systemd_environment_path }}/archivematica-storage-service
+{% if archivematica_src_syslog_enabled|bool %}
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=StorageStdout
+SyslogFacility={{ archivematica_src_syslog_storageservice_facility }}
+{% endif %}
+
 WorkingDirectory={{ archivematica_src_ss_app }}
 ExecStart={{ archivematica_src_ss_virtualenv }}/bin/gunicorn --config {{ archivematica_src_ss_gunicorn_config }} storage_service.wsgi:application
 ExecReload=/bin/kill -s HUP $MAINPID
