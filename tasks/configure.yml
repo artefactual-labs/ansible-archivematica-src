@@ -1,4 +1,21 @@
 ---
+# logging configuration
+- name: "Configure rsyslog"
+  template:
+    src: "{{ item }}"
+    dest: "/etc/rsyslog.d/archivematica.conf"
+    backup: "yes"
+  with_first_found:
+    - files:
+        - "templates/{{ inventory_hostname }}/rsyslog.conf.j2"
+        - "templates/rsyslog.conf.j2"
+        - "etc/rsyslog.d/archivematica.conf.j2"
+  tags: "amsrc-ss-osconf"
+  notify:
+    - Restart rsyslog
+  when: "archivematica_src_syslog_enabled|bool"
+
+
 # ss-configure
 
 # Create api-key if not defined
