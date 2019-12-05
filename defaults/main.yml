@@ -220,4 +220,11 @@ archivematica_src_syslog_mcpserver_level: "DEBUG"
 #     enabled: '0'
 #     field_name: 'command_id'
 
+#
+# Configure SS locations
+#
+#am_ss_default_locations:
+#  - { location_purpose: "RP", location_path: "/replicator", location_description: "Replicator location", location_default: "false" }
+#  - { location_purpose: "AS", location_path: "/aipstore", location_description: "AipStore", location_default: "true" }
+#  - { location_purpose: "TS", location_path: "/transfer-source/", location_description: "Transfer Source", location_default: "false" }
 
