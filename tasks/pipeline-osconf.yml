@@ -95,7 +95,7 @@
     mode: "g+w"
   with_items:
     - "{{ archivematica_src_syslog_logdir }}"
-  when: "archivematica_src_syslog|bool"
+  when: "archivematica_src_syslog_enabled|bool"
 
 - name: "Touch log files"
   file:
