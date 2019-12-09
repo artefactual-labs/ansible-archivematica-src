@@ -1,5 +1,5 @@
 #Create templates
-$template AMLOG,"/var/log/archivematica/%$YEAR%/%$MONTH%/%$DAY%/%programname%.log"
+$template AMLOG,"{{ archivematica_src_syslog_logdir }}/%$YEAR%/%$MONTH%/%$DAY%/%programname%.log"
 
 #Log each service on it's own file
 {{ archivematica_src_syslog_storageservice_facility }}.*  -?AMLOG

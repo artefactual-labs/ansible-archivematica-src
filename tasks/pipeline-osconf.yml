@@ -86,6 +86,17 @@
     - "{{ archivematica_src_mcpserver_logdir }}"
   when: "archivematica_src_logging_backward_compatible|bool"
 
+- name: "Set syslog permissions in archivematica log directory"
+  file:
+    dest: "{{ item }}"
+    state: "directory"
+    owner: "archivematica"
+    group: "syslog"
+    mode: "g+w"
+  with_items:
+    - "{{ archivematica_src_syslog_logdir }}"
+  when: "archivematica_src_syslog|bool"
+
 - name: "Touch log files"
   file:
     path: "{{ item }}"
