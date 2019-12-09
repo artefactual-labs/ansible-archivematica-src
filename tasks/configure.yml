@@ -217,7 +217,7 @@
       register: location_descriptions
       tags: "configure-am"
 
-    - name: "Configure SS: add NFS location: {{ item.location_description }}"
+    - name: "Configure SS: add custom locations"
       uri:
         url: "{{ archivematica_src_configure_ss_url }}/api/v2/location/"
         headers:
