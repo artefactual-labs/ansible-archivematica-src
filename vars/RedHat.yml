@@ -7,3 +7,4 @@ ansible_deps:
   - "sqlite"       # Required for am-configure and fixity
   - "p7zip-plugins" 
 ca_custom_bundle: "/etc/pki/tls/certs/ca-bundle.crt"
+npm_path: "/opt/rh/rh-nodejs8/root/bin/"
