@@ -83,7 +83,13 @@
 # Check whether pipeline is registered and dashboard user exists
 - name:  Check Dashboard SS url
   become: "yes"
-  command: mysql {{ archivematica_src_am_db_name }} -Ns -e "select * from DashboardSettings where name='storage_service_url'"
+  command: >
+    mysql --user="{{ archivematica_src_am_db_user }}"
+          --password="{{ archivematica_src_am_db_password }}"
+          --host="{{ archivematica_src_am_db_host }}"
+          "{{ archivematica_src_am_db_name }}"
+          --batch --skip-column-names
+          --execute="select * from DashboardSettings where name='storage_service_url';"
   register: dashboard_ss_url
 
 - debug:
@@ -92,7 +98,13 @@
 
 - name:  Check Dashboard user
   become: "yes"
-  command: mysql {{ archivematica_src_am_db_name }} -Ns -e "select * from auth_user where username='{{ archivematica_src_configure_am_user }}'"
+  command: >
+    mysql --user="{{ archivematica_src_am_db_user }}"
+          --password="{{ archivematica_src_am_db_password }}"
+          --host="{{ archivematica_src_am_db_host }}"
+          "{{ archivematica_src_am_db_name }}"
+          --batch --skip-column-names
+          --execute="select * from auth_user where username='{{ archivematica_src_configure_am_user }}';"
   register: dashboard_user
 
 - debug:
