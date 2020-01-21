@@ -8,7 +8,11 @@ After=syslog.target network.target
 Type=simple
 User=archivematica
 Group=archivematica
+{% if archivematica_src_am_mcpclient_instances == 1 %}
 EnvironmentFile=-{{ systemd_environment_path }}/archivematica-mcp-client
+{% else %}
+EnvironmentFile=-{{ systemd_environment_path }}/archivematica-mcp-client-{{ '%1x' | format(item) }}
+{% endif %}
 {% if archivematica_src_syslog_enabled|bool %}
 StandardOutput=syslog
 StandardError=syslog
