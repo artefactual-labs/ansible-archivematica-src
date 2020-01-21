@@ -15,6 +15,7 @@ archivematica_src_install_automationtools: "no"
 archivematica_src_install_acceptance_tests: "no"
 archivematica_src_install_fixity: "no"
 archivematica_src_search_enabled: "yes"
+archivematica_src_am_mcpclient_instances: 1
 
 #Components to configure
 archivematica_src_configure_dashboard: "no"
