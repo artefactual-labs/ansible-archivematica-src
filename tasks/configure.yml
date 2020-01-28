@@ -140,21 +140,19 @@
   when: archivematica_src_configure_dashboardsettings is defined
 
 - name: "Create ssh key"
-  user:
-    name: "archivematica"
-    generate_ssh_key: "yes"
-    ssh_key_file: ".ssh/id_rsa"
+  command: ssh-keygen -q -t rsa -f /var/lib/archivematica/.ssh/id_rsa -C "{{ ansible_host }}" -N ""
+  args:
+    creates: /var/lib/archivematica/.ssh/id_rsa
+  register: created_key
   when: archivematica_src_configure_dashboardsettings is defined
+  become_user: archivematica
 
-- name: "Use StrictHostKeyChecking=no ssh option for archivematica user"
-  lineinfile:
-    create: "yes"
-    path: "/var/lib/archivematica/.ssh/config"
-    owner: "archivematica"
-    group: "archivematica"
-    mode: "0600"
-    line: "StrictHostKeyChecking no"
-  when: archivematica_src_configure_dashboardsettings is defined
+- name: "Populate atom server key"
+  command:
+     timeout 2s ssh -o StrictHostKeyChecking=false {{ archivematica_src_configure_dashboardsettings["url"]|urlsplit('hostname') }}
+  ignore_errors: true
+  become_user: archivematica
+  when: created_key.changed
 
 - name: "Register ssh key"
   command: cat /var/lib/archivematica/.ssh/id_rsa.pub
@@ -165,26 +163,12 @@
   debug: msg={{ ssh_key.stdout_lines }}
   when: archivematica_src_configure_dashboardsettings is defined
 
-- name: "Create archivematica user in AtoM server"
-  user:
-    name: "archivematica"
-    group: "users"
-    system: True
-    home: "/home/archivematica"
-    createhome: True
-    shell: "/bin/bash"
-  delegate_to: "{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') }}"
-  remote_user: "{{ archivematica_src_configure_atom_ssh_user | default('artefactual') }}"
-  when: archivematica_src_configure_dashboardsettings is defined
-
 - name: "Add ssh key to AtoM server"
-  authorized_key:
-    user: "archivematica"
-    state: "present"
-    key: "{{ ssh_key.stdout }}"
+  shell: echo {{ ssh_key.stdout }} >> ~/.ssh/authorized_keys
   delegate_to: "{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') }}"
-  remote_user: "{{ archivematica_src_configure_atom_ssh_user | default('artefactual') }}"
-  when: archivematica_src_configure_dashboardsettings is defined
+  remote_user: "{{ archivematica_src_configure_atomuser | default('archivematica') }}"
+  become: false
+  when: created_key.changed
 
 #
 # Configure FPR
