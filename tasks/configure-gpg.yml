@@ -15,20 +15,19 @@
 - name: "Add GPG space and locations"
   block:
 
-    - name: "Set gpg binary name"
+    - name: "Set gpg binary name (Bionic)"
       set_fact:
         gpg_binary: "gpg1"
       when: "ansible_distribution_version | version_compare('18.04', '>=')"
 
-    - name: "Create batch file for GPG key"
-      template:
-        src: "gpg/gpg-batch-file.j2"
-        dest: "/tmp/gpg-batch-file"
-      become: "yes"
+    - name: "Set gpg binary name (Distribution!=Bionic)"
+      set_fact:
+        gpg_binary: "gpg"
+      when: "ansible_distribution_version | version_compare('18.04', '<')"
 
     - name: "Check whether GPG already exists"
       shell: >
-        {{ archivematica_src_configure_gpg.binary }}
+        {{ gpg_binary }}
         --no-tty
         --homedir={{ archivematica_src_configure_gpg.gpg_home_directory }}
         --quiet
@@ -42,44 +41,30 @@
       ignore_errors: "yes"
 
     - name: "Create GPG key when doesn't exist"
-      shell: >
-        {{ archivematica_src_configure_gpg.binary }}
-        --batch
-        --no-tty
-        --homedir={{ archivematica_src_configure_gpg.gpg_home_directory }}
-        --quiet
-        --gen-key
-        /tmp/gpg-batch-file
+      command: "{{ archivematica_src_ss_virtualenv }}/bin/python"
       args:
-        executable: "/bin/bash"
-      become: "yes"
-      become_user: "archivematica"
-      when: gpg_key_already_exist.rc != 0
-      ignore_errors: "yes"
+        stdin: |
+          import os
+          import gnupg
 
-    - name: "Delete GPG tmp file"
-      file:
-        state: absent
-        path: "/tmp/gpg-batch-file"
-      become: "yes"
-
-    - name: "Get gpg key fingerprint"
-      shell: >
-        {{ archivematica_src_configure_gpg.binary }}
-        --no-tty
-        --homedir={{ archivematica_src_configure_gpg.gpg_home_directory }}
-        --quiet
-        --list-secret-keys
-        --fingerprint {{ archivematica_src_configure_gpg.key_user }}
-        | grep "Key fingerprint"
-        | awk -F= '{ print $2}'
-        | tail -n1
-        | sed 's/\s//g'
-      args:
-        executable: "/bin/bash"
+          gpg = gnupg.GPG(
+                  gnupghome = '{{ archivematica_src_configure_gpg.gpg_home_directory }}',
+                  gpgbinary = '{{ gpg_binary }}'
+                )
+          input_data = gpg.gen_key_input(
+            name_email = '{{ archivematica_src_configure_gpg.key_mail }}',
+            name_comment = '{{ archivematica_src_configure_gpg.key_comment }}',
+            name_real = '{{ archivematica_src_configure_gpg.key_user }}',
+            passphrase = '{{ archivematica_src_configure_gpg.key_passphrase }}',
+            key_length = '4096',
+            key_type = 'RSA'
+          )
+          key = gpg.gen_key(input_data)
+          print(key)
       register: "gpg_fingerprint"
       become: "yes"
       become_user: "archivematica"
+      when: gpg_key_already_exist.rc != 0
 
     - name: "Create GPG Space"
       uri:
@@ -143,7 +128,7 @@
         status_code: 201
         method: POST
       when: gpg_list_gpg_spaces.json is defined and gpg_list_pipelines.json is defined
-      
+
     - name: "Create GPG Transfer Backlog"
       uri:
         url: "{{ archivematica_src_configure_ss_url }}/api/v2/location/"
