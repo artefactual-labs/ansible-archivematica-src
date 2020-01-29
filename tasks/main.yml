@@ -79,6 +79,7 @@
     repo: "https://github.com/artefactual/archivematica-sampledata.git"
     dest: "~/archivematica-sampledata"
     update: "yes"
+    version: "dev/issue-851-reorganize-amauat-sampledata"
     depth: 1
   when: "archivematica_src_install_sample_data|bool"
   async: "{{ archivematica_src_install_sample_data_timeout }}"
