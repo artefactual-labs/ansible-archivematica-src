@@ -158,7 +158,6 @@ archivematica_src_configure_am_whitelist: '""'               # Dashboard API whi
 # Uncomment this to add GPG AIPs Store and Backlog locations.
 #archivematica_src_configure_gpg:
 #  gpg_home_directory: "/var/archivematica/storage_service"
-#  binary: "gpg"
 #  key_user: "{{ archivematica_src_configure_ss_user }}"
 #  key_passphrase: "passphrase"
 #  key_comment: "Ansible Generated"
