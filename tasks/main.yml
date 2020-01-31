@@ -272,4 +272,6 @@
 - include: "configure-gpg.yml"
   tags:
     - "amsrc-configure"
-  when: "archivematica_src_install_ss|bool and archivematica_src_configure_gpg is defined"
+  when:
+    - "archivematica_src_install_ss|bool or archivematica_src_install_ss=='rpm'"
+    - "archivematica_src_configure_gpg is defined"
