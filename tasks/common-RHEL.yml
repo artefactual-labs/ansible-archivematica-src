@@ -21,3 +21,7 @@
   command: subscription-manager repos --enable "rhel-*-optional-rpms" --enable "rhel-*-extras-rpms"
   ignore_errors: True
   when: install_rpm_repositories|bool
+
+- name: "Enable SCL repo"
+  command: "yum-config-manager --enable rhel-server-rhscl-7-rpms"
+
