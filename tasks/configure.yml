@@ -22,6 +22,20 @@
 - set_fact: archivematica_src_configure_ss_api_key={{ 999999999999999999999 | random | to_uuid | hash('md5') }}
   when: "archivematica_src_configure_ss_api_key is undefined and archivematica_src_configure_ss|bool"
 
+- name: "Get API Key"
+  become: "yes"
+  command: >
+    mysql --user="{{ archivematica_src_ss_db_user }}"
+          --password="{{ archivematica_src_ss_db_password }}"
+          --host="{{ archivematica_src_ss_db_host }}"
+          "{{ archivematica_src_ss_db_name }}"
+          --batch --skip-column-names
+          --execute="select `key` from tastypie_apikey where id in (select id from auth_user where username = '{{ archivematica_src_configure_ss_user }}');"
+  register: archivematica_src_configure_ss_api_key_temp
+  when: "archivematica_src_configure_ss_api_key is undefined and archivematica_src_configure_dashboard|bool"
+- set_fact: archivematica_src_configure_ss_api_key="{{ archivematica_src_configure_ss_api_key_temp.stdout }}"
+  when: "archivematica_src_configure_dashboard|bool and archivematica_src_configure_ss_api_key_temp is defined"
+
 - name: "Check for default SS user"
   become: "yes"
   shell: echo 'select username from auth_user where (id=1 and last_login is NULL and first_name="" and last_name="" and email="x@x.com" and username="test");'  | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell
