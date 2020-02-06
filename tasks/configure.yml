@@ -82,19 +82,21 @@
   become: "yes"
   command: mysql {{ archivematica_src_am_db_name }} -Ns -e "select * from DashboardSettings where name='storage_service_url'"
   register: dashboard_ss_url
+  when: archivematica_src_configure_dashboard|bool
 
 - debug:
     msg: "The pipeline is already configured: The dashboard superuser will not be created and the pipeline will not be registered."
-  when: dashboard_ss_url.stdout != "" and archivematica_src_configure_dashboard|bool
+  when: archivematica_src_configure_dashboard|bool and dashboard_ss_url.stdout != ""
 
 - name:  Check Dashboard user
   become: "yes"
   command: mysql {{ archivematica_src_am_db_name }} -Ns -e "select * from auth_user where username='{{ archivematica_src_configure_am_user }}'"
   register: dashboard_user
+  when: archivematica_src_configure_dashboard|bool
 
 - debug:
     msg: "The dashboard user {{ archivematica_src_configure_am_user }} is already configured: The dashboard superuser will not be created and the pipeline will not be registered."
-  when: dashboard_user.stdout != "" and archivematica_src_configure_dashboard|bool
+  when: archivematica_src_configure_dashboard|bool and dashboard_user.stdout != ""
 
 # Create api-key if not defined
 - set_fact: archivematica_src_configure_am_api_key={{ 999999999999999999998 | random | to_uuid | hash('md5') }}
