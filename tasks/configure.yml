@@ -30,12 +30,11 @@
     executable: /bin/bash
   environment: "{{ archivematica_src_ss_environment }}"
   register: ss_default_test_user
+  when: archivematica_src_configure_ss|bool
 
 - debug:
     msg: "The SS default test user is already configured and never was used: this user will be deleted."
-  when:
-    - ss_default_test_user.stdout != "" 
-    - archivematica_src_configure_ss|bool
+  when: archivematica_src_configure_ss|bool and ss_default_test_user.stdout != ""
 
 # Delete default SS superuser test
 - name: "Delete default SS superuser"
@@ -56,13 +55,11 @@
     executable: /bin/bash
   environment: "{{ archivematica_src_ss_environment }}"
   register: ss_user
+  when: archivematica_src_configure_ss|bool
 
 - debug:
     msg: "The SS user {{ archivematica_src_configure_ss_user }} is already configured: The SS superuser will not be created."
-  when: ss_user.stdout != "" and archivematica_src_configure_ss|bool
-    - (ss_user.stdout != "" or ss_user_my.stdout != "")
-    - archivematica_src_configure_ss|bool
-
+  when: archivematica_src_configure_ss|bool and ss_user.stdout != ""
 
 - name: "Create SS superuser"
   django_manage:
