@@ -32,9 +32,9 @@
           --batch --skip-column-names
           --execute="select `key` from tastypie_apikey where id in (select id from auth_user where username = '{{ archivematica_src_configure_ss_user }}');"
   register: archivematica_src_configure_ss_api_key_temp
-  when: "archivematica_src_configure_ss_api_key is undefined and archivematica_src_configure_dashboard|bool"
+  when: "archivematica_src_configure_dashboard|bool and archivematica_src_configure_ss_api_key is undefined"
 - set_fact: archivematica_src_configure_ss_api_key="{{ archivematica_src_configure_ss_api_key_temp.stdout }}"
-  when: "archivematica_src_configure_dashboard|bool and archivematica_src_configure_ss_api_key_temp is defined"
+  when: "archivematica_src_configure_dashboard|bool and archivematica_src_configure_ss_api_key_temp.stdout is defined"
 
 - name: "Check for default SS user"
   become: "yes"
