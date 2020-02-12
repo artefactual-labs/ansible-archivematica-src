@@ -22,17 +22,20 @@
 - set_fact: archivematica_src_configure_ss_api_key={{ 999999999999999999999 | random | to_uuid | hash('md5') }}
   when: "archivematica_src_configure_ss_api_key is undefined and archivematica_src_configure_ss|bool"
 
-- name: "Get API Key"
-  become: "yes"
-  command: >
-    mysql --user="{{ archivematica_src_ss_db_user }}"
-          --password="{{ archivematica_src_ss_db_password }}"
-          --host="{{ archivematica_src_ss_db_host }}"
-          "{{ archivematica_src_ss_db_name }}"
-          --batch --skip-column-names
-          --execute="select `key` from tastypie_apikey where id in (select id from auth_user where username = '{{ archivematica_src_configure_ss_user }}');"
+- name: "Get SS API Key"
+  shell: >
+    echo "select key from tastypie_apikey where id in (select id from auth_user where username = '{{ archivematica_src_configure_ss_user }}');"
+    | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell
+  args:
+    chdir: "{{ archivematica_src_ss_app }}"
+    executable: /bin/bash
+  environment: "{{ archivematica_src_ss_environment }}"
+  delegate_to: "{{ archivematica_src_configure_ss_url|urlsplit('hostname') }}"
+  become: yes
+  remote_user: "{{ archivematica_src_configure_ss_ssh_user | default('artefactual') }}"
   register: archivematica_src_configure_ss_api_key_temp
   when: "archivematica_src_configure_dashboard|bool and archivematica_src_configure_ss_api_key is undefined"
+
 - set_fact: archivematica_src_configure_ss_api_key="{{ archivematica_src_configure_ss_api_key_temp.stdout }}"
   when: "archivematica_src_configure_dashboard|bool and archivematica_src_configure_ss_api_key_temp.stdout is defined"
 
