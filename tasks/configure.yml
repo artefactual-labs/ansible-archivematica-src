@@ -138,6 +138,7 @@
       --username="{{ archivematica_src_configure_am_user }}"
       --password="{{ archivematica_src_configure_am_password }}"
       --email="{{ archivematica_src_configure_am_email }}"
+      --site-url="{{ archivematica_src_configure_am_site_url }}"
       --org-name="{{ archivematica_src_configure_am_org_name }}"
       --org-id="{{ archivematica_src_configure_am_org_id }}"
       --api-key="{{ archivematica_src_configure_am_api_key }}"
