@@ -25,7 +25,7 @@
 - name: "Get SS API Key"
   shell: >
     echo "select \`key\` from tastypie_apikey where id in (select id from auth_user where username = '{{ archivematica_src_configure_ss_user }}');"
-    | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell
+    | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell | tail -n1
   args:
     chdir: "{{ archivematica_src_ss_app }}"
     executable: /bin/bash
