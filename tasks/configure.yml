@@ -41,7 +41,7 @@
 
 - name: "Check for default SS user"
   become: "yes"
-  shell: echo 'select username from auth_user where (id=1 and last_login is NULL and first_name="" and last_name="" and email="x@x.com" and username="test");'  | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell dbshell | tail -n1
+  shell: echo 'select username from auth_user where (id=1 and last_login is NULL and first_name="" and last_name="" and email="x@x.com" and username="test");'  | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell | tail -n1
   args:
     chdir: "{{ archivematica_src_ss_app }}"
     executable: /bin/bash
