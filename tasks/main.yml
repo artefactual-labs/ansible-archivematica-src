@@ -53,26 +53,37 @@
     is_prod: "{{ archivematica_src_environment_type == 'production' }}"
   tags: "always" # inocuous to use always here
 
-- name: "Include common-RHEL.yml for RHEL"
-  include: "common-RHEL.yml"
-  when: "ansible_distribution == 'RedHat'"
 
-- name: "Install necessary packages required by this role"
-  package:
-    name: "{{ item }}"
-    state: "latest"
-  with_items: "{{ ansible_deps }}"
+- name: "Configure common prerequisites"
+  block:
 
-- name: "Include common.yml common tasks for all components"
-  include: "common.yml"
-  tags: # do not use "always" tag in role, to avoid issues when including other roles in a playbook
-    - "amsrc-common"
-    - "amsrc-ss"
-    - "amsrc-pipeline"
-    - "amsrc-devtools"
-    - "amsrc-automationtools"
-    - "amsrc-fixity"
+  - name: "Include common-RHEL.yml for RHEL"
+    include: "common-RHEL.yml"
+    when:
+      - "ansible_distribution == 'RedHat'"
 
+  - name: "Install necessary packages required by this role"
+    package:
+      name: "{{ item }}"
+      state: "latest"
+    with_items: "{{ ansible_deps }}"
+
+  - name: "Include common.yml common tasks for all components"
+    include: "common.yml"
+    tags: # do not use "always" tag in role, to avoid issues when including other roles in a playbook
+      - "amsrc-common"
+      - "amsrc-ss"
+      - "amsrc-pipeline"
+      - "amsrc-devtools"
+      - "amsrc-automationtools"
+      - "amsrc-fixity"
+
+  when:
+    - "archivematica_src_install_ss|bool or
+       archivematica_src_install_ss=='rpm' or
+       archivematica_src_install_am|bool or
+       archivematica_src_install_am=='rpm'"
+ 
 
 - name: "Checkout out archivematica-sampledata repository"
   git:
