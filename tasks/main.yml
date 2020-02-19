@@ -80,6 +80,7 @@
     dest: "~/archivematica-sampledata"
     update: "yes"
     depth: 1
+    version: "{{ archivematica_src_install_sample_data_branch | default('master') }}"
   when: "archivematica_src_install_sample_data|bool"
   async: "{{ archivematica_src_install_sample_data_timeout }}"
   poll: 0
