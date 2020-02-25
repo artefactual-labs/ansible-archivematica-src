@@ -150,8 +150,9 @@ archivematica_src_configure_ss_url: "http://localhost:8000"  # SS url to registe
 archivematica_src_configure_am_user: "test"                  # Dashboard admin
 archivematica_src_configure_am_password: "PleaseChangeMe!"   # Dashboard admin password
 archivematica_src_configure_am_email: "test@example.com"     # Dashboard admin password
-archivematica_src_configure_am_org_name: "test org"              # Dashboard admin Org name
-archivematica_src_configure_am_org_id: "test id"                # Dashboard admin Org id
+archivematica_src_configure_am_site_url: "127.0.0.1"         # Pipeline "Remote name" on SS. Base URL of the pipeline server for making API calls.
+archivematica_src_configure_am_org_name: "test org"          # Dashboard admin Org name
+archivematica_src_configure_am_org_id: "test id"             # Dashboard admin Org id
 archivematica_src_configure_am_whitelist: '""'               # Dashboard API whitelist, IP address or hostnames separated by blank spaces and inside quotes
 
 # Configure GPG
