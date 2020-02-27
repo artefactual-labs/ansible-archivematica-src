@@ -24,4 +24,4 @@
 
 - name: "Enable SCL repo"
   command: "yum-config-manager --enable rhel-server-rhscl-7-rpms"
-
+  when: install_rpm_repositories|bool
