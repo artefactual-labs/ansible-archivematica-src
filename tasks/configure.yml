@@ -194,21 +194,31 @@
   debug: msg={{ ssh_key.stdout_lines }}
   when: archivematica_src_configure_dashboardsettings is defined
 
+# The rsync user is defined in the rsync_target, as user@host:/path 
+- name: "Get rsync user for dip upload"
+  set_fact:
+    atom_dipupload_ssh_user: "{{ archivematica_src_configure_dashboardsettings['rsync_target'].split('@')[0] }}"
+  when:
+    -  archivematica_src_configure_dashboardsettings is defined
+    -  archivematica_src_configure_dashboardsettings['rsync_target'].split('@')[0] != archivematica_src_configure_dashboardsettings['rsync_target'] 
+
+
 - name: "Create archivematica user in AtoM server"
   user:
-    name: "archivematica"
+    name: "{{ atom_dipupload_ssh_user | default('archivematica') }}"
     group: "users"
     system: True
-    home: "/home/archivematica"
+    home: "/home/{{ atom_dipupload_ssh_user | default('archivematica') }}"
     createhome: True
     shell: "/bin/bash"
   delegate_to: "{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') }}"
   remote_user: "{{ archivematica_src_configure_atom_ssh_user | default('artefactual') }}"
-  when: archivematica_src_configure_dashboardsettings is defined
+  when:
+    -  archivematica_src_configure_dashboardsettings is defined
 
 - name: "Add ssh key to AtoM server"
   authorized_key:
-    user: "archivematica"
+    user: "{{ atom_dipupload_ssh_user }}"
     state: "present"
     key: "{{ ssh_key.stdout }}"
   delegate_to: "{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') }}"
