@@ -3,7 +3,7 @@
 - name: "Install packages"
   apt:
     pkg: "{{ item }}"
-    state: installed
+    state: present
     update_cache: yes
     cache_valid_time: 3600
   with_items:
@@ -77,7 +77,7 @@
 - name: "Install packages"
   apt: 
     pkg: "google-chrome-stable"
-    state: installed
+    state: present
     update_cache: yes
     cache_valid_time: 3600
   when: "'Chrome' in archivematica_src_acceptance_tests_browser_list"
