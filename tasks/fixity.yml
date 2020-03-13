@@ -1,7 +1,7 @@
 - name: "Install required deb packages "
   apt:
     name: "{{ item }}"
-    state: installed
+    state: present
   with_items:
     - "sqlite3"
     - "moreutils"
