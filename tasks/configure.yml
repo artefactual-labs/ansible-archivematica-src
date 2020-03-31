@@ -236,7 +236,7 @@
            "{{ archivematica_src_am_db_name }}"
            --batch --skip-column-names
            --execute="update fpr_fpcommand set enabled={{ item.value.enabled }} where {{ item.value.field_name }}=\"{{ item.key }}\";"
-  loop: "{{ lookup('dict',archivematica_src_configure_fpcommand|default({})) }}"
+  loop: "{{ lookup('dict',archivematica_src_configure_fpcommand|default({}),wantlist=True) }}"
   when: archivematica_src_configure_fpcommand is defined
 #
 - name: "Configure fprule settings"
@@ -247,7 +247,7 @@
            "{{ archivematica_src_am_db_name }}"
            --batch --skip-column-names
            --execute="update fpr_fprule set enabled={{ item.value.enabled }} where {{ item.value.field_name }}=\"{{ item.key }}\";"
-  loop: "{{ lookup('dict',archivematica_src_configure_fprule|default({})) }}"
+  loop: "{{ lookup('dict',archivematica_src_configure_fprule|default({}),wantlist=True) }}"
   when: archivematica_src_configure_fprule is defined
 
 - name: "Configure locations"
