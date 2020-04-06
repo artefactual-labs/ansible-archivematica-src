@@ -88,7 +88,7 @@
 - name: "Checkout out archivematica-sampledata repository"
   git:
     repo: "https://github.com/artefactual/archivematica-sampledata.git"
-    dest: "~/archivematica-sampledata"
+    dest: "{{ archivematica_src_install_sample_data_path }}"
     update: "yes"
     depth: 1
   when: "archivematica_src_install_sample_data|bool"
@@ -222,7 +222,7 @@
 - name: "Generate special sampledata transfers"
   command: "make simple"
   args:
-    chdir: "~/archivematica-sampledata/"
+    chdir: "{{ archivematica_src_install_sample_data_path }}"
   environment:
     LC_ALL: "en_US.utf8"
   when: "archivematica_src_install_sample_data|bool"
