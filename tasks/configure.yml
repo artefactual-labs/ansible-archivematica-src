@@ -39,31 +39,6 @@
 - set_fact: archivematica_src_configure_ss_api_key="{{ archivematica_src_configure_ss_api_key_temp.stdout }}"
   when: "archivematica_src_configure_dashboard|bool and archivematica_src_configure_ss_api_key_temp.stdout is defined"
 
-- name: "Check for default SS user"
-  become: "yes"
-  shell: echo 'select username from auth_user where (id=1 and last_login is NULL and first_name="" and last_name="" and email="x@x.com" and username="test");'  | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell | tail -n1
-  args:
-    chdir: "{{ archivematica_src_ss_app }}"
-    executable: /bin/bash
-  environment: "{{ archivematica_src_ss_environment }}"
-  register: ss_default_test_user
-  when: archivematica_src_configure_ss|bool
-
-- debug:
-    msg: "The SS default test user is already configured and never was used: this user will be deleted."
-  when: archivematica_src_configure_ss|bool and ss_default_test_user.stdout != ""
-
-# Delete default SS superuser test
-- name: "Delete default SS superuser"
-  become: "yes"
-  ignore_errors: "yes"
-  shell: echo "from django.contrib.auth.models import User;User.objects.get(username='test').delete()" | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py shell
-  args:
-    chdir: "{{ archivematica_src_ss_app }}"
-    executable: /bin/bash
-  environment: "{{ archivematica_src_ss_environment }}"
-  when: archivematica_src_configure_ss|bool and ss_default_test_user.stdout != ""
-
 - name: "Check for SS user"
   become: "yes"
   shell: echo 'select username from auth_user where username="{{ archivematica_src_configure_ss_user }}";'  | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell | tail -n1
