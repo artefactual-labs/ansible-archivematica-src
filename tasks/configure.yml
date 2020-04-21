@@ -18,27 +18,6 @@
 
 # ss-configure
 
-# Create api-key if not defined
-- set_fact: archivematica_src_configure_ss_api_key={{ 999999999999999999999 | random | to_uuid | hash('md5') }}
-  when: "archivematica_src_configure_ss_api_key is undefined and archivematica_src_configure_ss|bool"
-
-- name: "Get SS API Key"
-  shell: >
-    echo "select \`key\` from tastypie_apikey where id in (select id from auth_user where username = '{{ archivematica_src_configure_ss_user }}');"
-    | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell | tail -n1
-  args:
-    chdir: "{{ archivematica_src_ss_app }}"
-    executable: /bin/bash
-  environment: "{{ archivematica_src_ss_environment }}"
-  delegate_to: "{{ archivematica_src_configure_ss_url|urlsplit('hostname') }}"
-  become: yes
-  remote_user: "{{ archivematica_src_configure_ss_ssh_user | default('artefactual') }}"
-  register: archivematica_src_configure_ss_api_key_temp
-  when: "archivematica_src_configure_dashboard|bool and archivematica_src_configure_ss_api_key is undefined"
-
-- set_fact: archivematica_src_configure_ss_api_key="{{ archivematica_src_configure_ss_api_key_temp.stdout }}"
-  when: "archivematica_src_configure_dashboard|bool and archivematica_src_configure_ss_api_key_temp.stdout is defined"
-
 - name: "Check for SS user"
   become: "yes"
   shell: echo 'select username from auth_user where username="{{ archivematica_src_configure_ss_user }}";'  | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell | tail -n1
@@ -52,6 +31,33 @@
 - debug:
     msg: "The SS user {{ archivematica_src_configure_ss_user }} is already configured: The SS superuser will not be created."
   when: archivematica_src_configure_ss|bool and ss_user.stdout != ""
+
+- name: "Get SS API Key"
+  shell: >
+    echo "select \`key\` from tastypie_apikey where id in (select id from auth_user where username = '{{ archivematica_src_configure_ss_user }}');"
+    | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell | tail -n1
+  args:
+    chdir: "{{ archivematica_src_ss_app }}"
+    executable: /bin/bash
+  environment: "{{ archivematica_src_ss_environment }}"
+  delegate_to: "{{ archivematica_src_configure_ss_url|urlsplit('hostname') }}"
+  become: yes
+  remote_user: "{{ archivematica_src_configure_ss_ssh_user | default('artefactual') }}"
+  register: archivematica_src_configure_ss_api_key_temp
+  when: 
+     - "archivematica_src_configure_dashboard|bool or archivematica_src_configure_ss|bool"
+     - "archivematica_src_configure_ss_api_key is undefined"
+
+- set_fact: archivematica_src_configure_ss_api_key="{{ archivematica_src_configure_ss_api_key_temp.stdout }}"
+  when: 
+    - "archivematica_src_configure_dashboard|bool"
+    - "archivematica_src_configure_ss_api_key_temp.stdout is defined"
+
+# Create api-key if not defined and SS user was not already configured
+- set_fact: archivematica_src_configure_ss_api_key={{ 999999999999999999999 | random | to_uuid | hash('md5') }}
+  when: 
+    - "archivematica_src_configure_ss_api_key is undefined"
+    - "archivematica_src_configure_ss|bool"
 
 - name: "Create SS superuser"
   django_manage:
