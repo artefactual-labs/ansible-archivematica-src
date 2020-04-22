@@ -257,20 +257,17 @@
       become: "yes"
       command:  mysql {{ archivematica_src_ss_db_name }} -Ns -e "select uuid from locations_pipeline where id='1';"
       register: pipeline_uuid
-      tags: "configure-am"
 
     # Gets the uuid of the first registered space (id=1)
     - name: "Configure AM: get default Space UUID from SS database"
       become: "yes"
       command:  mysql {{ archivematica_src_ss_db_name }} -Ns -e "select uuid from locations_space where id='1';"
       register: space_uuid
-      tags: "configure-am"
 
     - name: "Configure AM: get all TS descriptions from SS database"
       become: "yes"
       command:  mysql {{ archivematica_src_ss_db_name }} -Ns -e "select description from locations_location;"
       register: location_descriptions
-      tags: "configure-am"
 
     - name: "Configure SS: add custom locations"
       uri:
@@ -290,7 +287,6 @@
         method: POST
       when: not location_descriptions.stdout | join('') | regex_search( '(^|\n)'+item.location_description+'(\n|$)' )
       with_items: "{{ am_ss_default_locations }}"
-      tags: "configure-am"
 
 #
 #   S3 Space/locations configuration
@@ -300,7 +296,6 @@
       become: "yes"
       command:  mysql {{ archivematica_src_ss_db_name }} -Ns -e "select uuid from locations_space where access_protocol='S3';"
       register: s3_space_exists
-      tags: "configure-am"
 
     - name: "Configure SS: add spaces"
       uri:
@@ -324,13 +319,11 @@
       when:
         - s3_space_exists.stdout == ""
         - am_ss_s3_spaces is defined
-      tags: "configure-am"
 
     - name: "Configure AM: get existing S3 Space UUID from SS database"
       become: "yes"
       command:  mysql {{ archivematica_src_ss_db_name }} -Ns -e "select uuid from locations_space where access_protocol='S3';"
       register: s3_space_uuid
-      tags: "configure-am"
 
     - name: "Configure SS: add S3 locations"
       uri:
@@ -353,7 +346,6 @@
       when:
         - am_ss_s3_locations is defined and am_ss_s3_locations != ""
         - not location_descriptions.stdout | join('') | regex_search( '(^|\n)'+item.location_description+'(\n|$)' )
-      tags: "configure-am"
 
 #
 #  Configure replication
@@ -379,5 +371,7 @@
       with_items:
         - "{{ am_ss_default_locations|default({}) }}"
         - "{{ am_ss_s3_locations|default({}) }}"
-      tags: "configure-rep"
   when: am_ss_default_locations is defined or am_ss_s3_locations is defined
+  tags:
+    - "configure-am"
+    - "configure-locations"
