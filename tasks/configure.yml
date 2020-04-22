@@ -291,4 +291,93 @@
       when: not location_descriptions.stdout | join('') | regex_search( '(^|\n)'+item.location_description+'(\n|$)' )
       with_items: "{{ am_ss_default_locations }}"
       tags: "configure-am"
-  when: am_ss_default_locations is defined
+
+#
+#   S3 Space/locations configuration
+#
+
+    - name: "Configure AM: get S3 Space UUID from SS database"
+      become: "yes"
+      command:  mysql {{ archivematica_src_ss_db_name }} -Ns -e "select uuid from locations_space where access_protocol='S3';"
+      register: s3_space_exists
+      tags: "configure-am"
+
+    - name: "Configure SS: add spaces"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/"
+        headers:
+          Content-Type: "application/json"
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+        body:
+          access_protocol: "{{ item.access_protocol }}"
+          path: "{{ item.path }}"
+          staging_path: "{{ item.staging_path }}"
+          endpoint_url: "{{ item.endpoint_url }}"
+          access_key_id: "{{ item.access_key_id }}"
+          secret_access_key: "{{ item.secret_access_key }}"
+          region: "{{ item.region }}"
+          bucket: "{{ item.bucket }}"
+        body_format: json
+        status_code: 201
+        method: POST
+      with_items: "{{ am_ss_s3_spaces }}"
+      when:
+        - s3_space_exists.stdout == ""
+        - am_ss_s3_spaces is defined
+      tags: "configure-am"
+
+    - name: "Configure AM: get existing S3 Space UUID from SS database"
+      become: "yes"
+      command:  mysql {{ archivematica_src_ss_db_name }} -Ns -e "select uuid from locations_space where access_protocol='S3';"
+      register: s3_space_uuid
+      tags: "configure-am"
+
+    - name: "Configure SS: add S3 locations"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/location/"
+        headers:
+          Content-Type: "application/json"
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+        body:
+          pipeline: ["/api/v2/pipeline/{{ pipeline_uuid.stdout }}/"]
+          purpose: "{{ item.location_purpose }}"
+          relative_path: "{{ item.location_path | regex_replace('^\\/', '') }}"
+          staging_path: "{{ item.staging_path }}"
+          description: "{{ item.location_description }}"
+          space: "/api/v2/space/{{ s3_space_uuid.stdout }}/"
+          default: "{{ item.location_default }}"
+        body_format: json
+        status_code: 201
+        method: POST
+      with_items: "{{ am_ss_s3_locations | default([]) }}"
+      when:
+        - am_ss_s3_locations is defined and am_ss_s3_locations != ""
+        - not location_descriptions.stdout | join('') | regex_search( '(^|\n)'+item.location_description+'(\n|$)' )
+      tags: "configure-am"
+
+#
+#  Configure replication
+#
+
+    - name: "Configure replicas"
+      shell: |
+        if [ x"$PURPOSE" == x"RP" ]
+        then
+        echo $LOCATION replicates $REPLICAOF
+        LOCATION_ID=$(echo "select id from locations_location where description=\"$LOCATION\";" | mysql -s -N SS)
+        REPLICAOF_ID=$(echo "select id from locations_location where description=\"$REPLICAOF\";" | mysql -s -N SS)
+        CONFIG_ID=$(echo "select id from locations_location_replicators where  from_location_id=$REPLICAOF_ID and to_location_id=$LOCATION_ID;" | mysql -s -N SS)
+        if [ x$CONFIG_ID == x ]
+        then
+        echo "insert into locations_location_replicators (from_location_id, to_location_id) values($REPLICAOF_ID,$LOCATION_ID);" | mysql -s -N SS
+        fi
+        fi
+      environment:
+        PURPOSE: "{{ item.location_purpose }}"
+        LOCATION: "{{ item.location_description }}"
+        REPLICAOF: "{{ item.location_replicaof|default('') }}"
+      with_items:
+        - "{{ am_ss_default_locations|default({}) }}"
+        - "{{ am_ss_s3_locations|default({}) }}"
+      tags: "configure-rep"
+  when: am_ss_default_locations is defined or am_ss_s3_locations is defined
