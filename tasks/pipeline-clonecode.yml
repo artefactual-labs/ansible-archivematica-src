@@ -11,4 +11,4 @@
     version: "{{ archivematica_src_am_version }}"
     force: "yes"
     accept_hostkey: "yes"
-    
+  become_flags: "-E"    

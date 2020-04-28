@@ -12,6 +12,7 @@
     version: "{{ archivematica_src_ss_version }}"
     force: "yes"
     accept_hostkey: "yes"
+  become_flags: "-E"
   tags: "amsrc-ss-clone"
 
 # For some reason, some dirs in the cloned source code
