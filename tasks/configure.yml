@@ -251,22 +251,35 @@
   when: archivematica_src_configure_fprule is defined
 
 - name: "Configure locations"
+  environment: "{{ archivematica_src_ss_environment }}"
   block:
     # Get id of the first registered pipeline (id=1)
     - name: "Configure AM: get default pipeline UUID from SS database"
-      become: "yes"
-      command:  mysql {{ archivematica_src_ss_db_name }} -Ns -e "select uuid from locations_pipeline where id='1';"
+      shell: >
+         echo "select uuid from locations_pipeline where id='1';"
+         | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell | tail -n1
+      args:
+        chdir: "{{ archivematica_src_ss_app }}"
+        executable: "/bin/bash"
       register: pipeline_uuid
 
     # Gets the uuid of the first registered space (id=1)
     - name: "Configure AM: get default Space UUID from SS database"
-      become: "yes"
-      command:  mysql {{ archivematica_src_ss_db_name }} -Ns -e "select uuid from locations_space where id='1';"
+      shell: >
+         echo  "select uuid from locations_space where id='1';"
+         | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell | tail -n1
+      args:
+        chdir: "{{ archivematica_src_ss_app }}"
+        executable: "/bin/bash"
       register: space_uuid
 
     - name: "Configure AM: get all TS descriptions from SS database"
-      become: "yes"
-      command:  mysql {{ archivematica_src_ss_db_name }} -Ns -e "select description from locations_location;"
+      shell: >
+         echo "select description from locations_location;"
+         | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell | grep -v "^description$"
+      args:
+        chdir: "{{ archivematica_src_ss_app }}"
+        executable: "/bin/bash"
       register: location_descriptions
 
     - name: "Configure SS: add custom locations"
@@ -293,8 +306,12 @@
 #
 
     - name: "Configure AM: get S3 Space UUID from SS database"
-      become: "yes"
-      command:  mysql {{ archivematica_src_ss_db_name }} -Ns -e "select uuid from locations_space where access_protocol='S3';"
+      shell: >
+         echo "select uuid from locations_space where access_protocol='S3';"
+         | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell | tail -n1
+      args:
+        chdir: "{{ archivematica_src_ss_app }}"
+        executable: "/bin/bash"
       register: s3_space_exists
 
     - name: "Configure SS: add spaces"
@@ -321,8 +338,12 @@
         - am_ss_s3_spaces is defined
 
     - name: "Configure AM: get existing S3 Space UUID from SS database"
-      become: "yes"
-      command:  mysql {{ archivematica_src_ss_db_name }} -Ns -e "select uuid from locations_space where access_protocol='S3';"
+      shell: >
+         echo "select uuid from locations_space where access_protocol='S3';"
+         | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell | tail -n1
+      args:
+        chdir: "{{ archivematica_src_ss_app }}"
+        executable: "/bin/bash"
       register: s3_space_uuid
 
     - name: "Configure SS: add S3 locations"
@@ -356,14 +377,17 @@
         if [ x"$PURPOSE" == x"RP" ]
         then
         echo $LOCATION replicates $REPLICAOF
-        LOCATION_ID=$(echo "select id from locations_location where description=\"$LOCATION\";" | mysql -s -N SS)
-        REPLICAOF_ID=$(echo "select id from locations_location where description=\"$REPLICAOF\";" | mysql -s -N SS)
-        CONFIG_ID=$(echo "select id from locations_location_replicators where  from_location_id=$REPLICAOF_ID and to_location_id=$LOCATION_ID;" | mysql -s -N SS)
+        LOCATION_ID=$(echo "select id from locations_location where description=\"$LOCATION\";" | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell | tail -n1 )
+        REPLICAOF_ID=$(echo "select id from locations_location where description=\"$REPLICAOF\";" | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell | tail -n1)
+        CONFIG_ID=$(echo "select id from locations_location_replicators where  from_location_id=$REPLICAOF_ID and to_location_id=$LOCATION_ID;" | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell | tail -n1)
         if [ x$CONFIG_ID == x ]
         then
-        echo "insert into locations_location_replicators (from_location_id, to_location_id) values($REPLICAOF_ID,$LOCATION_ID);" | mysql -s -N SS
+        echo "insert into locations_location_replicators (from_location_id, to_location_id) values($REPLICAOF_ID,$LOCATION_ID);" | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell 
         fi
         fi
+      args:
+        chdir: "{{ archivematica_src_ss_app }}"
+        executable: "/bin/bash"
       environment:
         PURPOSE: "{{ item.location_purpose }}"
         LOCATION: "{{ item.location_description }}"
