@@ -37,7 +37,7 @@
         executable: "/bin/bash"
       register: "gpg_key_already_exist"
       become: "yes"
-      become_user: "archivematica"
+      become_user: "{{ archivematica_src_ss_system_user }}"
       ignore_errors: "yes"
 
     - name: "Create GPG key when doesn't exist"
@@ -63,7 +63,7 @@
           print(key)
       register: "gpg_fingerprint"
       become: "yes"
-      become_user: "archivematica"
+      become_user: "{{ archivematica_src_ss_system_user }}"
       when: gpg_key_already_exist.rc != 0
 
     - name: "Create GPG Space (new key)"
@@ -119,8 +119,8 @@
     - name: "Create directories for GPG locations"
       file:
         path: "{{ item }}"
-        owner: "archivematica"
-        group: "archivematica"
+        owner: "{{ archivematica_src_ss_system_user }}"
+        group: "{{ archivematica_src_ss_system_group }}"
         mode: "0755"
         state: "directory"
       become: "yes"
