@@ -265,7 +265,8 @@
 - include: "fixity.yml"
   tags:
     - "amsrc-fixity"
-  when: "archivematica_src_install_fixity|bool"
+  when: "archivematica_src_install_fixity|bool or
+         archivematica_src_install_fixity=='rpm'"
 
 #
 # Configure pipeline and SS
