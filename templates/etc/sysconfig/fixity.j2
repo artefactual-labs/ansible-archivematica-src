@@ -2,3 +2,13 @@
 export STORAGE_SERVICE_URL="{{ archivematica_src_fixity_ss_url }}"
 export STORAGE_SERVICE_USER="{{ archivematica_src_fixity_ss_user }}"
 export STORAGE_SERVICE_KEY="{{ archivematica_src_fixity_ss_apikey }}"
+
+{% if archivematica_src_fixity_report_url is defined %}
+export REPORT_URL="{{ archivematica_src_fixity_report_url }}"
+{% endif %}
+{% if archivematica_src_fixity_report_username is defined %}
+export REPORT_USERNAME="{{ archivematica_src_fixity_report_username }}"
+{% endif %}
+{% if archivematica_src_fixity_report_password is defined %}
+export REPORT_PASSWORD="{{ archivematica_src_fixity_report_password }}"
+{% endif %}
