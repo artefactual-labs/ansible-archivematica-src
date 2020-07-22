@@ -1,22 +1,20 @@
 - name: "Install required deb packages "
   apt:
-    name: "{{ item }}"
+    name:
+      - "sqlite3"
+      - "moreutils"
+      - "mailutils"
     state: present
-  with_items:
-    - "sqlite3"
-    - "moreutils"
-    - "mailutils"
   when:
     - ansible_os_family == "Debian"
 
 - name: "Install required rpm packages"
-  apt:
-    name: "{{ item }}"
-    state: installed
-  with_items:
-    - "sqlite"
-    - "moreutils"
-    - "mailx"
+  yum:
+    name:
+      - "sqlite"
+      - "moreutils"
+      - "mailx"
+    state: present
   when:
     - ansible_os_family == "RedHat"
 
@@ -46,7 +44,7 @@
      owner: "archivematica"
      group: "archivematica"
      recurse: "yes"
- 
+
 - name: "Create config file"
   template:
      src: "etc/sysconfig/fixity.j2"
