@@ -18,12 +18,12 @@
     - name: "Set gpg binary name (Bionic)"
       set_fact:
         gpg_binary: "gpg1"
-      when: "ansible_distribution_version | version_compare('18.04', '>=')"
+      when: "ansible_distribution_version is version('18.04', '>=')"
 
     - name: "Set gpg binary name (Distribution!=Bionic)"
       set_fact:
         gpg_binary: "gpg"
-      when: "ansible_distribution_version | version_compare('18.04', '<')"
+      when: "ansible_distribution_version is version('18.04', '<')"
 
     - name: "Check whether GPG already exists"
       shell: >
