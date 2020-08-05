@@ -31,6 +31,20 @@
       defaults: "{{ _archivematica_src_ss_environment }}"
   tags: "always"
 
+# Append SS_GUNICORN_WORKERS=3 only when SS_GUNICORN_WORKERS
+# is not defined in dictionary and MySQL database
+- name: "Append default SS_GUNICORN_WORKERS when using MySQL"
+  set_fact:
+    "{{ item.name }}": "{{ item.dict|combine({item.key: 3}) }}"
+  with_items:
+    - name: "archivematica_src_ss_environment"
+      dict: "{{ archivematica_src_ss_environment }}"
+      key: "SS_GUNICORN_WORKERS"
+  when:
+    - archivematica_src_ss_environment['SS_DB_URL'] is defined
+    - archivematica_src_ss_environment['SS_GUNICORN_WORKERS'] is not defined
+  tags: "always"
+
 - include: "envs-patch-backward-compatibility.yml"
   tags: "always"
 
