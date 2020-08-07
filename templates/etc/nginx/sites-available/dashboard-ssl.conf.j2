@@ -27,7 +27,9 @@ server {
   location / {
     return 301 https://$host$request_uri;
   }
-
+    location ~ ^/administration/accounts/login/.+$ {
+        return 404;
+    }
 }
 
 server {
@@ -65,5 +67,7 @@ server {
     proxy_read_timeout {{ archivematica_src_am_dashboard_nginx_proxy_read_timeout }};
     proxy_pass http://archivematica_dashboard_backend;
   }
-
+    location ~ ^/administration/accounts/login/.+$ {
+        return 404;
+    }
 }
