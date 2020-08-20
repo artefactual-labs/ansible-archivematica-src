@@ -66,7 +66,7 @@
       become_user: "archivematica"
       when: gpg_key_already_exist.rc != 0
 
-    - name: "Create GPG Space"
+    - name: "Create GPG Space (new key)"
       uri:
         url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/"
         headers:
@@ -80,6 +80,23 @@
         body_format: json
         status_code: 201
         method: POST
+      when: gpg_key_already_exist.rc != 0
+
+    - name: "Create GPG Space (existing key)"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/"
+        headers:
+          Content-Type: "application/json"
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+        body:
+          access_protocol: "GPG"
+          path: "/"
+          staging_path: "{{ archivematica_src_configure_gpg.space_staging_directory }}"
+          key: "{{ gpg_key_already_exist.stdout }}"
+        body_format: json
+        status_code: 201
+        method: POST
+      when: gpg_key_already_exist.rc == 0
 
     - name: "List GPG Spaces from API"
       uri:
