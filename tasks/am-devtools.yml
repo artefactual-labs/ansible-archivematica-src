@@ -31,21 +31,12 @@
         - "graphviz-devel"
         - "graphviz-python"
         - "python2-pkgconfig"
-
-    # psych is needed to install ronn on RH/CentOS
-    - name: "Install ronn (RH/CentOS)"
-      gem:
-        name: "{{ item.name }}"
-        version: "{{ item.version }}"
-        state: present
-      with_items:
-        - { name: "psych", version: "2.2.4" }
-        - { name: "ronn", version: "" }
+        - "nodejs-ronn"
 
     # Needed to find the command ronn when running make
     - name: "Create ronn symlink (RH/CentOS)"
       file:
-        src: "/usr/local/bin/ronn"
+        src: "/usr//bin/ronn-nodejs"
         dest: "/usr/bin/ronn"
         state: link
   when:
