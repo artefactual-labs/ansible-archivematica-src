@@ -30,7 +30,7 @@
     chdir: "{{ archivematica_src_ss_app }}"
     executable: /bin/bash
   environment: "{{ archivematica_src_ss_environment }}"
-  delegate_to: "{{ archivematica_src_configure_ss_url|urlsplit('hostname') }}"
+  delegate_to: "{{ archivematica_src_configure_ss_inventory_hostname | default(archivematica_src_configure_ss_url|urlsplit('hostname')) }}"
   become: yes
   remote_user: "{{ archivematica_src_configure_ss_ssh_user | default('artefactual') }}"
   register: archivematica_src_configure_ss_api_key_temp
@@ -211,7 +211,7 @@
     home: "/home/{{ atom_dipupload_ssh_user | default('archivematica') }}"
     createhome: True
     shell: "/bin/bash"
-  delegate_to: "{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') }}"
+  delegate_to: "{{ archivematica_src_configure_atom_inventory_hostname | default(archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname')) }}"
   remote_user: "{{ archivematica_src_configure_atom_ssh_user | default('artefactual') }}"
   when:
     -  archivematica_src_configure_dashboardsettings is defined
@@ -221,7 +221,7 @@
     user: "{{ atom_dipupload_ssh_user | default('archivematica') }}"
     state: "present"
     key: "{{ ssh_key.stdout }}"
-  delegate_to: "{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') }}"
+  delegate_to: "{{ archivematica_src_configure_atom_inventory_hostname | default(archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname')) }}"
   remote_user: "{{ archivematica_src_configure_atom_ssh_user | default('artefactual') }}"
   when: archivematica_src_configure_dashboardsettings is defined
 
