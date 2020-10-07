@@ -29,8 +29,8 @@ archivematica_src_ss_repo: "https://github.com/artefactual/archivematica-storage
 archivematica_src_automation_tools_repo: "https://github.com/artefactual/automation-tools.git"
 
 # Branches
-archivematica_src_am_version: "qa/1.x"
-archivematica_src_ss_version: "qa/0.x"
+archivematica_src_am_version: "stable/1.12.x"
+archivematica_src_ss_version: "stable/0.17.x"
 archivematica_src_devtools_version: "master"
 archivematica_src_automationtools_version: "master"
 archivematica_src_acceptance_tests_version: "master"
@@ -38,12 +38,12 @@ archivematica_src_acceptance_tests_version: "master"
 # RPM repositories
 archivematica_src_rpm_repositories:
   archivematica:
-    baseurl: "https://packages.archivematica.org/1.10.x/centos"
-    gpgkey: "https://packages.archivematica.org/1.10.x/key.asc"
+    baseurl: "https://packages.archivematica.org/1.12.x/centos"
+    gpgkey: "https://packages.archivematica.org/1.12.x/key.asc"
     gpgcheck: 1
   archivematica-extras:
-    baseurl: "https://packages.archivematica.org/1.10.x/centos-extras"
-    gpgkey: "https://packages.archivematica.org/1.10.x/key.asc"
+    baseurl: "https://packages.archivematica.org/1.12.x/centos-extras"
+    gpgkey: "https://packages.archivematica.org/1.12.x/key.asc"
     gpgcheck: 1
 
 # Database settings
