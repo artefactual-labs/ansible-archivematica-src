@@ -76,7 +76,7 @@
       name: "{{ item.key }}"
       description: "{{ item.key }}"
       baseurl: "{{ item.value.baseurl }}"
-      gpgkey: "{{ item.value.gpgkey|default('https://packages.archivematica.org/1.10.x/key.asc') }}"
+      gpgkey: "{{ item.value.gpgkey|default('https://packages.archivematica.org/1.12.x/key.asc') }}"
       gpgcheck: "{{ item.value.gpgcheck|default('1') }}"
     loop: "{{ lookup('dict',archivematica_src_rpm_repositories) }}"
 
