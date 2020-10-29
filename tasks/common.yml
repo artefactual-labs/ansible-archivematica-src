@@ -15,6 +15,7 @@
     system: "yes"
     groups: "audio"
     home: "/var/lib/archivematica"
+  when: archivematica_src_am_system_user == "archivematica" 
 
 #
 # Prepare pip
