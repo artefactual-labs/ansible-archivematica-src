@@ -4,17 +4,12 @@ galaxy_info:
   description: An ansible role for installing Archivematica from source.
   company: Artefactual Systems
   license: AGPLv3
-  min_ansible_version: 2.3
+  min_ansible_version: 2.7
   platforms:
   - name: EL
     versions:
     - 7
   - name: Ubuntu
     versions:
-    - trusty
     - xenial
-
-dependencies:
-- role: geerlingguy.nodejs
-  version: 4.1.1
-  nodejs_version: 8.x
+    - bionic
