@@ -22,7 +22,7 @@
 
     - name: "Install archivematicaCommon ext. package deps. (ubuntu)"
       apt:
-        pkg: "{{ archivematicaCommon.osdeps_packages | community.general.json_query('[].name') }}"
+        pkg: "{{ archivematicaCommon.osdeps_packages | json_query('[].name') }}"
         state: "latest"
       when:
         - "archivematicaCommon.osdeps_packages"
@@ -45,21 +45,21 @@
 
     - name: "Install archivematicaCommon ext. package deps. (RH/CentOS)"
       yum:
-        name: "{{ archivematicaCommon.osdeps_packages | community.general.json_query('[].name') }}"
+        name: "{{ archivematicaCommon.osdeps_packages | json_query('[].name') }}"
         state: "latest"
       when:
         - archivematicaCommon.osdeps_packages is defined and archivematicaCommon.osdeps_packages
 
     - name: "Install archivematicaCommon ext. package deps. (2)(RH/CentOS)"
       yum:
-        name: "{{ archivematicaCommon.osdeps_packages_2 | community.general.json_query('[].name') }}"
+        name: "{{ archivematicaCommon.osdeps_packages_2 | json_query('[].name') }}"
         state: "latest"
       when:
         - archivematicaCommon.osdeps_packages_2 is defined and archivematicaCommon.osdeps_packages_2
 
     - name: "Install archivematicaCommon ext. package deps. (3)(RH/CentOS)"
       yum:
-        name: "{{ archivematicaCommon.osdeps_packages_3 | community.general.json_query('[].name') }}"
+        name: "{{ archivematicaCommon.osdeps_packages_3 | json_query('[].name') }}"
         state: "latest"
       when:
         - archivematicaCommon.osdeps_packages_3 is defined and archivematicaCommon.osdeps_packages_3

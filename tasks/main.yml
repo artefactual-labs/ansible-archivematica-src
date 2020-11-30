@@ -78,9 +78,8 @@
 
   - name: "Install necessary packages required by this role"
     package:
-      name: "{{ item }}"
+      name: "{{ ansible_deps }}"
       state: "latest"
-    with_items: "{{ ansible_deps }}"
 
   - name: "Include common.yml common tasks for all components"
     include: "common.yml"
@@ -97,7 +96,7 @@
        archivematica_src_install_ss=='rpm' or
        archivematica_src_install_am|bool or
        archivematica_src_install_am=='rpm'"
- 
+
 
 - name: "Checkout out archivematica-sampledata repository"
   git:

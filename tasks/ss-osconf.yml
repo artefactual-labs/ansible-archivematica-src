@@ -71,12 +71,10 @@
 
 - name: "Enable SS services (systemd)"
   service:
-    name: "{{ item }}"
+    name: "archivematica-storage-service"
     state: "restarted"
     enabled: "yes"
     daemon_reload: "yes"
-  with_items:
-    - "archivematica-storage-service"
   when:
     - ansible_service_mgr == "systemd"
   tags: "amsrc-ss-osconf"

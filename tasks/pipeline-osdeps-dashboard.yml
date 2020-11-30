@@ -21,7 +21,7 @@
 
     - name: "Install dashboard ext. package deps."
       apt:
-        pkg: "{{ dashboard.osdeps_packages | community.general.json_query('[].name') }}"
+        pkg: "{{ dashboard.osdeps_packages | json_query('[].name') }}"
         state: "latest"
       when:
         - "dashboard.osdeps_packages"
@@ -44,21 +44,21 @@
 
     - name: "Install dashboard ext. package deps. (RH/CentOS)"
       yum:
-        name: "{{ dashboard.osdeps_packages | community.general.json_query('[].name') }}"
+        name: "{{ dashboard.osdeps_packages | json_query('[].name') }}"
         state: "latest"
       when:
         - dashboard.osdeps_packages is defined and dashboard.osdeps_packages
 
     - name: "Install dashboard ext. package deps. (RH/CentOS) (2)"
       yum:
-        name: "{{ dashboard.osdeps_packages_2 | community.general.json_query('[].name') }}"
+        name: "{{ dashboard.osdeps_packages_2 | json_query('[].name') }}"
         state: "latest"
       when:
         - dashboard.osdeps_packages_2 is defined and dashboard.osdeps_packages_2
 
     - name: "Install dashboard ext. package deps. (RH/CentOS) (3)"
       yum:
-        name: "{{ dashboard.osdeps_packages_3 | community.general.json_query('[].name') }}"
+        name: "{{ dashboard.osdeps_packages_3 | json_query('[].name') }}"
         state: "latest"
       when:
         - dashboard.osdeps_packages_3 is defined and dashboard.osdeps_packages_3

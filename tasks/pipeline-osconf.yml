@@ -25,8 +25,8 @@
     state: "absent"
   when: "archivematica_src_reset_shareddir|bool or archivematica_src_reset_am_all|bool"
 
-# to avoid playbook errors when the shared dir is a symlink, 
-# check for existence before creating 
+# to avoid playbook errors when the shared dir is a symlink,
+# check for existence before creating
 - name: "Check if shared directory exists"
   stat:
     path: "{{ archivematica_src_shareddir }}"
@@ -34,11 +34,11 @@
 
 - set_fact:
     create_shareddir: true
-  when: "shareddir_st.stat.exists is defined and not shareddir_st.stat.exists" 
+  when: "shareddir_st.stat.exists is defined and not shareddir_st.stat.exists"
 
 - set_fact:
     create_shareddir: false
-  when: "shareddir_st.stat.exists is defined and shareddir_st.stat.exists" 
+  when: "shareddir_st.stat.exists is defined and shareddir_st.stat.exists"
 
 - name: "Create shared directory (if it doesn't exist and there is no symlink to it)"
   file:
@@ -71,7 +71,7 @@
 
 #
 # Backward-compatible Logging config
-# 
+#
 
 - name: "Create archivematica log directories"
   file:

@@ -2,58 +2,31 @@
 
 # archivematica-devtools installer
 
-# Ubuntu block
-- block:
-    - name: "Install am-devtools package dependencies (ubuntu)"
-      apt:
-        pkg: "{{ item }}"
-        state: "latest"
-      with_items:
-        - "ruby-ronn"
-        - "pkg-config"
-        - "graphviz"
-        - "libgraphviz-dev"
-        - "python-pygraphviz"
-  when:
-    - ansible_os_family == "Debian"
+- name: "Install am-devtools package dependencies"
+  package:
+    name: "{{ archivematica_src_am_devtools_deps }}"
+    state: "latest"
+  become: "yes"
 
- 
-# CentOS block
-- block:
-    - name: "Install am-devtools package dependencies (RH/CentOS)"
-      yum:
-        pkg: "{{ item }}"
-        state: "latest"
-      with_items:
-        - "rubygems"
-        - "ruby-devel"
-        - "graphviz"
-        - "graphviz-devel"
-        - "graphviz-python"
-        - "python2-pkgconfig"
-        - "nodejs-ronn"
-
-    # Needed to find the command ronn when running make
-    - name: "Create ronn symlink (RH/CentOS)"
-      file:
-        src: "/usr//bin/ronn-nodejs"
-        dest: "/usr/bin/ronn"
-        state: link
+# Needed to find the command ronn when running make
+- name: "Create ronn symlink (RH/CentOS)"
+  file:
+    src: "/usr//bin/ronn-nodejs"
+    dest: "/usr/bin/ronn"
+    state: link
   when:
     - ansible_os_family == "RedHat"
   become: "yes"
 
-# Common block
-- block:
-    - name: "Checkout out am-devtools repository"
-      git:
-       repo: "https://github.com/artefactual/archivematica-devtools.git"
-       dest: "{{ archivematica_src_dir }}/archivematica-devtools"
-       version: "{{ archivematica_src_devtools_version }}"
-       force: "yes"
+- name: "Checkout out am-devtools repository"
+  git:
+    repo: "https://github.com/artefactual/archivematica-devtools.git"
+    dest: "{{ archivematica_src_dir }}/archivematica-devtools"
+    version: "{{ archivematica_src_devtools_version }}"
+    force: "yes"
 
-    - name: "Install am-devtools"
-      command: "make install"
-      args:
-        chdir: "{{ archivematica_src_dir }}/archivematica-devtools"
-      become: "yes"
+- name: "Install am-devtools"
+  command: "make install"
+  args:
+    chdir: "{{ archivematica_src_dir }}/archivematica-devtools"
+  become: "yes"
