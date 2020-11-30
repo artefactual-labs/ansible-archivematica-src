@@ -118,6 +118,10 @@ Notes regarding role dependencies:
 
 Please use Ansible 2.3 or newer with this role.
 
+A number of tasks in this role use the `json_query` filter which needs the JMESPath library installed on the Ansible controller. It can be installed as follows:
+
+    pip install jmespath
+
 
 Example Playbooks
 -----------------
