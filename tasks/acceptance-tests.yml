@@ -1,14 +1,11 @@
 ---
 
 - name: "Install packages"
-  apt:
-    pkg: "{{ item }}"
+  package:
+    name: "{{ archivematica_src_am_amauat_deps }}"
     state: present
     update_cache: yes
     cache_valid_time: 3600
-  with_items:
-    - tightvncserver
-    - icewm
 
 - name: "Checkout acceptance tests repository"
   git:
@@ -75,7 +72,7 @@
     - "'Chrome' in archivematica_src_acceptance_tests_browser_list"
 
 - name: "Install packages"
-  apt: 
+  apt:
     pkg: "google-chrome-stable"
     state: present
     update_cache: yes
@@ -94,7 +91,7 @@
     creates: "/usr/local/bin/chromedriver"
   when: "'Chrome' in archivematica_src_acceptance_tests_browser_list"
 
-- name: "Set permissions" 
+- name: "Set permissions"
   file:
     path: "/usr/local/bin/chromedriver"
     owner: root

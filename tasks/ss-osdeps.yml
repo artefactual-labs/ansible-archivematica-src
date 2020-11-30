@@ -44,7 +44,7 @@
 
 - name: "Install storage service ext. package deps."
   package:
-    name: "{{ storage_service.osdeps_packages | community.general.json_query('[].name') }}"
+    name: "{{ storage_service.osdeps_packages | json_query('[].name') }}"
     state: "latest"
   when:
     - osdeps
@@ -54,7 +54,7 @@
 
 - name: "Install storage service ext. package deps. 2"
   package:
-    name: "{{ storage_service.osdeps_packages_2 | community.general.json_query('[].name') }}"
+    name: "{{ storage_service.osdeps_packages_2 | json_query('[].name') }}"
     state: "latest"
   when:
     - osdeps
@@ -64,7 +64,7 @@
 
 - name: "Install storage service ext. package deps. 3"
   package:
-    name: "{{ storage_service.osdeps_packages_3 | community.general.json_query('[].name') }}"
+    name: "{{ storage_service.osdeps_packages_3 | json_query('[].name') }}"
     state: "latest"
   when:
     - osdeps

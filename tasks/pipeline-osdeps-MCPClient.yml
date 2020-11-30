@@ -21,7 +21,7 @@
 
     - name: "Install MCPClient ext. package deps."
       apt:
-        pkg: "{{ MCPClient.osdeps_packages | community.general.json_query('[].name') }}"
+        pkg: "{{ MCPClient.osdeps_packages | json_query('[].name') }}"
         state: "latest"
       when:
         - "MCPClient.osdeps_packages"
@@ -44,21 +44,21 @@
 
     - name: "Install MCPClient ext. package deps. (RH/CentOS)"
       yum:
-        name: "{{ MCPClient.osdeps_packages | community.general.json_query('[].name') }}"
+        name: "{{ MCPClient.osdeps_packages | json_query('[].name') }}"
         state: "latest"
       when:
         - MCPClient.osdeps_packages is defined and MCPClient.osdeps_packages
 
     - name: "Install MCPClient ext. package deps. (2) (RH/CentOS)"
       yum:
-        name: "{{ MCPClient.osdeps_packages_2 | community.general.json_query('[].name') }}"
+        name: "{{ MCPClient.osdeps_packages_2 | json_query('[].name') }}"
         state: "latest"
       when:
         - MCPClient.osdeps_packages_2 is defined and MCPClient.osdeps_packages_2
 
     - name: "Install MCPClient ext. package deps. (3) (RH/CentOS)"
       yum:
-        name: "{{ MCPClient.osdeps_packages_3 | community.general.json_query('[].name') }}"
+        name: "{{ MCPClient.osdeps_packages_3 | json_query('[].name') }}"
         state: "latest"
       when:
         - MCPClient.osdeps_packages_3 is defined and MCPClient.osdeps_packages_3

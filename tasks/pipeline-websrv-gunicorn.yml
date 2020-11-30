@@ -60,11 +60,9 @@
 
 - name: "Enable services"
   systemd:
-    name: "{{ item }}"
+    name: "nginx"
     state: "restarted"
     enabled: "yes"
     daemon_reload: "yes"
-  with_items:
-    - "nginx"
   when:
     - ansible_service_mgr == "systemd"

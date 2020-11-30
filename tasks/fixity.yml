@@ -1,22 +1,7 @@
 - name: "Install required deb packages "
-  apt:
-    name:
-      - "sqlite3"
-      - "moreutils"
-      - "mailutils"
-    state: present
-  when:
-    - ansible_os_family == "Debian"
-
-- name: "Install required rpm packages"
-  yum:
-    name:
-      - "sqlite"
-      - "moreutils"
-      - "mailx"
-    state: present
-  when:
-    - ansible_os_family == "RedHat"
+  package:
+    name: "{{ archivematica_src_am_fixity_deps }}"
+    state: "present"
 
 - name: "Download code"
   git:
@@ -60,7 +45,6 @@
      mode: 0750
      owner: "archivematica"
      group: "archivematica"
-
 
 - name: "Create fixity script"
   template:

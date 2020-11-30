@@ -22,7 +22,7 @@
 
     - name: "Install MCPServer ext. package deps."
       apt:
-        pkg: "{{ MCPServer.osdeps_packages | community.general.json_query('[].name') }}"
+        pkg: "{{ MCPServer.osdeps_packages | json_query('[].name') }}"
         state: "latest"
       when:
         - "MCPServer.osdeps_packages"
@@ -45,21 +45,21 @@
 
     - name: "Install MCPServer ext. package deps. (RH/CentOS)"
       yum:
-        name: "{{ MCPServer.osdeps_packages | community.general.json_query('[].name') }}"
+        name: "{{ MCPServer.osdeps_packages | json_query('[].name') }}"
         state: "latest"
       when:
         - MCPServer.osdeps_packages is defined and MCPServer.osdeps_packages
 
     - name: "Install MCPServer ext. package deps. (2) (RH/CentOS)"
       yum:
-        name: "{{ MCPServer.osdeps_packages_2 | community.general.json_query('[].name') }}"
+        name: "{{ MCPServer.osdeps_packages_2 | json_query('[].name') }}"
         state: "latest"
       when:
         - MCPServer.osdeps_packages_2 is defined and MCPServer.osdeps_packages_2
 
     - name: "Install MCPServer ext. package deps. (3) (RH/CentOS)"
       yum:
-        name: "{{ MCPServer.osdeps_packages_3 | community.general.json_query('[].name') }}"
+        name: "{{ MCPServer.osdeps_packages_3 | json_query('[].name') }}"
         state: "latest"
       when:
         - MCPServer.osdeps_packages_3 is defined and MCPServer.osdeps_packages_3
