@@ -35,7 +35,7 @@
       dest: "/root/get-pip.py"
 
   - name: "Install pip with get-pip.py"
-    command: "python get-pip.py"
+    command: "python get-pip.py pip=={{ archivematica_src_pip_version }}"
     args:
       chdir: "/root/"
 

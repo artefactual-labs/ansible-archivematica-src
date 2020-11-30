@@ -9,40 +9,12 @@
     - "archivematica-mcp-client"
     - "archivematica-mcp-server"
 
-- name: "virtualenv | Set `virtualenvs` variable"
-  set_fact:
-    virtualenvs:
-      - name: "Archivematica MCPServer"
-        path: "{{ archivematica_src_am_mcpserver_virtualenv }}"
-        requirements_dir:
-          - "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon"
-          - "{{ archivematica_src_dir }}/archivematica/src/MCPServer"
-          - "{{ archivematica_src_dir }}/archivematica/src/dashboard/src"
-      - name: "Archivematica MCPClient"
-        path: "{{ archivematica_src_am_mcpclient_virtualenv }}"
-        requirements_dir:
-          - "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon"
-          - "{{ archivematica_src_dir }}/archivematica/src/MCPClient"
-          - "{{ archivematica_src_dir }}/archivematica/src/dashboard/src"
-      - name: "Archivematica Dashboard"
-        path: "{{ archivematica_src_am_dashboard_virtualenv }}"
-        requirements_dir:
-          - "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon"
-          - "{{ archivematica_src_dir }}/archivematica/src/dashboard/src"
-
-- name: "virtualenv | Create environment and install a recent version of pip"
+- name: "virtualenv | Create environment and install requirements"
   pip:
-    name: "pip"
-    virtualenv: "{{ item.path }}"
-    state: "latest"
-  with_items: "{{ virtualenvs }}"
+    virtualenv: "{{ archivematica_src_am_virtualenv }}"
+    requirements: "{{ archivematica_src_dir }}/archivematica/{{ 'requirements-dev.txt' if is_dev else 'requirements.txt' }}"
 
-- name: "virtualenv | Install requirements"
-  pip:
-    chdir: "{{ item.1 }}"
-    virtualenv: "{{ item.0.path }}"
-    state: "latest"
-    requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt' }}"
-  with_subelements:
-    - "{{ virtualenvs }}"
-    - "requirements_dir"
+- name: "virtualenv | Synchronize requirements"
+  command: "{{ archivematica_src_am_virtualenv }}/bin/pip-sync {{ 'requirements-dev.txt' if is_dev else 'requirements.txt' }}"
+  args:
+    chdir: "{{ archivematica_src_dir }}/archivematica"
