@@ -9,7 +9,7 @@
         state: "present"
         validate_certs: "{{ item.validate_certs }}"
       with_items: "{{ archivematicaCommon.osdeps_repokeys }}"
-      when: 
+      when:
         - "archivematicaCommon.osdeps_repokeys"
 
     - name: "Add archivematicaCommon ext. deps. repos (ubuntu)"
@@ -22,17 +22,16 @@
 
     - name: "Install archivematicaCommon ext. package deps. (ubuntu)"
       apt:
-        pkg: "{{ item['name'] }}"
-        state: "{{ item['state'] }}"
-      with_items: "{{ archivematicaCommon.osdeps_packages }}"
+        pkg: "{{ archivematicaCommon.osdeps_packages | community.general.json_query('[].name') }}"
+        state: "latest"
       when:
         - "archivematicaCommon.osdeps_packages"
 
   when:
     - ansible_distribution == "Ubuntu"
 
-# Centos/RH block 
-- block: 
+# Centos/RH block
+- block:
     - name: "Add archivematicaCommon ext. deps. repos (RH/CentOS)"
       yum_repository:
         name: "{{ item['name'] }}"
@@ -45,28 +44,25 @@
         - archivematicaCommon.osdeps_repos
 
     - name: "Install archivematicaCommon ext. package deps. (RH/CentOS)"
-      yum: 
-        name: "{{ item['name'] }}"
-        state: "{{ item['state'] }}"
-      with_items: "{{ archivematicaCommon.osdeps_packages }}"
+      yum:
+        name: "{{ archivematicaCommon.osdeps_packages | community.general.json_query('[].name') }}"
+        state: "latest"
       when:
         - archivematicaCommon.osdeps_packages is defined and archivematicaCommon.osdeps_packages
 
     - name: "Install archivematicaCommon ext. package deps. (2)(RH/CentOS)"
-      yum: 
-        name: "{{ item['name'] }}"
-        state: "{{ item['state'] }}"
-      with_items: "{{ archivematicaCommon.osdeps_packages_2 }}"
+      yum:
+        name: "{{ archivematicaCommon.osdeps_packages_2 | community.general.json_query('[].name') }}"
+        state: "latest"
       when:
-        - archivematicaCommon.osdeps_packages_2 is defined and archivematicaCommon.osdeps_packages_2 
+        - archivematicaCommon.osdeps_packages_2 is defined and archivematicaCommon.osdeps_packages_2
 
     - name: "Install archivematicaCommon ext. package deps. (3)(RH/CentOS)"
-      yum: 
-        name: "{{ item['name'] }}"
-        state: "{{ item['state'] }}"
-      with_items: "{{ archivematicaCommon.osdeps_packages_3 }}"
+      yum:
+        name: "{{ archivematicaCommon.osdeps_packages_3 | community.general.json_query('[].name') }}"
+        state: "latest"
       when:
-        - archivematicaCommon.osdeps_packages_3 is defined and archivematicaCommon.osdeps_packages_3 
+        - archivematicaCommon.osdeps_packages_3 is defined and archivematicaCommon.osdeps_packages_3
 
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"

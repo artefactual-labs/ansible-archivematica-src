@@ -8,7 +8,7 @@
         state: "present"
         validate_certs: "{{ item.validate_certs }}"
       with_items: "{{ MCPClient.osdeps_repokeys }}"
-      when: 
+      when:
         - "MCPClient.osdeps_repokeys"
 
     - name: "Add MCPClient ext. deps. repos"
@@ -21,24 +21,16 @@
 
     - name: "Install MCPClient ext. package deps."
       apt:
-        pkg: "{{ item['name'] }}"
-        state: "{{ item['state'] }}"
-      with_items: "{{ MCPClient.osdeps_packages }}"
+        pkg: "{{ MCPClient.osdeps_packages | community.general.json_query('[].name') }}"
+        state: "latest"
       when:
         - "MCPClient.osdeps_packages"
-
-    - name: "Install MCPClient ext. package deb file deps."
-      apt:
-        deb: "{{ item }}"
-      with_items: "{{ MCPClient.osdeps_debfiles }}"
-      when:
-        - "MCPClient.osdeps_debfiles is defined and MCPClient.osdeps_debfiles"
 
   when:
     - ansible_distribution == "Ubuntu"
 
-# Centos/RH block 
-- block: 
+# Centos/RH block
+- block:
     - name: "Add MCPClient ext. deps. repos (RH/CentOS)"
       yum_repository:
         name: "{{ item['name'] }}"
@@ -51,28 +43,25 @@
         - MCPClient.osdeps_repos
 
     - name: "Install MCPClient ext. package deps. (RH/CentOS)"
-      yum: 
-        name: "{{ item['name'] }}"
-        state: "{{ item['state'] }}"
-      with_items: "{{ MCPClient.osdeps_packages }}"
+      yum:
+        name: "{{ MCPClient.osdeps_packages | community.general.json_query('[].name') }}"
+        state: "latest"
       when:
-        - MCPClient.osdeps_packages is defined and MCPClient.osdeps_packages 
+        - MCPClient.osdeps_packages is defined and MCPClient.osdeps_packages
 
     - name: "Install MCPClient ext. package deps. (2) (RH/CentOS)"
-      yum: 
-        name: "{{ item['name'] }}"
-        state: "{{ item['state'] }}"
-      with_items: "{{ MCPClient.osdeps_packages_2 }}"
+      yum:
+        name: "{{ MCPClient.osdeps_packages_2 | community.general.json_query('[].name') }}"
+        state: "latest"
       when:
         - MCPClient.osdeps_packages_2 is defined and MCPClient.osdeps_packages_2
 
     - name: "Install MCPClient ext. package deps. (3) (RH/CentOS)"
-      yum: 
-        name: "{{ item['name'] }}"
-        state: "{{ item['state'] }}"
-      with_items: "{{ MCPClient.osdeps_packages_3 }}"
+      yum:
+        name: "{{ MCPClient.osdeps_packages_3 | community.general.json_query('[].name') }}"
+        state: "latest"
       when:
-        - MCPClient.osdeps_packages_3 is defined and MCPClient.osdeps_packages_3 
+        - MCPClient.osdeps_packages_3 is defined and MCPClient.osdeps_packages_3
 
   when:
     - ansible_distribution == "RedHat" or ansible_distribution == "CentOS"
