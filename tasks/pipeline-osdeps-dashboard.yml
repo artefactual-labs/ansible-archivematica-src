@@ -8,7 +8,7 @@
         state: "present"
         validate_certs: "{{ item.validate_certs }}"
       with_items: "{{ dashboard.osdeps_repokeys }}"
-      when: 
+      when:
         - "dashboard.osdeps_repokeys"
 
     - name: "Add dashboard ext. deps. repos"
@@ -21,17 +21,16 @@
 
     - name: "Install dashboard ext. package deps."
       apt:
-        pkg: "{{ item['name'] }}"
-        state: "{{ item['state'] }}"
-      with_items: "{{ dashboard.osdeps_packages }}"
+        pkg: "{{ dashboard.osdeps_packages | community.general.json_query('[].name') }}"
+        state: "latest"
       when:
         - "dashboard.osdeps_packages"
 
   when:
     - ansible_distribution == "Ubuntu"
 
-# Centos/RH block 
-- block: 
+# Centos/RH block
+- block:
     - name: "Add dashboard ext. deps. repos (RH/CentOS)"
       yum_repository:
         name: "{{ item['name'] }}"
@@ -44,26 +43,23 @@
         - dashboard.osdeps_repos
 
     - name: "Install dashboard ext. package deps. (RH/CentOS)"
-      yum: 
-        name: "{{ item['name'] }}"
-        state: "{{ item['state'] }}"
-      with_items: "{{ dashboard.osdeps_packages }}"
+      yum:
+        name: "{{ dashboard.osdeps_packages | community.general.json_query('[].name') }}"
+        state: "latest"
       when:
         - dashboard.osdeps_packages is defined and dashboard.osdeps_packages
 
     - name: "Install dashboard ext. package deps. (RH/CentOS) (2)"
-      yum: 
-        name: "{{ item['name'] }}"
-        state: "{{ item['state'] }}"
-      with_items: "{{ dashboard.osdeps_packages_2 }}"
+      yum:
+        name: "{{ dashboard.osdeps_packages_2 | community.general.json_query('[].name') }}"
+        state: "latest"
       when:
         - dashboard.osdeps_packages_2 is defined and dashboard.osdeps_packages_2
 
     - name: "Install dashboard ext. package deps. (RH/CentOS) (3)"
-      yum: 
-        name: "{{ item['name'] }}"
-        state: "{{ item['state'] }}"
-      with_items: "{{ dashboard.osdeps_packages_3 }}"
+      yum:
+        name: "{{ dashboard.osdeps_packages_3 | community.general.json_query('[].name') }}"
+        state: "latest"
       when:
         - dashboard.osdeps_packages_3 is defined and dashboard.osdeps_packages_3
 
