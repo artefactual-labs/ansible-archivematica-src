@@ -6,10 +6,9 @@
 #######################################################################
 #  Notes:
 #  - Recent archivematica branches to include osdeps file per component
-#    (e.g., src/archivematicaCommon/osdeps/Ubuntu-14.yml,
+#    (e.g., src/MCPServer/osdeps/Ubuntu-14.yml,
 #     src/dashboard/osdeps/Ubuntu-14.yml)
-#  - "Component" refer to any of archivematicaCommon, dashboard,
-#    MCPServer, MCPClient
+#  - "Component" refer to any of dashboard, MCPServer, and MCPClient
 #  - osdeps files contains the following information
 #      - repository keys
 #      - repository names
@@ -23,7 +22,10 @@
 - set_fact:
     osdeps_file: "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.json"
     tmpdirname: "/tmp/amsrc-{{ ansible_date_time.date }}-{{ ansible_date_time.epoch }}"
-    comps: "[ 'archivematicaCommon', 'MCPServer', 'MCPClient', 'dashboard' ]"
+    comps:
+      - "MCPServer"
+      - "MCPClient"
+      - "dashboard"
 
 # become: false is required in tasks delegated to localhost
 # (to avoid "sudo: a password is required" error)
@@ -71,10 +73,6 @@
 
 # (Couldn't find a way to loop within components for tasks below,
 #  can't use ansible nested loops for this case)
-
-- name: "include pipeline-osdeps-archivematicaCommon"
-  include_tasks: "pipeline-osdeps-archivematicaCommon.yml"
-  when: archivematicaCommon is defined
 
 - name: "include pipeline-osdeps-MCPServer"
   include_tasks: "pipeline-osdeps-MCPServer.yml"
