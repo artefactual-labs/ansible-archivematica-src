@@ -379,4 +379,7 @@
   when:
     - "archivematica_src_install_ss|bool or archivematica_src_install_ss=='rpm'"
     - "archivematica_src_configure_gpg is defined"
+<<<<<<< HEAD
 
+=======
+>>>>>>> Fix problems with merge
