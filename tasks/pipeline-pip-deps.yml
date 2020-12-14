@@ -11,8 +11,13 @@
 
 - name: "virtualenv | Create environment and install requirements"
   pip:
+    name:
+      - "pip=={{ archivematica_src_pip_version }}"
+      - "pip-tools"
+      - "setuptools=={{ archivematica_src_setuptools_version }}"
+      - "wheel=={{ archivematica_src_wheel_version }}"
     virtualenv: "{{ archivematica_src_am_virtualenv }}"
-    requirements: "{{ archivematica_src_dir }}/archivematica/{{ 'requirements-dev.txt' if is_dev else 'requirements.txt' }}"
+    state: "present"
 
 - name: "virtualenv | Synchronize requirements"
   command: "{{ archivematica_src_am_virtualenv }}/bin/pip-sync {{ 'requirements-dev.txt' if is_dev else 'requirements.txt' }}"
