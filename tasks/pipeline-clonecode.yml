@@ -4,6 +4,14 @@
 #   0- Clone source repo
 ###########################################################
 
+- name: "Delete pychache, pyc and pyo files/dir"
+  command: "{{ item }}"
+  args:
+    removes: "{{ archivematica_src_dir }}/archivematica"
+  loop:
+    - 'find {{ archivematica_src_dir }}/archivematica -type f -name "*.py[co]" -delete'
+    - 'find {{ archivematica_src_dir }}/archivematica -type d -name "__pycache__" -delete'
+
 - name: "Checkout Archivematica code"
   git:
     repo: "{{ archivematica_src_am_repo }}"
