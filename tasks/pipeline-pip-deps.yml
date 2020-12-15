@@ -32,16 +32,18 @@
 
 - name: "virtualenv | Create environment and install a recent version of pip"
   pip:
-    name: "pip"
+    name:
+      - "pip=={{ archivematica_src_pip_version }}"
+      - "setuptools=={{ archivematica_src_setuptools_version }}"
+      - "wheel=={{ archivematica_src_wheel_version }}"
     virtualenv: "{{ item.path }}"
-    state: "latest"
+    state: "present"
   with_items: "{{ virtualenvs }}"
 
 - name: "virtualenv | Install requirements"
   pip:
     chdir: "{{ item.1 }}"
     virtualenv: "{{ item.0.path }}"
-    state: "latest"
     requirements: "{{ 'requirements/test.txt' if is_dev else 'requirements.txt' }}"
   with_subelements:
     - "{{ virtualenvs }}"
