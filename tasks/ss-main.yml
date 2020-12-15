@@ -76,7 +76,7 @@
   pip:
     name:
       - "pip=={{ archivematica_src_pip_version }}"
-      - "pip-tools"
+      - "pip-tools={{ archivematica_src_piptools_version }}"
       - "setuptools=={{ archivematica_src_setuptools_version }}"
       - "wheel=={{ archivematica_src_wheel_version }}"
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
