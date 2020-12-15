@@ -80,26 +80,6 @@
     state: "latest"
   tags: "amsrc-ss-pydep"
 
-## these tasks added in PR #103 are breaking in CentOS
-## (error in pip install after removing setuptools)
-## will remove for now
-
-# - name: "Update setuptools in virtualenv for archivematica-storage-service"
-#   pip:
-#     name: "setuptools"
-#     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-#     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
-#     state: "absent"
-#   tags: "amsrc-ss-pydep"
-
-# - name: "Update setuptools in virtualenv for archivematica-storage-service"
-#   pip:
-#     name: "setuptools"
-#     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-#     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
-#     state: "latest"
-#   tags: "amsrc-ss-pydep"
-
 - name: "Install pip requirements for production"
   pip:
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
