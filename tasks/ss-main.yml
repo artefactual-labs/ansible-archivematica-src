@@ -65,10 +65,13 @@
 # is required to avoid errors
 - name: "Create virtualenv for archivematica-storage-service"
   pip:
-    name: "pip"
+    name:
+      - "pip=={{ archivematica_src_pip_version }}"
+      - "setuptools=={{ archivematica_src_setuptools_version }}"
+      - "wheel=={{ archivematica_src_wheel_version }}"
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
-    state: "latest"
+    state: "present"
   tags: "amsrc-ss-pydep"
 
 ## these tasks added in PR #103 are breaking in CentOS
@@ -97,7 +100,6 @@
     requirements: "{{ item }}"
     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
     extra_args: "{{ ss_pip_install_extra_args }}"
-    state: "latest"
   tags: "amsrc-ss-pydep"
   when: "is_prod"
   with_items:
@@ -109,7 +111,6 @@
     requirements: "{{ item }}"
     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
     extra_args: "{{ ss_pip_install_extra_args }}"
-    state: "latest"
   tags: "amsrc-ss-pydep"
   when: "is_dev"
   with_items:
