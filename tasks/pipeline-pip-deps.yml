@@ -30,6 +30,12 @@
           - "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon"
           - "{{ archivematica_src_dir }}/archivematica/src/dashboard/src"
 
+- name: "virtualenv | Delete environment"
+  file:
+    path: "{{ item.path }}"
+    state: "absent"
+  with_items: "{{ virtualenvs }}"
+
 - name: "virtualenv | Create environment and install a recent version of pip"
   pip:
     name:

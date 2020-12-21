@@ -70,6 +70,11 @@
     state: absent
     path: "/usr/share/python/archivematica-storage-service/"
 
+- name: "Delete SS virtualenv"
+  file:
+    path: "{{ archivematica_src_ss_virtualenv }}"
+    state: "absent"
+
 # a separate task to create the virtualenv before install requirements
 # is required to avoid errors
 - name: "Create virtualenv for archivematica-storage-service"
