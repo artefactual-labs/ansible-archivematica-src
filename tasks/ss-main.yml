@@ -50,60 +50,23 @@
 #   2- Python dependencies (pip packages)
 ###########################################################
 
-- stat:
-    path: "{{ archivematica_src_dir }}/archivematica-storage-service/lib"
-  register: "ss_lib_dir_check"
-  tags: "amsrc-ss-pydep"
-
-- set_fact:
-    ss_pip_install_extra_args: ""
-  tags: "amsrc-ss-pydep"
-
-- set_fact:
-    ss_pip_install_extra_args: "--find-links lib"
-  when: "ss_lib_dir_check.stat.isdir is defined and ss_lib_dir_check.stat.isdir"
-  tags: "amsrc-ss-pydep"
-
 # this task is needed to avoid problems when upgrading python package
 - name: "Remove old SS virtualenv default dir"
   file:
     state: absent
     path: "/usr/share/python/archivematica-storage-service/"
 
-# a separate task to create the virtualenv before install requirements
-# is required to avoid errors
-- name: "Create virtualenv for archivematica-storage-service"
+- name: "Create virtualenv and install pip-tools"
   pip:
-    name: "pip"
-    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
-    state: "latest"
+    name: "pip-tools"
   tags: "amsrc-ss-pydep"
 
-- name: "Install pip requirements for production"
-  pip:
-    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-    requirements: "{{ item }}"
-    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
-    extra_args: "{{ ss_pip_install_extra_args }}"
-    state: "latest"
+- name: "Synchronize requirements"
+  command: "{{ archivematica_src_ss_virtualenv }}/bin/pip-sync {{ 'local.txt' if is_dev else 'production.txt' }}"
+  args:
+    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service/requirements"
   tags: "amsrc-ss-pydep"
-  when: "is_prod"
-  with_items:
-    - "requirements/production.txt"
-
-- name: "Install pip requirements for development"
-  pip:
-    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-    requirements: "{{ item }}"
-    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
-    extra_args: "{{ ss_pip_install_extra_args }}"
-    state: "latest"
-  tags: "amsrc-ss-pydep"
-  when: "is_dev"
-  with_items:
-    - "requirements/local.txt"
-    - "requirements/test.txt"
 
 ###########################################################
 #   3- OS configuration (user/directory/file creation/permissions/ownership)
