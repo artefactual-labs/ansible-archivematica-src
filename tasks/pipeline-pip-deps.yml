@@ -1,6 +1,6 @@
 ---
 # this task is needed to avoid problems when upgrading python package
-- name: "virtualenv | Remove old virtualenv default dirs"
+- name: "Remove old virtualenv default dirs"
   file:
     state: absent
     path: "/usr/share/python/{{ item }}/"
@@ -9,12 +9,12 @@
     - "archivematica-mcp-client"
     - "archivematica-mcp-server"
 
-- name: "virtualenv | Create environment and install requirements"
+- name: "Create virtualenv and install pip-tools"
   pip:
     virtualenv: "{{ archivematica_src_am_virtualenv }}"
-    requirements: "{{ archivematica_src_dir }}/archivematica/{{ 'requirements-dev.txt' if is_dev else 'requirements.txt' }}"
+    name: "pip-tools"
 
-- name: "virtualenv | Synchronize requirements"
+- name: "Synchronize requirements"
   command: "{{ archivematica_src_am_virtualenv }}/bin/pip-sync {{ 'requirements-dev.txt' if is_dev else 'requirements.txt' }}"
   args:
     chdir: "{{ archivematica_src_dir }}/archivematica"
