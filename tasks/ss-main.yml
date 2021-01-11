@@ -59,7 +59,7 @@
 - name: "Create virtualenv and install pip-tools"
   pip:
     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
-    name: "pip-tools"
+    name: "pip-tools=={{ archivematica_src_pip_tools_version }}"
   tags: "amsrc-ss-pydep"
 
 - name: "Synchronize requirements"
