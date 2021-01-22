@@ -71,3 +71,15 @@
     pythonpath: "{{ archivematica_src_am_common_app }}"
     virtualenv: "{{ archivematica_src_am_dashboard_virtualenv }}"
   environment: "{{ archivematica_src_am_dashboard_environment }}"
+
+#
+# compilemessages
+#
+
+- name: "Compile gettext po files (compilemessages)"
+  django_manage:
+    command: "compilemessages"
+    app_path: "{{ archivematica_src_am_dashboard_app }}"
+    pythonpath: "{{ archivematica_src_am_common_app }}"
+    virtualenv: "{{ archivematica_src_am_dashboard_virtualenv }}"
+  environment: "{{ archivematica_src_am_dashboard_environment }}"
