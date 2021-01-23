@@ -205,6 +205,14 @@
   environment: "{{ archivematica_src_ss_environment }}"
   tags: ["amsrc-ss-code", "amsrc-ss-code-collectstatic"]
 
+- name: "Run SS django compilemessages"
+  django_manage:
+    command: "compilemessages"
+    app_path: "{{ archivematica_src_ss_app }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+  environment: "{{ archivematica_src_ss_environment }}"
+  tags: ["amsrc-ss-code", "amsrc-ss-code-compilemessages"]
+
 - name: "Copy gunicorn configuration file"
   copy:
     src: "{{ archivematica_src_dir }}/archivematica-storage-service/install/storage-service.gunicorn-config.py"
