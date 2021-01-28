@@ -22,3 +22,6 @@ archivematica_src_am_fixity_deps:
   - "sqlite"
   - "moreutils"
   - "mailx"
+  - "rh-nodejs8-npm"
+
+npm_path: "/opt/rh/rh-nodejs8/root/bin/"

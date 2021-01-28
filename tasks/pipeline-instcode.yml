@@ -54,7 +54,7 @@
 - name: "Install front-end dependencies"
   become: "yes"
   become_user: "archivematica"
-  command: npm install
+  command: "{{ npm_path }}/npm install"
   args:
     chdir: "{{ item }}"
   with_items:

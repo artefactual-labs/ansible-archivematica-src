@@ -19,3 +19,5 @@ archivematica_src_am_fixity_deps:
   - "sqlite3"
   - "moreutils"
   - "mailutils"
+
+npm_path: "/usr/bin/npm"
