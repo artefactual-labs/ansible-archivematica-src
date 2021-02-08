@@ -115,7 +115,7 @@
   when:
     - archivematica_src_install_ss == "rpm"
 
-- name: "Configure storage service"
+- name: "Complete storage service deployment"
   block:
   - include: "ss-db.yml"
     tags:
@@ -129,7 +129,7 @@
     tags:
       - "amsrc-ss"
       - "amsrc-ss-websrv"
-  when: "archivematica_src_configure_ss|bool"
+  when: "archivematica_src_install_ss|bool"
 
 
 #
@@ -180,7 +180,7 @@
   when:
     - archivematica_src_install_am == "rpm"
 
-- name: "Configure AM environment"
+- name: "Complete AM deployment"
   block:
   - include: "pipeline-dbconf.yml"
     tags:
@@ -202,7 +202,7 @@
       - "amsrc-pipeline"
       - "amsrc-pipeline-websrv"
 
-  when: "archivematica_src_configure_dashboard|bool"
+  when: "archivematica_src_install_am|bool"
 
 
 #
