@@ -13,7 +13,7 @@ _archivematica_src_am_dashboard_environment:
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER: "127.0.0.1:9200"
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_STORAGE_SERVICE_CLIENT_QUICK_TIMEOUT: "{{ archivematica_src_ss_client_quick_timeout | default(20) }}"
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_TIMEOUT: "{{ archivematica_src_elasticsearch_timeout | default('30') }}"
-
+  ARCHIVEMATICA_DASHBOARD_DASHBOARD_AUDIT_LOG_MIDDLEWARE: '{{ archivematica_src_audit|default("false") }}'
 
 # Base hash for archivematica_src_am_dashboard_environment.
 _archivematica_src_am_mcpserver_environment:
@@ -46,3 +46,4 @@ _archivematica_src_ss_environment:
   EMAIL_HOST_PASSWORD: ""
   EMAIL_HOST_USER: ""
   EMAIL_PORT: "25"
+  SS_AUDIT_LOG_MIDDLEWARE: 'archivematica_src_audit|default("false") }}'

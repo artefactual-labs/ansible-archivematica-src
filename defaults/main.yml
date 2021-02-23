@@ -79,6 +79,12 @@ archivematica_src_mcpclient_clamav_tcp_ip: "localhost"
 archivematica_src_mcpclient_clamav_tcp_port: "3310"
 
 #
+# Audit settings (auditmatica)
+#
+
+archivematica_src_audit: "false"
+
+#
 # Logging settings
 #
 
