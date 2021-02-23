@@ -69,6 +69,13 @@
   tags: "amsrc-ss-websrv"
 # SSL configuration tasks - end
 
+- name: "Set up audit log"
+  template:
+    src: "etc/nginx/conf.d/auditmatica.conf.j2"
+    dest: "/etc/nginx/conf.d/auditmatica.conf"
+  when: "archivematica_src_audit|bool"
+  tags: "amsrc-ss-websrv"
+
 - name: "Enable services (systemd)"
   service:
     name: "{{ item }}"
