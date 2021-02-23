@@ -1,9 +1,46 @@
 map $request $loggable {
-    ~*\.css 0;
-    ~*\.js 0;
-    ~/status/ 0; 
+    # By default, everything is audited
     default 1;
+
+    # List of exceptions:
+    # Polling endpoints
+    ~/status/(.*) 0;
+    ~/transfer/status/(.*) 0;
+    ~/ingest/status/(.*) 0;
+    # DataTable column state management.
+    ~/archival-storage/load_state/ 0;
+    ~/archival-storage/save_state/ 0;
+    ~/backlog/load_state/ 0;
+    ~/backlog/save_state/ 0;
+    # Web assets.
+    ~/media/ 0;
+    ~/static/ 0;
+    ~/jsi18n/ 0;
+    ~/favicon.ico 0;
+    # Gearman tasks.
+    ~/tasks/ 0;
+    # Calls issued while user browses transfer browser. Since users
+    # cannot access the content from here, we can safely ignore.
+    ~/filesystem/children/location 0;
+    # API calls used internally by Archivematica.
+    ~/api/ingest/copy_metadata_files 0;
+    ~/api/administration/dips/atom/levels 0;
+    ~/api/administration/dips/atom/fetch_levels 0;
+    ~/api/v2beta/jobs 0;
+    ~/api/v2beta/task 0;
+    ~/api/filesystem/metadata 0;
+    ~/api/processing-configuration 0;
+    ~/api/v2beta/validate 0;
+    # The AJAX call issued to populate the Packages tab datatable
+    # can be ignored because the associated user activity (viewing
+    # package information) is already covered.
+    ~/packages_ajax 0;
+}
+
+map $time_iso8601 $logdate {
+  '~^(?<ymd>\d{4}-\d{2}-\d{2})'   $ymd;
+   default                         'nodate';
 }
 
 log_format audit '$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" "$http_x_forwarded_for" user=$upstream_http_x_username';
-access_log "/var/log/nginx/audit.log" audit if=$loggable;
+access_log "/var/log/nginx/audit-${logdate}.log" audit if=$loggable;
