@@ -127,6 +127,9 @@ archivematica_src_pip_version: "20.3"
 archivematica_src_setuptools_version: "44.1.1"
 archivematica_src_wheel_version: "0.35.1"
 
+# get-pip.py url
+archivematica_src_get_pip_url: "https://bootstrap.pypa.io/pip/2.7/get-pip.py"
+
 # Sample data
 archivematica_src_install_sample_data_timeout: "3600"
 
