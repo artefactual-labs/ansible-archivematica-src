@@ -46,6 +46,13 @@
       state: "latest"
     with_items:
       - "virtualenv"
+    when: archivematica_src_virtualenv_version is not defined
+
+  - name: "Install virtualenv with pip"
+    pip:
+      name: "virtualenv=={{ archivematica_src_virtualenv_version }}"
+    when: archivematica_src_virtualenv_version is defined
+
 #
 # Prepare `archivematica_src_dir`
 #
