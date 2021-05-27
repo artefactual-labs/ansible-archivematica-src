@@ -1,7 +1,7 @@
 # {{ ansible_managed }}
 
 PATH={{ archivematica_src_am_mcpclient_virtualenv }}/bin:/usr/local/sbin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
-PYTHONPATH={{ archivematica_src_am_mcpclient_app }}:{{ archivematica_src_am_common_app }}:{{ archivematica_src_am_dashboard_app }}
+PYTHONPATH={{ archivematica_src_am_mcpclient_app }}:{{ archivematica_src_am_mcpclient_modules_app }}:{{ archivematica_src_am_common_app }}:{{ archivematica_src_am_dashboard_app }}
 LANG="en_US.UTF-8"
 LC_ALL="en_US.UTF-8"
 LC_LANG="en_US.UTF-8"

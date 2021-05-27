@@ -59,13 +59,18 @@
 - name: "Create virtualenv and install pip-tools"
   pip:
     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+    virtualenv_command: "{{ archivematica_src_virtualenv }}"
+    virtualenv_python: "{{ archivematica_src_virtualenv_python }}"
     name: "pip-tools=={{ archivematica_src_pip_tools_version }}"
   tags: "amsrc-ss-pydep"
 
 - name: "Synchronize requirements"
-  command: "{{ archivematica_src_ss_virtualenv }}/bin/pip-sync {{ 'local.txt' if is_dev else 'production.txt' }}"
+  command: "{{ archivematica_src_ss_virtualenv }}/bin/pip-sync {{ 'local-py3.txt' if is_dev else 'production-py3.txt' }}"
   args:
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service/requirements"
+  environment:
+    LC_ALL: "en_US.utf8"
+    LANG: "en_US.utf8"
   tags: "amsrc-ss-pydep"
 
 ###########################################################

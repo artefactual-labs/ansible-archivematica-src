@@ -29,20 +29,26 @@
         - "python2-pip"
       state: "absent"
 
+  - name: "Ensure Python 3 is installed"
+    package:
+      name: "{{ archivematica_src_python_packages }}"
+      state: "present"
+
   - name: "Download get-pip.py"
     get_url:
-      url: "https://bootstrap.pypa.io/pip/2.7/get-pip.py"
+      url: "https://bootstrap.pypa.io/pip/get-pip.py"
       force: "yes"
       dest: "/root/get-pip.py"
 
   - name: "Install pip with get-pip.py"
-    command: "python get-pip.py pip=={{ archivematica_src_pip_version }} setuptools=={{ archivematica_src_setuptools_version }} wheel=={{ archivematica_src_wheel_version }}"
+    command: "{{ archivematica_src_virtualenv_python }} get-pip.py"
     args:
       chdir: "/root/"
 
   - name: "Install virtualenv with pip"
     pip:
       name: "virtualenv"
+      executable: "{{ archivematica_src_pip }}"
       state: "latest"
 
   #
