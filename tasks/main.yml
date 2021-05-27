@@ -87,7 +87,6 @@
       - "amsrc-common"
       - "amsrc-ss"
       - "amsrc-pipeline"
-      - "amsrc-devtools"
       - "amsrc-automationtools"
       - "amsrc-fixity"
 
@@ -240,15 +239,6 @@
     LC_ALL: "en_US.utf8"
   when: "archivematica_src_install_sample_data|bool"
   become: "no"
-
-#
-# archivematica-devtools
-#
-
-- include: "am-devtools.yml"
-  tags:
-    - "amsrc-devtools"
-  when: "archivematica_src_install_devtools|bool"
 
 
 #

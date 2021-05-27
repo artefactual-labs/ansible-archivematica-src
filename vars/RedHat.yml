@@ -10,14 +10,6 @@ ansible_deps:
   - "policycoreutils-python"  # Required by SELinux management
 ca_custom_bundle: "/etc/pki/tls/certs/ca-bundle.crt"
 archivematica_src_am_amauat_deps: []
-archivematica_src_am_devtools_deps:
-  - "rubygems"
-  - "ruby-devel"
-  - "graphviz"
-  - "graphviz-devel"
-  - "graphviz-python"
-  - "python2-pkgconfig"
-  - "nodejs-ronn"
 archivematica_src_am_fixity_deps:
   - "sqlite"
   - "moreutils"

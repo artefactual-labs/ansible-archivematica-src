@@ -10,7 +10,6 @@ archivematica_src_shareddir: "/var/archivematica/sharedDirectory"
 archivematica_src_install_am: "yes"
 archivematica_src_install_ss: "yes"
 archivematica_src_install_sample_data: "yes"
-archivematica_src_install_devtools: "no"
 archivematica_src_install_automationtools: "no"
 archivematica_src_install_acceptance_tests: "no"
 archivematica_src_install_fixity: "no"
@@ -32,7 +31,6 @@ archivematica_src_automation_tools_repo: "https://github.com/artefactual/automat
 # Branches
 archivematica_src_am_version: "qa/1.x"
 archivematica_src_ss_version: "qa/0.x"
-archivematica_src_devtools_version: "master"
 archivematica_src_automationtools_version: "master"
 archivematica_src_acceptance_tests_version: "master"
 
