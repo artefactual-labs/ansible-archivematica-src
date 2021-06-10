@@ -1,13 +1,18 @@
 ---
-# this task is needed to avoid problems when upgrading python package
-- name: "Remove old virtualenv default dirs"
-  file:
-    state: absent
-    path: "/usr/share/python/{{ item }}/"
-  with_items:
-    - "archivematica-dashboard"
-    - "archivematica-mcp-client"
-    - "archivematica-mcp-server"
+
+- name: "Destroy virtualenv if it's still using Python 2"
+  block:
+    - name: "Capture current Python version"
+      command: |-
+        {{ archivematica_src_am_virtualenv }}/bin/python -c
+          'import sys; sys.stdout.write("{}".format(sys.version_info[0])); sys.stdout.flush();'
+      ignore_errors: yes
+      register: "pyver_check"
+    - name: "Destroy Python 2 virtualenv"
+      file:
+        path: "{{ archivematica_src_am_virtualenv }}"
+        state: "absent"
+      when: "pyver_check.rc == 0 and pyver_check.stdout == '2'"
 
 - name: "Create virtualenv and install pip-tools"
   pip:
