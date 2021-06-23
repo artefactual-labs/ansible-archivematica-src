@@ -141,7 +141,9 @@
     tags:
       - "amsrc-ss"
       - "amsrc-ss-websrv"
-  when: "archivematica_src_install_ss|bool"
+  when:
+    - "archivematica_src_install_ss|bool or
+       archivematica_src_install_ss == 'rpm'"
 
 
 #
@@ -214,7 +216,9 @@
       - "amsrc-pipeline"
       - "amsrc-pipeline-websrv"
 
-  when: "archivematica_src_install_am|bool"
+  when:
+    - "archivematica_src_install_am|bool or
+       archivematica_src_install_am == 'rpm'"
 
 
 #
