@@ -22,5 +22,8 @@ ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
 PrivateTmp=true
 
+Restart=always
+RestartSec=30
+
 [Install]
 WantedBy=multi-user.target
