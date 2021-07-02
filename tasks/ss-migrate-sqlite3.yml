@@ -1,0 +1,84 @@
+---
+
+- name: "set_fact: set temporary hash to be used as SS environment with sqlite3"
+  set_fact: 
+    __archivematica_src_ss_environment_remove_SS_DB_URL: {}
+
+# Define temporary hash to be used when removing the SS_DB_URL line 
+# from SS environment hash
+- name: "set_fact: set temporary hash removing the SS_DB_URL item from SS environment"
+  set_fact:
+    __archivematica_src_ss_environment_remove_SS_DB_URL: "{{ __archivematica_src_ss_environment_remove_SS_DB_URL | combine({item.key: item.value}) }}"
+  when: item.key not in ['SS_DB_URL']
+  with_dict: "{{ archivematica_src_ss_environment }}"
+  no_log: True
+
+- name: "set_fact: Add SS_DB_* items to temporary hash"
+  set_fact:
+    __archivematica_src_ss_environment_remove_SS_DB_URL: "{{ __archivematica_src_ss_environment_remove_SS_DB_URL | combine({item.key: item.value}) }}"
+  with_items:
+    - { key: "SS_DB_HOST", value: "{{ archivematica_src_migrate_sqlite3_db_host }}" }
+    - { key: "SS_DB_NAME", value: "{{ archivematica_src_migrate_sqlite3_db_name }}" }
+    - { key: "SS_DB_PASSWORD", value: "{{ archivematica_src_migrate_sqlite3_db_password }}" }
+    - { key: "SS_DB_USER", value: "{{ archivematica_src_migrate_sqlite3_db_password }}" }
+  no_log: True
+
+- name: "Get current date and time string"
+  command: "date -u +%Y%m%d-%H%M%S%z"
+  register: "date_result"
+  failed_when: "date_result.stderr != ''"
+
+- name: "Run SS django database migrations in sqlite3 database"
+  become: "yes"
+  become_user: "archivematica"
+  django_manage:
+    command: "migrate"
+    app_path: "{{ archivematica_src_ss_app }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+  environment: "{{ __archivematica_src_ss_environment_remove_SS_DB_URL }}"
+
+- name: "Create a dump from django SS database (sqlite3)"
+  become: "yes"
+  become_user: "archivematica"
+  django_manage:
+    command: >
+      dumpdata
+      --exclude auth.permission
+      --exclude contenttypes
+      --exclude sessions.session
+      --natural-foreign
+      --natural-primary
+      --indent 4
+      --output /tmp/datadump_{{ date_result.stdout }}.json
+    app_path: "{{ archivematica_src_ss_app }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+  environment: "{{ __archivematica_src_ss_environment_remove_SS_DB_URL }}"
+
+- name: "Remove SS DB (mysql)"
+  mysql_db:
+    name: "{{ archivematica_src_ss_db_name }}"
+    state: absent
+
+- name: "Create SS DB (mysql)"
+  mysql_db:
+    name: "{{ archivematica_src_ss_db_name }}"
+    state: present
+
+- name: "Run SS django database migrations (To syncdb database)"
+  become: "yes"
+  become_user: "archivematica"
+  django_manage:
+    command: "migrate"
+    app_path: "{{ archivematica_src_ss_app }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+  environment: "{{ archivematica_src_ss_environment }}"
+
+- name: "Load database from the sqlite3 dump"
+  become: "yes"
+  become_user: "archivematica"
+  django_manage:
+    command: >
+      loaddata /tmp/datadump_{{ date_result.stdout }}.json
+    app_path: "{{ archivematica_src_ss_app }}"
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+  environment: "{{ archivematica_src_ss_environment }}"
