@@ -37,10 +37,6 @@ _archivematica_src_ss_environment:
   DJANGO_SETTINGS_MODULE: "storage_service.settings.production"
   DJANGO_ALLOWED_HOSTS: "*"
   DJANGO_SECRET_KEY: '{{ archivematica_src_ss_django_secret_key | default("CHANGE_ME_WITH_A_SECRET_KEY") }}'
-  SS_DB_HOST: ""
-  SS_DB_NAME: "/var/archivematica/storage-service/storage.db"
-  SS_DB_PASSWORD: ""
-  SS_DB_USER: ""
   SS_GUNICORN_BIND: "127.0.0.1:8001"
   EMAIL_HOST: "localhost"
   EMAIL_HOST_PASSWORD: ""
