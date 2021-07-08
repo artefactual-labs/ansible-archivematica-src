@@ -19,4 +19,5 @@
     version: "{{ archivematica_src_am_version }}"
     force: "yes"
     accept_hostkey: "yes"
+    recursive: "no"
   become_flags: "-E"    
