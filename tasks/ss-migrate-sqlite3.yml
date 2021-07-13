@@ -28,6 +28,17 @@
   register: "date_result"
   failed_when: "date_result.stderr != ''"
 
+- name: "Fix locations_events table in sqlite3 database"
+  become: "yes"
+  become_user: "archivematica"
+  shell: >
+    echo "delete from locations_event where package_id not in (select f.id from locations_package f);"
+    | {{ archivematica_src_ss_virtualenv }}/bin/python manage.py dbshell
+  args:
+    chdir: "{{ archivematica_src_ss_app }}"
+    executable: /bin/bash
+  environment: "{{ __archivematica_src_ss_environment_remove_SS_DB_URL }}"
+
 - name: "Run SS django database migrations in sqlite3 database"
   become: "yes"
   become_user: "archivematica"
