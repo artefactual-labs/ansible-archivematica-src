@@ -22,7 +22,7 @@
     name: "pip-tools=={{ archivematica_src_pip_tools_version }}"
 
 - name: "Synchronize requirements"
-  command: "{{ archivematica_src_am_virtualenv }}/bin/pip-sync {{ 'requirements-dev-py3.txt' if is_dev else 'requirements-py3.txt' }}"
+  command: "{{ archivematica_src_am_virtualenv }}/bin/pip-sync {{ 'requirements-dev.txt' if is_dev else 'requirements.txt' }}"
   args:
     chdir: "{{ archivematica_src_dir }}/archivematica"
   environment:
