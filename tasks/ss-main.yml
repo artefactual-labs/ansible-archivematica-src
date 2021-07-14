@@ -73,7 +73,7 @@
   tags: "amsrc-ss-pydep"
 
 - name: "Synchronize requirements"
-  command: "{{ archivematica_src_ss_virtualenv }}/bin/pip-sync {{ 'local-py3.txt' if is_dev else 'production-py3.txt' }}"
+  command: "{{ archivematica_src_ss_virtualenv }}/bin/pip-sync {{ 'local.txt' if is_dev else 'production.txt' }}"
   args:
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service/requirements"
   environment:
