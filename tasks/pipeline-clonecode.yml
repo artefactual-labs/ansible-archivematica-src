@@ -20,4 +20,15 @@
     force: "yes"
     accept_hostkey: "yes"
     recursive: "no"
-  become_flags: "-E"    
+  become_flags: "-E"
+
+- name: "Download AM1.12 osdeps files for Xenial"
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+  loop:
+    - { url: "https://raw.githubusercontent.com/artefactual/archivematica/stable/1.12.x/src/MCPClient/osdeps/Ubuntu-16.json", dest: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/osdeps/Ubuntu-16.json" }
+    - { url: "https://raw.githubusercontent.com/artefactual/archivematica/stable/1.12.x/src/MCPServer/osdeps/Ubuntu-16.json", dest: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/osdeps/Ubuntu-16.json" }
+    - { url: "https://raw.githubusercontent.com/artefactual/archivematica/stable/1.12.x/src/dashboard/osdeps/Ubuntu-16.json", dest: "{{ archivematica_src_dir }}/archivematica/src/dashboard/osdeps/Ubuntu-16.json" }
+  when:
+    - ansible_distribution_version is version('16.04', '==')

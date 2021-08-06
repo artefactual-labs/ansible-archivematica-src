@@ -16,5 +16,5 @@ archivematica_src_am_fixity_deps:
   - "mailutils"
 archivematica_src_python_packages:
   - "python3.6-dev"
-  - "python3.6-distutils"
+  - "{{ 'libpython3.6-stdlib' if ansible_distribution_version is version('16.04', '==') else 'python3.6-distutils' }}"
   - "python3-setuptools"

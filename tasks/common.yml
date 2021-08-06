@@ -29,6 +29,13 @@
         - "python2-pip"
       state: "absent"
 
+  - name: "Add deadsnakes repo for Xenial"
+    apt_repository:
+      repo: "ppa:deadsnakes/ppa"
+      state: "present"
+    when:
+      - ansible_distribution_version is version('16.04', '==')
+
   - name: "Ensure Python 3 is installed"
     package:
       name: "{{ archivematica_src_python_packages }}"
