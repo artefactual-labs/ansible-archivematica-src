@@ -47,6 +47,7 @@
   when: 
      - "archivematica_src_configure_dashboard|bool or archivematica_src_configure_ss|bool"
      - "archivematica_src_configure_ss_api_key is undefined"
+     - ss_user.stdout != ""
 
 - set_fact: archivematica_src_configure_ss_api_key="{{ archivematica_src_configure_ss_api_key_temp.stdout }}"
   when: 
