@@ -24,7 +24,7 @@
 {% if archivematica_src_syslog_enabled|bool %}
     "syslog": {
       "class": "logging.handlers.SysLogHandler",
-      "address": [ "{{ archivematica_src_syslog_server }}", {{ archivematica_src_syslog_port }} ],
+      "address": ["{{ archivematica_src_syslog_server }}", {{ archivematica_src_syslog_port }}],
       "formatter": "syslog",
       "facility": "{{ archivematica_src_syslog_storageservice_facility }}",
       "level": "{{ archivematica_src_syslog_storageservice_level }}"
