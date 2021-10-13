@@ -210,6 +210,7 @@ archivematica_src_configure_am_whitelist: '""'               # Dashboard API whi
 #  Send logs to syslog
 #
 archivematica_src_syslog_enabled: "false"
+archivematica_src_syslog_nginx_enabled: "false"
 archivematica_src_syslog_server: "localhost"
 archivematica_src_syslog_port: "514"
 archivematica_src_syslog_storageservice_facility: "local0"

@@ -9,15 +9,15 @@ upstream archivematica_dashboard_backend {
 server {
 
   listen 80;
+  server_name _;
 
   # Adjust to taste
   client_max_body_size 256M;
 
-  server_name _;
-    {% if archivematica_src_syslog_enabled|bool %}
-    error_log syslog:server={{ archivematica_src_syslog_server }},tag=dashboard info;
-    access_log syslog:server={{ archivematica_src_syslog_server }},tag=dashboard combined;
-    {% endif %}
+{% if archivematica_src_syslog_enabled|bool and archivematica_src_syslog_nginx_enabled|bool %}
+  access_log syslog:server={{ archivematica_src_syslog_server }},tag=dashboard combined;
+  error_log syslog:server={{ archivematica_src_syslog_server }},tag=dashboard info;
+{% endif %}
 
   location / {
     proxy_set_header Host $http_host;

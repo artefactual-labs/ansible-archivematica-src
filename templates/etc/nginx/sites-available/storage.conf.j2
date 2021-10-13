@@ -10,12 +10,14 @@ server {
 
     listen 8000;
 
+{% if archivematica_src_syslog_enabled|bool %}
+    access_log syslog:server={{ archivematica_src_syslog_server }},tag=storage combined;
+    error_log syslog:server={{ archivematica_src_syslog_server }},tag=storage info;
+{% endif %}
+
     # Adjust to taste
     client_max_body_size 256M;
-    {% if archivematica_src_syslog_enabled|bool %}
-    error_log syslog:server={{ archivematica_src_syslog_server }},tag=storage info;
-    access_log syslog:server={{ archivematica_src_syslog_server }},tag=storage combined;
-    {% endif %}
+
     location / {
     proxy_set_header Host $http_host;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
