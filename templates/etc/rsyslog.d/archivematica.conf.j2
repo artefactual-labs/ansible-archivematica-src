@@ -4,12 +4,12 @@ $template AMLOG,"{{ archivematica_src_syslog_logdir }}/%$YEAR%/%$MONTH%/%$DAY%/%
 $template NGINXAMLOG,"/var/log/archivematica/%$YEAR%/%$MONTH%/%$DAY%/%programname%-access.log"
 $template NGINXAMLOGERROR,"/var/log/archivematica/%$YEAR%/%$MONTH%/%$DAY%/%programname%-error.log"
 
-if (re_match($programname, '(dashboard|storage)') and $syslogseverity-text == 'error') then {
+if (re_match($programname, '({{ archivematica_src_syslog_dashboard_nginx_identifier }}|{{ archivematica_src_syslog_storageservice_nginx_identifier }})') and $syslogseverity-text == 'error') then {
   ?NGINXAMLOGERROR
   stop
 }
 
-if (re_match($programname, '(dashboard|storage)')) then {
+if (re_match($programname, '({{ archivematica_src_syslog_dashboard_nginx_identifier }}|{{ archivematica_src_syslog_storageservice_nginx_identifier }})')) then {
   ?NGINXAMLOG
   stop
 }

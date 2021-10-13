@@ -11,8 +11,8 @@ server {
     listen 8000 ssl;
 
 {% if archivematica_src_syslog_enabled|bool and archivematica_src_syslog_nginx_enabled|bool %}
-    access_log syslog:server={{ archivematica_src_syslog_server }},tag=storage combined;
-    error_log syslog:server={{ archivematica_src_syslog_server }},tag=storage info;
+    access_log syslog:server={{ archivematica_src_syslog_server }},tag={{ archivematica_src_syslog_storageservice_nginx_identifier }},facility={{ archivematica_src_syslog_storageservice_nginx_facility }},severity={{ archivematica_src_syslog_storageservice_nginx_level }} combined;
+    error_log syslog:server={{ archivematica_src_syslog_server }},tag={{ archivematica_src_syslog_storageservice_nginx_identifier }},facility={{ archivematica_src_syslog_storageservice_nginx_facility }} info;
 {% endif %}
 
     ssl_certificate  {{ archivematica_src_ssl_fullchain }};
