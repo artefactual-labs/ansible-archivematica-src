@@ -135,6 +135,7 @@ archivematica_src_ssl_include_acme_chlg_loc: "false"
 #
 
 # Pip version
+archivematica_src_pip_version: "21.2.4"
 archivematica_src_pip_tools_version: "5.5.0"
 
 # Sample data
