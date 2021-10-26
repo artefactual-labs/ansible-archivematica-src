@@ -79,7 +79,9 @@
     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
     virtualenv_command: "{{ archivematica_src_virtualenv }}"
     virtualenv_python: "{{ archivematica_src_virtualenv_python }}"
-    name: "pip-tools=={{ archivematica_src_pip_tools_version }}"
+    name: 
+      - "pip=={{ archivematica_src_pip_version }}"
+      - "pip-tools=={{ archivematica_src_pip_tools_version }}"
   tags: "amsrc-ss-pydep"
 
 - name: "Synchronize requirements"
