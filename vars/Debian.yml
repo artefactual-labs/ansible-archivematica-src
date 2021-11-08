@@ -4,8 +4,9 @@ ansible_deps:
   - "python-pycurl"
   - "python-setuptools"
   - "git"
-  - "python-mysqldb" # Required for mysql_db module
-  - "sqlite3"        # Required for am-configure and fixity
+  - "python-mysqldb"  # Required for mysql_db module
+  - "sqlite3"         # Required for am-configure and fixity
+  - "ca-certificates" # Required for apt-get
 ca_custom_bundle: "/etc/ssl/certs/ca-certificates.crt"
 archivematica_src_am_amauat_deps:
   - "tightvncserver"
