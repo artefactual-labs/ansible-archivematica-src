@@ -9,6 +9,7 @@ ansible_deps:
   - "p7zip-plugins"
   - "libsemanage-python"      # Required by SELinux management
   - "policycoreutils-python"  # Required by SELinux management
+  - "ca-certificates"         # Required for yum
 ca_custom_bundle: "/etc/pki/tls/certs/ca-bundle.crt"
 archivematica_src_am_amauat_deps: []
 archivematica_src_am_fixity_deps:
