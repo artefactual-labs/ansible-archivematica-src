@@ -18,6 +18,9 @@
 #    dependencies according to these files
 ############################################################
 
+- name: "Enable dnf powertools"
+  command: "dnf config-manager --set-enabled powertools -y"
+
 # osdeps filenames in the archivematica repo are something like "Ubuntu-14.04.json"
 - set_fact:
     osdeps_file: "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.json"
