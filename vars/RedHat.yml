@@ -10,6 +10,7 @@ ansible_deps:
   - "python3-libsemanage"      # Required by SELinux management
   - "python3-policycoreutils"  # Required by SELinux management
   - "ca-certificates"          # Required for yum
+  - "npm"
 ca_custom_bundle: "/etc/pki/tls/certs/ca-bundle.crt"
 archivematica_src_am_amauat_deps: []
 archivematica_src_am_fixity_deps:
