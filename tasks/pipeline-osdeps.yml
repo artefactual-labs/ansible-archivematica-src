@@ -97,12 +97,4 @@
   when:
     - ansible_service_mgr == "systemd" and ansible_distribution == "Ubuntu"
 
-- name: "Enable and start fits-nailgun (Systemd)"
-  systemd:
-    name: "fits-nailgun"
-    state: "started"
-    enabled: "yes"
-    daemon_reload: "yes"
-  when:
-    - ansible_service_mgr == "systemd"
 
