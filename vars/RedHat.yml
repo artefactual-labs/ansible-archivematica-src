@@ -2,14 +2,14 @@
 systemd_environment_path: "/etc/sysconfig"
 ansible_deps:
   - "epel-release"
-  - "python-setuptools"
+  - "platform-python-setuptools"
   - "git"
-  - "MySQL-python"            # Required for mysql_db module
-  - "sqlite"                  # Required for am-configure and fixity
+  - "python3-PyMySQL"          # Required for mysql_db module
+  - "sqlite"                   # Required for am-configure and fixity
   - "p7zip-plugins"
-  - "libsemanage-python"      # Required by SELinux management
-  - "policycoreutils-python"  # Required by SELinux management
-  - "ca-certificates"         # Required for yum
+  - "python3-libsemanage"      # Required by SELinux management
+  - "python3-policycoreutils"  # Required by SELinux management
+  - "ca-certificates"          # Required for yum
 ca_custom_bundle: "/etc/pki/tls/certs/ca-bundle.crt"
 archivematica_src_am_amauat_deps: []
 archivematica_src_am_fixity_deps:
@@ -17,6 +17,6 @@ archivematica_src_am_fixity_deps:
   - "moreutils"
   - "mailx"
 archivematica_src_python_packages:
-  - "python36-devel"
-  - "python36-distutils-extra"
-  - "python36-setuptools"
+  - "python3-devel"
+  - "python3-distutils-extra"
+  - "python3-setuptools"
