@@ -20,3 +20,6 @@ archivematica_src_python_packages:
   - "python36-devel"
   - "python36-distutils-extra"
   - "python36-setuptools"
+  - "rh-nodejs8-npm"
+
+npm_path: "/opt/rh/rh-nodejs8/root/bin/"

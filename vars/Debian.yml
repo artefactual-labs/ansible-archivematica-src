@@ -19,3 +19,5 @@ archivematica_src_python_packages:
   - "python3.6-dev"
   - "python3.6-distutils"
   - "python3-setuptools"
+
+npm_path: "/usr/bin/npm"
