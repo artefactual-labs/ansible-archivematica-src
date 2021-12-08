@@ -12,7 +12,7 @@ function get_emails(){
                 cd /usr/lib/archivematica/storage-service
                 echo 'select email from auth_user;' | \
                         /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python \
-                        manage.py dbshell 2> /dev/null | tail -n+2 | grep -v "x@x"
+                        manage.py dbshell 2> /dev/null | tail -n+2 | grep -v "x@x"| grep -v ^$
 ";
 }
 
