@@ -27,6 +27,16 @@
 #   6- Database migrations
 ###########################################################
 
+- name: "Delete pychache, pyc and pyo files/dir (RPM Install)"
+  command: "{{ item }}"
+  loop:
+    - 'find /usr/share/archivematica/ -type f -name "*.py[co]" -delete'
+    - 'find /usr/share/archivematica -type d -name "__pycache__" -delete'
+    - 'find /usr/lib/archivematica/ -type f -name "*.py[co]" -delete'
+    - 'find /usr/lib/archivematica -type d -name "__pycache__" -delete'
+  when:
+    - archivematica_src_install_am == "rpm"
+
 - name: "Run migrations"
   django_manage:
     command: "migrate"
