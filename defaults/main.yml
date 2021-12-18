@@ -145,6 +145,7 @@ archivematica_src_pip_tools_version: "5.5.0"
 
 # Sample data
 archivematica_src_install_sample_data_timeout: "3600"
+archivematica_src_sample_data_version: "master"
 
 # Automation tools
 archivematica_src_automationtools_transfers_logfile: "/var/log/archivematica/automation-tools/transfers.log"

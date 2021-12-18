@@ -122,6 +122,8 @@
   git:
     repo: "https://github.com/artefactual/archivematica-sampledata.git"
     dest: "~/archivematica-sampledata"
+    version: "{{ archivematica_src_sample_data_version }}"
+    force: "{{ archivematica_src_sample_data_git_force| default(omit) }}"
     update: "yes"
     depth: 1
   when: "archivematica_src_install_sample_data|bool"
