@@ -55,7 +55,7 @@
     - src: "etc/systemd/system/archivematica-mcp-client.service.j2"
       dest: "/etc/systemd/system/archivematica-mcp-client.service"
   when: "archivematica_src_am_mcpclient_instances == 1"
-
+  tags: amsrc-mcp-client
 
 - name: "Configure mcp-clients (multiple)"
   block:
@@ -71,23 +71,24 @@
   - name: "Create extra systemd mcpclient services"
     template:
       src: "etc/systemd/system/archivematica-mcp-client.service.j2"
-      dest: "/etc/systemd/system/archivematica-mcp-client-{{ '%1x' | format(item) }}.service"
+      dest: "/etc/systemd/system/archivematica-mcp-client-{{ '%1d' | format(item) }}.service"
     loop: "{{ range(1, archivematica_src_am_mcpclient_instances|int  + 1, 1)|list }}"
 
   - name: "Configure extra mcp-clients"
     template:
       src: "etc/sysconfig/archivematica-mcp-client.j2"
-      dest: "{{ systemd_environment_path }}/{{ 'archivematica-mcp-client-%1x' | format(item) }}"
+      dest: "{{ systemd_environment_path }}/{{ 'archivematica-mcp-client-%1d' | format(item) }}"
     loop: "{{ range(1, archivematica_src_am_mcpclient_instances|int  + 1, 1)|list }}"
 
   - name: "Update prometheus port"
     lineinfile:
-      path: "{{ systemd_environment_path }}/{{ 'archivematica-mcp-client-%1x' | format(item) }}"
+      path: "{{ systemd_environment_path }}/{{ 'archivematica-mcp-client-%1d' | format(item) }}"
       regexp: "^ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_PROMETHEUS_BIND_PORT="
-      line: "ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_PROMETHEUS_BIND_PORT=911{{ '%1x' | format(item) }}"
+      line: "ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_PROMETHEUS_BIND_PORT=96{{ '%02d' | format(item|int) }}"
     loop: "{{ range(1, archivematica_src_am_mcpclient_instances|int  + 1, 1)|list }}"
 
   when: archivematica_src_am_mcpclient_instances > 1
+  tags: amsrc-mcp-client
 
 
 #
@@ -183,10 +184,11 @@
   when:
     - ansible_service_mgr == "systemd"
     - archivematica_src_am_mcpclient_instances ==  1
+  tags: amsrc-mcp-client
 
 - name: "Enable mcpclient service (multiple)"
   systemd:
-    name: "{{ 'archivematica-mcp-client-%1x' | format(item) }}"
+    name: "{{ 'archivematica-mcp-client-%1d' | format(item) }}"
     state: "restarted"
     enabled: "yes"
     daemon_reload: "yes"
@@ -194,5 +196,5 @@
   when:
     - ansible_service_mgr == "systemd"
     - archivematica_src_am_mcpclient_instances > 1
-
+  tags: amsrc-mcp-client
 
