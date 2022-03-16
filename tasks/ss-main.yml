@@ -23,12 +23,22 @@
   become_flags: "-E"
   tags: "amsrc-ss-clone"
 
-- name: "Download AM1.12 osdeps files for Xenial"
-  get_url:
-    url: "{{ item.url }}"
-    dest: "{{ item.dest }}"
-  loop:
-    - { url: "https://raw.githubusercontent.com/artefactual/archivematica-storage-service/stable/0.17.x/osdeps/Ubuntu-16.json", dest: "{{ archivematica_src_dir }}/archivematica-storage-service/osdeps/Ubuntu-16.json" }
+- name: "Copy osdeps/Ubuntu-18.json to osdeps/Ubuntu-16.json (Xenial)"
+  copy:
+    remote_src: yes
+    src: "{{ archivematica_src_dir }}/archivematica-storage-service/osdeps/Ubuntu-18.json"
+    dest: "{{ archivematica_src_dir }}/archivematica-storage-service/osdeps/Ubuntu-16.json"
+    owner: "archivematica"
+    group: "archivematica"
+  when:
+    - ansible_distribution_version is version('16.04', '==')
+  tags: "amsrc-ss-clone"
+
+- name: "Update gnupg package on osdeps/Ubuntu-16.json file (Xenial)"
+  replace:
+    path: "{{ archivematica_src_dir }}/archivematica-storage-service/osdeps/Ubuntu-16.json"
+    regexp: "gnupg1"
+    replace: "gnupg"
   when:
     - ansible_distribution_version is version('16.04', '==')
   tags: "amsrc-ss-clone"
