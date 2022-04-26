@@ -3,6 +3,15 @@
     name: "{{ archivematica_src_am_fixity_deps }}"
     state: "present"
 
+- name: "Get git config global safe directories dir"
+  shell: "git config --global --get-all safe.directory || echo ''"
+  register: "__git_config_global_safe_dir"
+
+- name: "Set Fixity source directory as git safe dir"
+  command: "git config --global --add safe.directory {{ archivematica_src_dir }}/fixity"
+  when:
+    - archivematica_src_dir + '/fixity' not in __git_config_global_safe_dir.stdout_line
+
 - name: "Download code"
   git:
     repo: "https://github.com/artefactual/fixity.git"
