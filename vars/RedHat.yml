@@ -17,6 +17,6 @@ archivematica_src_am_fixity_deps:
   - "moreutils"
   - "mailx"
 archivematica_src_python_packages:
-  - "python36-devel"
-  - "python36-distutils-extra"
-  - "python36-setuptools"
+  - "python37-devel"
+  - "python37-distutils-extra"
+  - "python37-setuptools"

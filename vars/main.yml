@@ -24,6 +24,6 @@ archivematica_src_am_amauat_deps: []
 archivematica_src_am_fixity_deps: []
 
 archivematica_src_virtualenv: "/usr/local/bin/virtualenv"
-archivematica_src_pip: "/usr/local/bin/pip3.6"
-archivematica_src_virtualenv_python: "python3.6"
+archivematica_src_pip: "/usr/local/bin/pip3.7"
+archivematica_src_virtualenv_python: "python3.7"
 archivematica_src_python_packages: []  # Distro specific (see Debian.yml and RedHat.yml).

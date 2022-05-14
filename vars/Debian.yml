@@ -16,6 +16,6 @@ archivematica_src_am_fixity_deps:
   - "moreutils"
   - "mailutils"
 archivematica_src_python_packages:
-  - "python3.6-dev"
-  - "python3.6-distutils"
+  - "python3.7-dev"
+  - "python3.7-distutils"
   - "python3-setuptools"
