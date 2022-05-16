@@ -16,7 +16,12 @@ archivematica_src_am_fixity_deps:
   - "sqlite"
   - "moreutils"
   - "mailx"
-archivematica_src_python_packages:
-  - "python36-devel"
-  - "python36-distutils-extra"
-  - "python36-setuptools"
+archivematica_src_python_packages: []
+
+archivematica_src_python_deps:
+  - "gcc"
+  - "openssl-devel"
+  - "bzip2-devel"
+  - "libffi-devel"
+  - "zlib-devel"
+  - "xz-devel"

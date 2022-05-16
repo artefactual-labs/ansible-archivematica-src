@@ -18,7 +18,6 @@
   pip:
     virtualenv: "{{ archivematica_src_am_virtualenv }}"
     virtualenv_command: "{{ archivematica_src_virtualenv }}"
-    virtualenv_python: "{{ archivematica_src_virtualenv_python }}"
     name: "pip-tools=={{ archivematica_src_pip_tools_version }}"
 
 - name: "Synchronize requirements"

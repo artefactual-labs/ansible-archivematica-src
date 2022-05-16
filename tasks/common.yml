@@ -34,22 +34,56 @@
       name: "{{ archivematica_src_python_packages }}"
       state: "present"
 
-  - name: "Download get-pip.py"
-    get_url:
-      url: "https://bootstrap.pypa.io/pip/3.6/get-pip.py"
-      force: "yes"
-      dest: "/root/get-pip.py"
-
-  - name: "Install pip with get-pip.py"
-    command: "{{ archivematica_src_virtualenv_python }} get-pip.py"
+  - name: "Get current python3 version"
+    shell: "{{ archivematica_src_virtualenv_python }} --version |sed 's/^Python //'"
     args:
-      chdir: "/root/"
+      removes: "{{ archivematica_src_virtualenv_python }}"
+    register: __python_version_current
+    changed_when: '__python_version_current.stdout != archivematica_src_python_version'
+    check_mode: no
 
-  - name: "Install virtualenv with pip"
-    pip:
-      name: "virtualenv"
-      executable: "{{ archivematica_src_pip }}"
-      state: "latest"
+# Start build python environment block
+  - name: "Build python {{ archivematica_src_python_version }} environment"
+    block:
+    - name: "Install python dependencies to build python"
+      package:
+        name: "{{ archivematica_src_python_deps }}"
+        state: "present"
+
+    - name: "Download python {{ archivematica_src_python_version }} source code"
+      get_url:
+        url: "https://www.python.org/ftp/python/{{ archivematica_src_python_version }}/Python-{{ archivematica_src_python_version }}.tgz"
+        force: "yes"
+        dest: "/root/Python-{{ archivematica_src_python_version }}.tgz"
+
+    - name: "Unpack python {{ archivematica_src_python_version }} source code"
+      unarchive:
+        src: "/root/Python-{{ archivematica_src_python_version }}.tgz"
+        dest: "/usr/src/"
+        remote_src: yes
+
+    - name: "Run 'configure --enable-optimizations' target "
+      command: chdir=/usr/src/Python-{{ archivematica_src_python_version }} ./configure --enable-optimizations
+
+    - name: "Run 'make altinstall'"
+      make:
+        chdir: "/usr/src/Python-{{ archivematica_src_python_version }}"
+        target: "altinstall"
+        file: "/usr/src/Python-{{ archivematica_src_python_version }}/Makefile"
+
+    - name: "Remove python source code archive"
+      file:
+        path: "/root/Python-{{ archivematica_src_python_version }}.tgz"
+        state: absent
+
+    - name: "Remove python source code dir"
+      file:
+        path: "/usr/src/Python-{{ archivematica_src_python_version }}"
+        state: absent
+    when: >
+      __python_version_current is not defined or
+      __python_version_current.stdout != archivematica_src_python_version
+# End build python environment block
 
   #
   # Prepare `archivematica_src_dir`

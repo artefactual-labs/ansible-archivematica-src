@@ -15,7 +15,6 @@
     requirements: "requirements.txt"
     virtualenv: "/usr/share/archivematica/virtualenvs/automation-tools"
     virtualenv_command: "{{ archivematica_src_virtualenv }}"
-    virtualenv_python: "{{ archivematica_src_virtualenv_python }}"
     state: latest
 
 - name: "symlink automation-tools source to /usr/lib/archivematica"

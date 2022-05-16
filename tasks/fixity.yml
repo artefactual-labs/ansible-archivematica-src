@@ -25,7 +25,6 @@
     requirements: "requirements.txt"
     virtualenv: "{{ archivematica_src_fixity_virtualenv }}"
     virtualenv_command: "{{ archivematica_src_virtualenv }}"
-    virtualenv_python: "{{ archivematica_src_virtualenv_python }}"
     state: "latest"
 
 - name: "Run setup.py"

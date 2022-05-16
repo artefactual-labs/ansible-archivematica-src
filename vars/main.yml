@@ -23,7 +23,9 @@ archivematica_src_ss_gunicorn_config: "/etc/archivematica/storage-service.gunico
 archivematica_src_am_amauat_deps: []
 archivematica_src_am_fixity_deps: []
 
-archivematica_src_virtualenv: "/usr/local/bin/virtualenv"
-archivematica_src_pip: "/usr/local/bin/pip3.6"
-archivematica_src_virtualenv_python: "python3.6"
+archivematica_src_pip: "/usr/local/bin/pip3.7"
+archivematica_src_virtualenv_python: "/usr/local/bin/python3.7"
+archivematica_src_virtualenv: "{{ archivematica_src_virtualenv_python }} -m venv"
+archivematica_src_python_version: "3.7.13"
 archivematica_src_python_packages: []  # Distro specific (see Debian.yml and RedHat.yml).
+archivematica_src_python_deps: []  # Distro specific (see Debian.yml and RedHat.yml).
