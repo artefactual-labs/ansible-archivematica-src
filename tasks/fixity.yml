@@ -25,7 +25,7 @@
 - name: "Set Fixity source directory as git safe dir"
   command: "git config --global --add safe.directory {{ archivematica_src_dir }}/fixity"
   when:
-    - archivematica_src_dir + '/fixity' not in __git_config_global_safe_dir.stdout_line
+    - archivematica_src_dir + '/fixity' not in __git_config_global_safe_dir.stdout_lines
 
 - name: "Download code"
   git:
