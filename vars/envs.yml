@@ -25,9 +25,9 @@ _archivematica_src_am_mcpserver_environment:
 _archivematica_src_am_mcpclient_environment:
   DJANGO_SETTINGS_MODULE: "settings.common"
   ARCHIVEMATICA_MCPCLIENT_EMAIL_BACKEND: "django.core.mail.backends.smtp.EmailBackend"
-  ARCHIVEMATICA_MCPCLIENT_EMAIL_HOST: "127.0.0.1"
-  ARCHIVEMATICA_MCPCLIENT_EMAIL_PORT: "25"
-  ARCHIVEMATICA_MCPCLIENT_EMAIL_USE_TLS: "False"
+  ARCHIVEMATICA_MCPCLIENT_EMAIL_HOST: '{{ archivematica_email_host | default("127.0.0.1") }}'
+  ARCHIVEMATICA_MCPCLIENT_EMAIL_PORT: '{{ archivematica_email_port | default(25) }}'
+  ARCHIVEMATICA_MCPCLIENT_EMAIL_USE_TLS: '{{ archivematica_email_use_tls | default("False") }}'
   ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_ELASTICSEARCHTIMEOUT: "{{ archivematica_src_elasticsearch_timeout | default(30) }}"
   ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_STORAGE_SERVICE_CLIENT_QUICK_TIMEOUT: "{{ archivematica_src_ss_client_quick_timeout | default(20) }}"
 
@@ -38,8 +38,8 @@ _archivematica_src_ss_environment:
   DJANGO_ALLOWED_HOSTS: "*"
   DJANGO_SECRET_KEY: '{{ archivematica_src_ss_django_secret_key | default("CHANGE_ME_WITH_A_SECRET_KEY") }}'
   SS_GUNICORN_BIND: "127.0.0.1:8001"
-  EMAIL_HOST: "localhost"
-  EMAIL_HOST_PASSWORD: ""
-  EMAIL_HOST_USER: ""
-  EMAIL_PORT: "25"
+  EMAIL_HOST: '{{ archivematica_email_host | default("localhost") }}'
+  EMAIL_HOST_PASSWORD: '{{ archivematica_email_password | default("") }}'
+  EMAIL_HOST_USER: '{{ archivematica_email_user | default("") }}'
+  EMAIL_PORT: '{{ archivematica_email_port | default(25) }}'
   SS_AUDIT_LOG_MIDDLEWARE: "{{ archivematica_src_audit|default('false') }}"
