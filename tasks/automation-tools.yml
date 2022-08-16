@@ -2,6 +2,17 @@
 
 # automation-tools installer
 
+- name: "Get git config global safe directories dir"
+  shell: "git config --global --get-all safe.directory || echo ''"
+  register: "__git_config_global_safe_dir"
+  become_flags: "-E"
+
+- name: "Set Automation-Tools source directory as git safe dir"
+  command: "git config --global --add safe.directory {{ archivematica_src_dir }}/automation-tools"
+  become_flags: "-E"
+  when:
+    - archivematica_src_dir + '/automation-tools' not in __git_config_global_safe_dir.stdout_lines
+
 - name: "Checkout out automation tools repository"
   git:
     repo: "{{ archivematica_src_automation_tools_repo }}"
