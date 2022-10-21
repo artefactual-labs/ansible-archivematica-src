@@ -60,7 +60,7 @@
       --natural-foreign
       --natural-primary
       --indent 4
-      --output /tmp/datadump_{{ date_result.stdout }}.json
+      --output /tmp/datadump_{{ date_result.stdout }}.json
     app_path: "{{ archivematica_src_ss_app }}"
     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
   environment: "{{ __archivematica_src_ss_environment_remove_SS_DB_URL }}"
@@ -88,8 +88,8 @@
   become: "yes"
   become_user: "archivematica"
   django_manage:
-    command: >
-      loaddata /tmp/datadump_{{ date_result.stdout }}.json
+    command: "loaddata"
+    fixtures: "/tmp/datadump_{{ date_result.stdout }}.json"
     app_path: "{{ archivematica_src_ss_app }}"
     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
   environment: "{{ archivematica_src_ss_environment }}"
