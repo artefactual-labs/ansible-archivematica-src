@@ -1,6 +1,18 @@
 ---
 # ubuntu block
 - block:
+    - name: "Install mediaarea.net repo (mediaconch, mediainfo) (Ubuntu >=20.04)"
+      apt:
+        deb: "https://mediaarea.net/repo/deb/repo-mediaarea_1.0-21_all.deb"
+      when:
+        - "ansible_distribution_version is version('20.04', '>=')"
+
+    - name: "Update apt cache"
+      apt:
+        update_cache: yes
+      when:
+        - "ansible_distribution_version is version('20.04', '>=')"
+
     - name: "Install MCPClient ext. deps. repo keys"
       apt_key:
         id: "{{ item.id }}"
@@ -11,20 +23,42 @@
       when:
         - "MCPClient.osdeps_repokeys"
 
-    - name: "Add MCPClient ext. deps. repos"
+    - name: "Add MCPClient ext. deps. repos (Ubuntu < 20.04)"
       apt_repository:
         repo: "{{ item }}"
         state: "present"
       with_items: "{{ MCPClient.osdeps_repos }}"
       when:
         - "MCPClient.osdeps_repos"
+        - "ansible_distribution_version is version('20.04', '<')"
 
-    - name: "Install MCPClient ext. package deps."
+    # Add 1.13.x external-deps focal repo
+    - name: "Add MCPClient ext. deps. repos (Ubuntu >= 20.04)"
+      apt_repository:
+        repo: "{{ item }}"
+        state: "present"
+      with_items: 
+        - "deb [arch=amd64] http://packages.archivematica.org/1.13.x/ubuntu-externals {{ ansible_distribution_release }} main"
+      when:
+        - "MCPClient.osdeps_repos"
+        - "ansible_distribution_version is version('20.04', '>=')"
+
+    - name: "Install MCPClient ext. package deps. (Ubuntu < 20.04)"
       apt:
         pkg: "{{ MCPClient.osdeps_packages | json_query('[].name') }}"
         state: "latest"
       when:
         - "MCPClient.osdeps_packages"
+        - "ansible_distribution_version is version('20.04', '<')"
+        
+    # Exclude ufraw package, not supported on Ubuntu >=20.04
+    - name: "Install MCPClient ext. package deps. (Ubuntu >= 20.04)"
+      apt:
+        pkg: "{{ MCPClient.osdeps_packages | json_query('[].name') | reject('search', 'ufraw') | list }}"
+        state: "latest"
+      when:
+        - "MCPClient.osdeps_packages"
+        - "ansible_distribution_version is version('20.04', '>=')"
 
   when:
     - ansible_distribution == "Ubuntu"

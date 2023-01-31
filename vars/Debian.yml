@@ -1,10 +1,10 @@
 ---
 systemd_environment_path: "/etc/default"
 ansible_deps:
-  - "python-pycurl"
-  - "python-setuptools"
+  - "python3-pycurl"
+  - "python3-setuptools"
   - "git"
-  - "python-mysqldb"  # Required for mysql_db module
+  - "python3-mysqldb" # Required for mysql_db module
   - "sqlite3"         # Required for am-configure and fixity
   - "ca-certificates" # Required for apt-get
 ca_custom_bundle: "/etc/ssl/certs/ca-certificates.crt"

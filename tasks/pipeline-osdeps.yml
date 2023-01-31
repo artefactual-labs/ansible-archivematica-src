@@ -27,6 +27,15 @@
       - "MCPClient"
       - "dashboard"
 
+# Use Ubuntu18 osdeps file on Ubuntu >= 20.04
+- set_fact:
+    osdeps_file: "{{ ansible_distribution }}-18.json"
+    tmpdirname: "/tmp/amsrc-{{ ansible_date_time.date }}-{{ ansible_date_time.epoch }}"
+    comps:
+      - "MCPServer"
+      - "MCPClient"
+      - "dashboard"
+
 # become: false is required in tasks delegated to localhost
 # (to avoid "sudo: a password is required" error)
 - name: "create temp directory in local machine to store osdeps files"
@@ -106,3 +115,27 @@
   when:
     - ansible_service_mgr == "systemd"
 
+#
+# Install nodejs 8.x on Ubuntu >=20.04
+#
+
+- name: "Add nodesource repo for nodejs (Ubuntu >=20.04)"
+  apt_key:
+    url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+    state: present
+  when: 
+    - ansible_distribution == "Ubuntu"
+
+- name: "Add nodejs 10.x ppa for apt repo (Ubuntu >=20.04)"
+  apt_repository:
+     repo: "deb https://deb.nodesource.com/node_10.x {{ ansible_distribution_release }} main"
+     update_cache: "yes"
+  when:
+    - ansible_distribution == "Ubuntu"
+
+- name: "Install nodejs package (Ubuntu >=20.04)"
+  apt:
+    pkg: "nodejs"
+    state: "present"
+  when:
+    - ansible_distribution == "Ubuntu"

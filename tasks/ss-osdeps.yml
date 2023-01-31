@@ -5,6 +5,14 @@
     osdeps_file: "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.json"
     tmpdirname: "/tmp/amsrc-{{ ansible_date_time.date }}-{{ ansible_date_time.epoch }}"
 
+# Use Ubuntu18 osdeps file on Ubuntu >= 20.04
+- set_fact:
+    osdeps_file: "{{ ansible_distribution }}-18.json"
+    tmpdirname: "/tmp/amsrc-{{ ansible_date_time.date }}-{{ ansible_date_time.epoch }}"
+  when:
+    - ansible_os_family == "Debian"
+    - ansible_distribution_version is version_compare('20.04', '>=')
+
 # become: false is required in tasks delegated to localhost
 # (to avoid "sudo: a password is required" error)
 - name: "create temp directory in local machine to store osdeps files"

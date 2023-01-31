@@ -12,8 +12,4 @@ galaxy_info:
   - name: Ubuntu
     versions:
     - bionic
-
-dependencies:
-- role: geerlingguy.nodejs
-  version: 4.1.1
-  nodejs_version: 8.x
+    - focal
