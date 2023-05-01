@@ -54,7 +54,7 @@
       dest: "{{ systemd_environment_path }}/archivematica-mcp-client"
     - src: "etc/systemd/system/archivematica-mcp-client.service.j2"
       dest: "/etc/systemd/system/archivematica-mcp-client.service"
-  when: "archivematica_src_am_mcpclient_instances == 1"
+  when: "archivematica_src_am_mcpclient_instances|int == 1"
 
 
 - name: "Configure mcp-clients (multiple)"
@@ -87,7 +87,7 @@
       line: "ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_PROMETHEUS_BIND_PORT=911{{ '%1x' | format(item) }}"
     loop: "{{ range(1, archivematica_src_am_mcpclient_instances|int  + 1, 1)|list }}"
 
-  when: archivematica_src_am_mcpclient_instances > 1
+  when: archivematica_src_am_mcpclient_instances|int > 1
 
 
 #
@@ -182,7 +182,7 @@
     daemon_reload: "yes"
   when:
     - ansible_service_mgr == "systemd"
-    - archivematica_src_am_mcpclient_instances ==  1
+    - archivematica_src_am_mcpclient_instances|int ==  1
 
 - name: "Enable mcpclient service (multiple)"
   systemd:
@@ -193,6 +193,6 @@
   loop: "{{ range(1, archivematica_src_am_mcpclient_instances|int  + 1, 1)|list }}"
   when:
     - ansible_service_mgr == "systemd"
-    - archivematica_src_am_mcpclient_instances > 1
+    - archivematica_src_am_mcpclient_instances|int > 1
 
 

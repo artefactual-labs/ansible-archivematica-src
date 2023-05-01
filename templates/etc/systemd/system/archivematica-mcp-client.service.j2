@@ -8,7 +8,7 @@ After=syslog.target network.target
 Type=simple
 User={{ archivematica_src_am_system_user }}
 Group={{ archivematica_src_am_system_group }}
-{% if archivematica_src_am_mcpclient_instances == 1 %}
+{% if archivematica_src_am_mcpclient_instances|int == 1 %}
 EnvironmentFile=-{{ systemd_environment_path }}/archivematica-mcp-client
 {% else %}
 EnvironmentFile=-{{ systemd_environment_path }}/archivematica-mcp-client-{{ '%1x' | format(item) }}
