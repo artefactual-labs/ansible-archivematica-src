@@ -1,12 +1,13 @@
 ---
 systemd_environment_path: "/etc/default"
+__python_packages_prefix: "{% if ansible_python.version.major >= 3 %}python3{% else %}python{% endif %}"
 ansible_deps:
-  - "python-pycurl"
-  - "python-setuptools"
+  - "{{ __python_packages_prefix }}-pycurl"
+  - "{{ __python_packages_prefix }}-setuptools"
   - "git"
-  - "python-mysqldb"  # Required for mysql_db module
-  - "sqlite3"         # Required for am-configure and fixity
-  - "ca-certificates" # Required for apt-get
+  - "{{ __python_packages_prefix }}-mysqldb"  # Required for mysql_db module
+  - "sqlite3"                                 # Required for am-configure and fixity
+  - "ca-certificates"                         # Required for apt-get
 ca_custom_bundle: "/etc/ssl/certs/ca-certificates.crt"
 archivematica_src_am_amauat_deps:
   - "tightvncserver"
