@@ -1,6 +1,18 @@
 ---
 # ubuntu block
 - block:
+    - name: "Install mediaarea.net repo (mediaconch, mediainfo) (Ubuntu >=20.04)"
+      apt:
+        deb: "https://mediaarea.net/repo/deb/repo-mediaarea_1.0-21_all.deb"
+      when:
+        - "ansible_distribution_version is version('20.04', '>=')"
+
+    - name: "Update apt cache (Ubuntu >=20.04)"
+      apt:
+        update_cache: yes
+      when:
+        - "ansible_distribution_version is version('20.04', '>=')"
+
     - name: "Install MCPClient ext. deps. repo keys"
       apt_key:
         id: "{{ item.id }}"

@@ -29,6 +29,13 @@
         - "python2-pip"
       state: "absent"
 
+  - name: "Add Deadsnakes APT repository (Ubuntu >=20.04)"
+    apt_repository:
+      repo: "ppa:deadsnakes"
+    when:
+      - ansible_os_family == "Debian"
+      - ansible_distribution_version is version_compare('20.04', '>=')
+
   - name: "Ensure Python 3 is installed"
     package:
       name: "{{ archivematica_src_python_packages }}"
