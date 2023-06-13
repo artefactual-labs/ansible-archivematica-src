@@ -18,10 +18,18 @@ dependencies:
 
 # Use different node and geerlingguy.nodejs role versions on Ubuntu >=20.04
 - role: geerlingguy.nodejs
-  version: "{% if ansible_distribution_version is version('20.04', '>=') %}6.1.1{% else %}4.1.1{% endif %}"
-  nodejs_version: "{% if ansible_distribution_version is version('20.04', '>=') %}10.x{% else %}8.x{% endif %}"
+  version: "6.1.1"
+  nodejs_version: "10.x"
   when:
     - ansible_distribution == "Ubuntu"
+    - ansible_distribution_version is version('20.04', '>=')
+
+- role: geerlingguy.nodejs
+  version: "4.1.1"
+  nodejs_version: "8.x"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_version is version('20.04', '<')
 
 - role: geerlingguy.nodejs
   version: 4.1.1
