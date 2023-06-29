@@ -14,7 +14,7 @@
 
 - name: "Download get-pip.py"
   get_url:
-    url: "https://bootstrap.pypa.io/get-pip.py"
+    url: "https://bootstrap.pypa.io/pip/2.7/get-pip.py"
     dest: "/root/get-pip.py"
 
 - name: "Install pip with get-pip.py"

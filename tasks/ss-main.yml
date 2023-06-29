@@ -5,6 +5,19 @@
 #   0- Clone source repo
 ###########################################################
 
+- name: "Get git config global safe directories dir"
+  shell: "git config --global --get-all safe.directory || echo ''"
+  register: "__git_config_global_safe_dir"
+  become_flags: "-E"
+  tags: "amsrc-ss-clone"
+
+- name: "Set AM source directory as git safe dir"
+  command: "git config --global --add safe.directory {{ archivematica_src_dir }}/archivematica-storage-service"
+  become_flags: "-E"
+  when:
+    - archivematica_src_dir + '/archivematica-storage-service' not in __git_config_global_safe_dir.stdout_lines
+  tags: "amsrc-ss-clone"
+
 - name: "Checkout archivematica-storage-service code"
   git:
     repo: "{{ archivematica_src_ss_repo }}"
