@@ -20,7 +20,16 @@
     version: "{{ archivematica_src_automationtools_version }}"
     force: "yes"
 
+- name: "Ensure archivematica user can create virtualenv"
+  file:
+    path: "/usr/share/archivematica/virtualenvs"
+    owner: "archivematica"
+    group: "archivematica"
+    state: "directory"
+
 - name: "Install pip dependencies in virtualenv"
+  become: "yes"
+  become_user: "archivematica"
   pip:
     chdir: "{{ archivematica_src_dir }}/automation-tools"
     requirements: "requirements.txt"

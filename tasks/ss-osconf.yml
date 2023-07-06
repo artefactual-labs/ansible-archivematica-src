@@ -40,7 +40,7 @@
     state: "absent"
   when: "not archivematica_src_logging_backward_compatible|bool"
 
-- name: "Configure rng-tools"
+- name: "Configure rng-tools (Ubuntu < 22.04)"
   lineinfile:
     dest: "/etc/default/rng-tools"
     line: "HRNGDEVICE=/dev/urandom"
@@ -50,8 +50,21 @@
   become: "yes"
   when:
     - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version|int < 22
 
-- name: "Start rng-tools (Ubuntu-based distros)"
+- name: "Configure rng-tools-debian (Ubuntu >= 22.04)"
+  lineinfile:
+    dest: "/etc/default/rng-tools-debian"
+    line: "HRNGDEVICE=/dev/urandom"
+    insertafter: "^#HRNGDEVICE"
+    state: "present"
+  tags: "rng-tools"
+  become: "yes"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version|int >= 22
+
+- name: "Start rng-tools (Ubuntu < 22.04)"
   service:
     name: "rng-tools"
     state: "restarted"
@@ -59,15 +72,26 @@
   tags: "rng-tools"
   when:
     - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version|int < 22
 
-- name: "Start rng-tools (RedHat)"
+- name: "Start rng-tools (Ubuntu >= 22.04)"
+  service:
+    name: "rng-tools-debian"
+    state: "restarted"
+    enabled: "yes"
+  tags: "rng-tools"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version|int >= 22
+
+- name: "Start rng-tools (RedHat/CentOS/Rocky)"
   service:
     name: "rngd"
     state: "restarted"
     enabled: "yes"
   tags: "rng-tools"
   when:
-    - ansible_os_family == "RedHat"
+    - ansible_os_family in ['RedHat','Rocky']
 
 - name: "Enable SS services (systemd)"
   service:

@@ -58,5 +58,7 @@
         - "transfers"
         - "transferfiles"
         - "aipfiles"
-      ignore_errors: True
+      failed_when: false
+      changed_when: false
+      check_mode: false
   when: "archivematica_src_reset_es|bool or archivematica_src_reset_am_all|bool"

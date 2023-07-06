@@ -20,7 +20,17 @@
     state: absent
     path: "/usr/share/python/archivematica-acceptance-tests/"
 
+- name: "Ensure archivematica user can create virtualenv"
+  file:
+    path: "/usr/share/archivematica/virtualenvs"
+    owner: "archivematica"
+    group: "archivematica"
+    state: "directory"
+  tags: "amsrc-ss-pydep"
+
 - name: "Install pip dependencies in virtualenv"
+  become: "yes"
+  become_user: "archivematica"
   pip:
     chdir: "{{ archivematica_src_dir }}/archivematica-acceptance-tests"
     requirements: "requirements.txt"

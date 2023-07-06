@@ -1,73 +1,75 @@
 ---
-# osdeps filenames named "distribution"-"major_version".json
-#        example: CentOS-7.yml (case sensitive)
-- set_fact:
-    osdeps_file: "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.json"
-    tmpdirname: "/tmp/amsrc-{{ ansible_date_time.date }}-{{ ansible_date_time.epoch }}"
-
-# become: false is required in tasks delegated to localhost
-# (to avoid "sudo: a password is required" error)
-- name: "create temp directory in local machine to store osdeps files"
-  file:
-    path: "{{ tmpdirname }}/osdeps"
-    state: "directory"
-  become: false
-  delegate_to: "127.0.0.1"
-
-- name: "stat for osdeps file"
-  stat:
-    path: "{{ archivematica_src_dir }}/archivematica-storage-service/osdeps/{{ osdeps_file }}"
-  register: od
-
-- name: "set_fact osdeps"
-  set_fact:
-    osdeps: "{{ od.stat.exists is defined and od.stat.exists }}"
-
-- name: "fetch dependencies files from source code repository to local machine"
-  fetch:
-    src: "{{ archivematica_src_dir }}/archivematica-storage-service/osdeps/{{ osdeps_file }}"
-    dest: "{{ tmpdirname }}/osdeps/archivematica-storage-service/{{ osdeps_file }}"
-    flat: "yes"
-  become: false       # ansible recommends to run fetch without become whenever possible
-  when: osdeps
-
-# create a namespace for osdeps file variables
-- name: "include variables from retrieved dependencies files in namespace storage_service"
-  include_vars:
-    file: "{{ tmpdirname }}/osdeps/archivematica-storage-service/{{ osdeps_file }}"
-    name: "storage_service"
-  when: osdeps
 
 #######################################################################
-# Install dependencies according to osdeps files
+# Install dependencies according to osdeps dicts
 #######################################################################
 
-- name: "Install storage service ext. package deps."
-  package:
-    name: "{{ storage_service.osdeps_packages | json_query('[].name') }}"
-    state: "latest"
-  when:
-    - osdeps
-    - storage_service is defined
-    - storage_service.osdeps_packages is defined
-    - storage_service.osdeps_packages
+# ubuntu block
+- block:
+    - name: "Install External dependency repo keys (Ubuntu)"
+      apt_key:
+        id: "{{ item.id }}"
+        url: "{{ item.url }}"
+        state: "present"
+        validate_certs: "{{ item.validate_certs }}"
+      with_items:
+        - "{{ storage_service_osdeps.repokeys }}"
+      when:
+        - storage_service_osdeps.repokeys
 
-- name: "Install storage service ext. package deps. 2"
-  package:
-    name: "{{ storage_service.osdeps_packages_2 | json_query('[].name') }}"
-    state: "latest"
-  when:
-    - osdeps
-    - storage_service is defined
-    - storage_service.osdeps_packages_2 is defined
-    - storage_service.osdeps_packages_2
+    - name: "Add External dependency repos (Ubuntu)"
+      apt_repository:
+        repo: "{{ item }}"
+        state: "present"
+      with_items:
+        - "{{ storage_service_osdeps.repos }}"
+      when:
+        - storage_service_osdeps.repos
 
-- name: "Install storage service ext. package deps. 3"
-  package:
-    name: "{{ storage_service.osdeps_packages_3 | json_query('[].name') }}"
-    state: "latest"
   when:
-    - osdeps
-    - storage_service is defined
-    - storage_service.osdeps_packages_3 is defined
-    - storage_service.osdeps_packages_3
+    - ansible_distribution == "Ubuntu"
+# End Ubuntu block
+
+# Centos/RH block
+- block:
+    - name: "Add External repo keys (RH/CentOS/Rocky)"
+      rpm_key:
+        state: present
+        key: "{{ item }}"
+      with_items:
+        - "{{ storage_service_osdeps.repokeys }}"
+      when:
+        - storage_service_osdeps.repokeys
+
+    - name: "Add External dependency repos (RH/CentOS/Rocky)"
+      yum_repository:
+        name: "{{ item['name'] }}"
+        description: "{{ item['description'] }}"
+        baseurl: "{{ item['baseurl'] }}"
+        gpgcheck: "{{ item['gpgcheck'] }}"
+        enabled: "{{ item['enabled'] }}"
+      with_items:
+        - "{{ storage_service_osdeps.repos }}"
+      when:
+        - storage_service_osdeps.repos
+
+  when:
+    - ansible_distribution in ['RedHat','CentOS','Rocky']
+    - install_rpm_repositories|bool
+# End RH/CentOS/Rocky block
+
+# Not using package in next task because it is slower than apt or yum modules.
+# The package module is not installing the every list of packages at the same time
+# But yum or apt modules doesn't allow loops (deprecated) so the trick is using the
+# install-packages.yml task file
+
+- include: "install-packages.yml"
+  vars:
+    packages: "{{ item.packages }}"
+    name: "{{ item.name }}"
+  when:
+    - item.packages|length>0
+  loop:
+    - { name: 'Storage Service osdeps 1', packages: "{{ storage_service_osdeps.packages | default([]) }}" }
+    - { name: 'Storage Service osdeps 2', packages: "{{ storage_service_osdeps.packages_2 | default([]) }}" }
+    - { name: 'Storage Service osdeps 3', packages: "{{ storage_service_osdeps.packages_3 | default([]) }}" }
