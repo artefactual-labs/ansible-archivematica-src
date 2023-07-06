@@ -1,0 +1,112 @@
+---
+systemd_environment_path: "/etc/default"
+__python_packages_prefix: "{% if ansible_python.version.major >= 3 %}python3{% else %}python{% endif %}"
+ansible_deps:
+  - "{{ __python_packages_prefix }}-pycurl"
+  - "{{ __python_packages_prefix }}-setuptools"
+  - "git"
+  - "{{ __python_packages_prefix }}-mysqldb"  # Required for mysql_db module
+  - "sqlite3"                                 # Required for am-configure and fixity
+  - "ca-certificates"                         # Required for apt-get
+ca_custom_bundle: "/etc/ssl/certs/ca-certificates.crt"
+archivematica_src_am_amauat_deps:
+  - "tightvncserver"
+  - "icewm"
+archivematica_src_am_fixity_deps:
+  - "sqlite3"
+  - "moreutils"
+  - "mailutils"
+archivematica_src_python_packages:
+  - "python3.9-dev"
+  - "python3.9-distutils"
+  - "python3-setuptools"
+  - "pkg-config"
+
+
+dashboard_osdeps:
+  repokeys: []
+  repos: []
+  packages:
+    - gcc
+    - g++
+    - gettext
+    - nginx
+    - libffi-dev
+    - libxml2-dev
+    - libxslt1-dev
+    - libssl-dev
+    - python3.6-dev
+    - libsasl2-dev # Required to pip install python-ldap in virtualenv
+    - libldap2-dev # Required to pip install python-ldap in virtualenv
+    - unar
+    - coreutils
+    - libmysqlclient-dev
+
+MCPClient_osdeps:
+  repokeys:
+    - id: "0x5236CA08"
+      url: "https://packages.archivematica.org/GPG-KEY-archivematica"
+      validate_certs: "no"
+  repos:
+    - "deb [arch=amd64] http://packages.archivematica.org/1.15.x/ubuntu-externals focal main"
+  packages:
+    - atool
+    - bulk-extractor
+    - ffmpeg
+    - fits
+    - gearman
+    - ghostscript
+    - hashdeep
+    - imagemagick
+    - inkscape
+    - jhove
+    - libimage-exiftool-perl
+    - logapp
+    - md5deep
+    - nailgun
+    - mediaconch
+    - mediainfo
+    - nfs-common
+    - openjdk-8-jre-headless
+    - p7zip-full
+    - pbzip2
+    - postfix
+    - pst-utils
+    - rsync
+    - siegfried
+    - sleuthkit
+    - tesseract-ocr
+    - tree
+    - unrar-free
+    - uuid
+    - libmysqlclient-dev
+
+MCPServer_osdeps:
+  repokeys: []
+  repos: []
+  packages:
+    - libmysqlclient-dev
+
+storage_service_osdeps:
+  repokeys: []
+  repos: []
+  packages:
+    - nginx
+    - unar
+    - rsync
+    - p7zip-full
+    - python3.6-dev
+    - build-essential # required to compile brotli (cc1plus)
+    - libmysqlclient-dev
+    - libxml2-dev
+    - libxslt1-dev
+    - libz-dev
+    - libffi-dev
+    - libssl-dev
+    - gcc   # required to build some pip dependencies
+    - gettext
+    - gnupg1
+    - rng-tools
+    - libsasl2-dev
+    - libldap2-dev
+    - rclone

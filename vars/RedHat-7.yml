@@ -1,0 +1,117 @@
+---
+systemd_environment_path: "/etc/sysconfig"
+ansible_deps:
+  - "epel-release"
+  - "python-setuptools"
+  - "git"
+  - "MySQL-python"            # Required for mysql_db module
+  - "sqlite"                  # Required for am-configure and fixity
+  - "p7zip-plugins"
+  - "libsemanage-python"      # Required by SELinux management
+  - "policycoreutils-python"  # Required by SELinux management
+  - "ca-certificates"         # Required for yum
+ca_custom_bundle: "/etc/pki/tls/certs/ca-bundle.crt"
+archivematica_src_am_amauat_deps: []
+archivematica_src_am_fixity_deps:
+  - "sqlite"
+  - "moreutils"
+  - "mailx"
+archivematica_src_python_packages:
+  - "rh-python38-scldevel"
+  - "rh-python38-python-devel"
+  - "pkgconfig"
+# Distutils-extra?
+  - "rh-python38-python-setuptools"
+
+dashboard_osdeps:
+  repokeys: []
+  repos: []
+  packages:
+    - gcc
+    - gcc-c++
+    - gettext    # only required in development environments (used to make string translateable)
+    - nginx
+    - policycoreutils-python
+    - libffi-devel
+    - libxml2-devel
+    - libxslt-devel
+    - openssl-devel
+    - python3-devel
+    - openldap-devel
+    - unar
+    - coreutils
+
+MCPClient_osdeps:
+  repokeys:
+    - "https://packages.archivematica.org/GPG-KEY-archivematica"
+  repos:
+    - baseurl: "https://packages.archivematica.org/1.15.x/centos-extras"
+      description: "archivematica extras"
+      enabled: "yes"
+      gpgcheck: "no"
+      name: "archivematica-extras"
+  packages:
+    - epel-release
+  packages_2:
+    - atool
+    - bulk_extractor
+    - ffmpeg
+    - fits
+    - gearmand
+    - ghostscript
+    - ImageMagick
+    - inkscape
+    - jhove
+    - libewf
+    - libxml2
+    - libpst
+    - libraw1394
+    - libvpx
+    - md5deep
+    - mediainfo
+    - mediaconch
+    - nfs-utils
+    - java-1.7.0-openjdk-headless
+    - openjpeg
+    - p7zip
+    - p7zip-plugins
+    - pbzip2
+    - perl-Image-ExifTool
+    - postfix
+    - rsync
+    - siegfried
+    - sleuthkit
+    - tesseract
+    - tree
+    - ufraw
+    - uuid 
+
+MCPServer_osdeps:
+  repokeys: []
+  repos: []
+  packages: []
+
+storage_service_osdeps:
+  repokeys: []
+  repos: []
+  packages:
+    - epel-release  # required by unar and nginx
+  packages_2:
+    - nginx
+    - unar
+    - rsync
+    - python3-devel
+    - libxml2-devel
+    - libxslt-devel
+    - zlib-devel
+    - libffi-devel
+    - openssl-devel
+    - gcc           # required to build some pip dependencies
+    - gcc-c++
+    - gettext
+    - p7zip
+    - p7zip-plugins
+    - gnupg
+    - rng-tools
+    - openldap-devel
+    - rclone

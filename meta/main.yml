@@ -14,25 +14,4 @@ galaxy_info:
     - bionic
     - focal
 
-dependencies:
-
-# Use different node and geerlingguy.nodejs role versions on Ubuntu >=20.04
-- role: geerlingguy.nodejs
-  version: "6.1.1"
-  nodejs_version: "10.x"
-  when:
-    - ansible_distribution == "Ubuntu"
-    - ansible_distribution_version is version('20.04', '>=')
-
-- role: geerlingguy.nodejs
-  version: "4.1.1"
-  nodejs_version: "8.x"
-  when:
-    - ansible_distribution == "Ubuntu"
-    - ansible_distribution_version is version('20.04', '<')
-
-- role: geerlingguy.nodejs
-  version: 4.1.1
-  nodejs_version: 8.x
-  when:
-    - ansible_os_family == "RedHat"
+dependencies: []

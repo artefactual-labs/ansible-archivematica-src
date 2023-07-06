@@ -63,21 +63,34 @@
 #   2- Python dependencies (pip packages)
 ###########################################################
 
-- name: "Destroy virtualenv if it's still using Python 2"
+- name: "Destroy virtualenv if it's using a different python version"
   block:
     - name: "Capture current Python version"
       command: |-
         {{ archivematica_src_ss_virtualenv }}/bin/python -c
-          'import sys; sys.stdout.write("{}".format(sys.version_info[0])); sys.stdout.flush();'
-      ignore_errors: yes
+          'import sys; print("python"+str(sys.version_info[0])+"."+str(sys.version_info[1]))'
+      failed_when: false
+      changed_when: false
+      check_mode: false
       register: "pyver_check"
-    - name: "Destroy Python 2 virtualenv"
+    - name: "Destroy Python virtualenv when it's using a different version"
       file:
         path: "{{ archivematica_src_ss_virtualenv }}"
         state: "absent"
-      when: "pyver_check.rc == 0 and pyver_check.stdout == '2'"
+      when: "pyver_check.rc == 0 and pyver_check.stdout != archivematica_src_virtualenv_python"
+  tags: "amsrc-ss-pydep"
+
+- name: "Ensure archivematica user can create virtualenv"
+  file:
+    path: "{{ archivematica_src_ss_virtualenv | dirname }}"
+    owner: "archivematica"
+    group: "archivematica"
+    state: "directory"
+  tags: "amsrc-ss-pydep"
 
 - name: "Create virtualenv and install pip-tools"
+  become: "yes"
+  become_user: "archivematica"
   pip:
     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
     virtualenv_command: "{{ archivematica_src_virtualenv }}"
@@ -88,9 +101,11 @@
   tags: "amsrc-ss-pydep"
 
 - name: "Synchronize requirements"
-  command: "{{ archivematica_src_ss_virtualenv }}/bin/pip-sync {{ 'local.txt' if is_dev else 'production.txt' }}"
+  become: "yes"
+  become_user: "archivematica"
+  command: "{{ archivematica_src_ss_virtualenv }}/bin/pip-sync {{ 'requirements-dev.txt' if is_dev else 'requirements.txt' }}"
   args:
-    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service/requirements"
+    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
   environment:
     LC_ALL: "en_US.utf8"
     LANG: "en_US.utf8"

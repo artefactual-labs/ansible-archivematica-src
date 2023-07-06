@@ -1,0 +1,20 @@
+---
+# This task is very useful when installing/upgrading packages with loops
+# Requires:
+# - name: String with the name, it is only for the task name
+# - packages: List (or string when having a single package) of packages
+# - state: state os the package "latest,present,..". Optional, default: latest
+
+- name: "Install/Upgrade Debian packages: {{ name }}"
+  apt:
+    name: "{{ packages }}"
+    state: "{{ state | default('latest') }}"
+  when:
+    - ansible_os_family == "Debian"
+
+- name: "Install/Upgrade RHEL/CentOS/Rocky packages: {{ name }}"
+  yum:
+    name: "{{ packages }}"
+    state: "{{ state | default('latest') }}"
+  when:
+    - ansible_os_family in ['RedHat','Rocky']

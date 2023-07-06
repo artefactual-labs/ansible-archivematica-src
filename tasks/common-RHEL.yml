@@ -8,6 +8,8 @@
   yum:
     name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
     state: "present"
+  when:
+    - install_rpm_repositories|bool
 
 #
 # Install optional and extras repositories because EPEL packages may depend on
@@ -18,4 +20,8 @@
 
 - name: "Add rhel-*-optional-rpms repo on RHEL"
   command: subscription-manager repos --enable "rhel-*-optional-rpms" --enable "rhel-*-extras-rpms"
-  ignore_errors: True
+  failed_when: false
+  changed_when: false
+  check_mode: false
+  when:
+    - install_rpm_repositories|bool

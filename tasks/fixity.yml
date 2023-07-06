@@ -19,7 +19,16 @@
     version: "{{ archivematica_src_fixity_version }}"
     force: "yes"
 
+- name: "Ensure archivematica user can create virtualenv"
+  file:
+    path: "{{ archivematica_src_fixity_virtualenv | dirname }}"
+    owner: "archivematica"
+    group: "archivematica"
+    state: "directory"
+
 - name: "Install pip dependencies in virtualenv"
+  become: "yes"
+  become_user: "archivematica"
   pip:
     chdir: "{{ archivematica_src_dir }}/fixity"
     requirements: "requirements.txt"

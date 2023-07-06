@@ -38,7 +38,9 @@
       register: "gpg_key_already_exist"
       become: "yes"
       become_user: "archivematica"
-      ignore_errors: "yes"
+      failed_when: false
+      changed_when: false
+      check_mode: false
 
     - name: "Create GPG key when doesn't exist"
       command: "{{ archivematica_src_ss_virtualenv }}/bin/python"

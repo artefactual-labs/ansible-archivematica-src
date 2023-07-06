@@ -1,0 +1,146 @@
+---
+# In the past the nodejs was installed and configured using 
+# the geerlingguy/ansible-role-nodejs role as a role dependency.
+# We had problems with ansible < 2.10 and Rocky support
+# This is the https://github.com/geerlingguy/ansible-role-nodejs role
+# but added here as a task file
+
+# Debian setup
+
+- name: "Nodejs setup (Debian)"
+  block:
+
+  - name: "Nodejs: Ensure dependencies are present"
+    apt:
+      name:
+        - apt-transport-https
+        - gnupg2
+      state: present
+
+  - name: "Nodejs: Add Nodesource apt key"
+    apt_key:
+      url: https://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search=0x1655A0AB68576280
+      id: "68576280"
+      state: present
+
+  - name: "Nodejs: Add NodeSource repositories for Node.js"
+    apt_repository:
+      repo: "{{ item }}"
+      state: present
+    with_items:
+      - "deb https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_distribution_release }} main"
+      - "deb-src https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_distribution_release }} main"
+    register: node_repo
+
+  - name: "Nodejs: Update apt cache if repo was added"
+    apt: update_cache=yes
+    when: node_repo is changed
+    tags: ['skip_ansible_lint']
+
+  - name: "Nodejs: Ensure Node.js and npm are installed"
+    apt:
+      name: "nodejs={{ nodejs_version | regex_replace('x', '') }}*"
+      state: present
+
+  when:
+   - ansible_os_family == "Debian"
+
+# CentOS/Rockey/RHEL setup
+
+- name: "Nodejs setup (CentOS/Rocky/RHEL)"
+  block:
+
+  - name: "Nodejs: Set up the Nodesource RPM directory"
+    set_fact:
+      nodejs_rhel_rpm_dir: "pub_{{ nodejs_version }}"
+
+  - name: "Nodejs: Import Nodesource RPM key (CentOS < 7)"
+    rpm_key:
+      key: http://rpm.nodesource.com/pub/el/NODESOURCE-GPG-SIGNING-KEY-EL
+      state: present
+    when: ansible_distribution_major_version | int < 7
+
+  - name: "Nodejs: Import Nodesource RPM key (CentOS 7+)"
+    rpm_key:
+      key: https://rpm.nodesource.com/pub/el/NODESOURCE-GPG-SIGNING-KEY-EL
+      state: present
+    when:
+      - ansible_distribution_major_version | int >= 7
+      - install_rpm_repositories|bool
+
+  - name: "Nodejs: Add Nodesource repositories for Node.js (CentOS < 7)"
+    yum:
+      name: "http://rpm.nodesource.com/{{ nodejs_rhel_rpm_dir }}/el/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/nodesource-release-el{{ ansible_distribution_major_version }}-1.noarch.rpm"
+      state: present
+    when:
+      - ansible_distribution_major_version | int < 7
+      - install_rpm_repositories|bool
+    register: node_repo
+
+  - name: "Nodejs: Add Nodesource repositories for Node.js (CentOS 7+)"
+    yum:
+      name: "https://rpm.nodesource.com/{{ nodejs_rhel_rpm_dir }}/el/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/nodesource-release-el{{ ansible_distribution_major_version }}-1.noarch.rpm"
+      state: present
+    when:
+      - ansible_distribution_major_version | int >= 7
+      - install_rpm_repositories|bool
+    register: node_repo
+
+  - name: "Nodejs: Update package cache if repo was added"
+    yum: update_cache=yes
+    when: node_repo is changed
+    tags: ['skip_ansible_lint']
+
+  - name: "Nodejs: Ensure Node.js AppStream module is disabled (CentOS 8+)"
+    command: yum module disable -y nodejs
+    register: module_disable
+    changed_when: "'Nothing to do.' not in module_disable.stdout"
+    when:
+      - ansible_distribution_major_version | int >= 8
+      - install_rpm_repositories|bool
+
+  - name: "Nodejs: Ensure Node.js and npm are installed"
+    yum:
+      name: "nodejs-{{ nodejs_version | regex_replace('x', '') }}*"
+      state: present
+      enablerepo: nodesource
+
+  when:
+   - ansible_os_family in ['RedHat','Rocky']
+
+- name: "Nodejs: Define nodejs_install_npm_user"
+  set_fact:
+    nodejs_install_npm_user: "{{ ansible_user | default(lookup('env', 'USER')) }}"
+  when: nodejs_install_npm_user is not defined
+
+- name: "Nodejs: Create npm global directory"
+  file:
+    path: "{{ npm_config_prefix }}"
+    owner: "{{ nodejs_install_npm_user }}"
+    group: "{{ nodejs_install_npm_user }}"
+    state: directory
+    mode: 0755
+
+- name: "Nodejs: Add npm_config_prefix bin directory to global $PATH"
+  template:
+    src: etc/npm/npm.sh.j2
+    dest: /etc/profile.d/npm.sh
+    mode: 0644
+  when: nodejs_generate_etc_profile|bool
+
+- name: "Nodejs: Ensure npm global packages are installed"
+  npm:
+    name: "{{ item.name | default(item) }}"
+    version: "{{ item.version | default(omit) }}"
+    global: true
+    state: "{{ item.state | default('present') }}"
+  environment:
+    NPM_CONFIG_PREFIX: "{{ npm_config_prefix }}"
+    NODE_PATH: "{{ npm_config_prefix }}/lib/node_modules"
+    NPM_CONFIG_UNSAFE_PERM: "{{ npm_config_unsafe_perm }}"
+  with_items: "{{ nodejs_npm_global_packages }}"
+
+- name: "Nodejs: Install packages defined in a given package.json"
+  npm:
+    path: "{{ nodejs_package_json_path }}"
+  when: nodejs_package_json_path is defined and nodejs_package_json_path

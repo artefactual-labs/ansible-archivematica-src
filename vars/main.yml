@@ -23,7 +23,44 @@ archivematica_src_ss_gunicorn_config: "/etc/archivematica/storage-service.gunico
 archivematica_src_am_amauat_deps: []
 archivematica_src_am_fixity_deps: []
 
-archivematica_src_virtualenv: "/usr/local/bin/virtualenv"
-archivematica_src_pip: "/usr/local/bin/pip3.6"
-archivematica_src_virtualenv_python: "python3.6"
+archivematica_src_virtualenv: "/var/lib/archivematica/.local/bin/virtualenv"
+archivematica_src_pip: "/var/lib/archivematica/.local/bin/pip"
+# Ubuntu 18 and CentOS/RHEL 7 only have python3.8
+archivematica_src_virtualenv_python: "{{ 'python3.8' if ansible_distribution_major_version|string in ['7','18'] else 'python3.9' }}"
 archivematica_src_python_packages: []  # Distro specific (see Debian.yml and RedHat.yml).
+
+#
+# Nodejs vars
+#
+
+# Set the version of Node.js to install ("12.x", "13.x", "14.x", "15.x", etc.).
+# Version numbers from Nodesource: https://github.com/nodesource/distributions
+# Thios variable can be override in var/$DISTRO-$MAJOR_VERSION
+nodejs_version: "10.x"
+
+# The user for whom the npm packages will be installed.
+# nodejs_install_npm_user: username
+
+# The directory for global installations.
+npm_config_prefix: "/usr/local/lib/npm"
+
+# Set to true to suppress the UID/GID switching when running package scripts. If
+# set explicitly to false, then installing as a non-root user will fail.
+npm_config_unsafe_perm: "false"
+
+# Define a list of global packages to be installed with NPM.
+nodejs_npm_global_packages: []
+#  # Install a specific version of a package.
+#  - name: jslint
+#    version: 0.9.3
+#  # Install the latest stable release of a package.
+#  - name: node-sass
+#  # This shorthand syntax also works (same as previous example).
+#  - node-sass
+
+# The path of a package.json file used to install packages globally.
+nodejs_package_json_path: ""
+
+# Whether or not /etc/profile.d/npm.sh (globa) must be generated.
+# Set to false if you need to handle this manually with a per-user install.
+nodejs_generate_etc_profile: "true"

@@ -22,40 +22,65 @@
 
 - name: "Common configuration for source installs"
   block:
-  - name: "Ensure pip is not installed from packages"
-    package:
-      name:
-        - "python-pip"
-        - "python2-pip"
-      state: "absent"
+  # Needed to install python packages in CentOS/RHEL7
+  - name: "Add SCL repo in CentOS/RHEL 7"
+    yum:
+      name: "centos-release-scl"
+      state: "present"
+    when:
+      - ansible_os_family in ['RedHat','Rocky']
+      - ansible_distribution_major_version|int == 7
 
-  - name: "Add Deadsnakes APT repository (Ubuntu >=20.04)"
+  - name: "Add Deadsnakes APT repository (Ubuntu)"
     apt_repository:
       repo: "ppa:deadsnakes"
     when:
       - ansible_os_family == "Debian"
-      - ansible_distribution_version is version_compare('20.04', '>=')
 
-  - name: "Ensure Python 3 is installed"
-    package:
-      name: "{{ archivematica_src_python_packages }}"
+  # Not using package in next task because it is slower than apt or yum modules.
+  # The package module is not installing the every list of packages at the same time
+  # Using the install-packages.yml task file prepared for osdeps
+
+  # Ensure Python 3 is installed
+  - include: "install-packages.yml"
+    vars:
+      packages: "{{ archivematica_src_python_packages }}"
+      name: "Python 3"
       state: "present"
+    when:
+      - archivematica_src_python_packages|length>0
 
-  - name: "Download get-pip.py"
+  - name: "Create python38 symbolic link in CentOS/RHEL7"
+    file:
+      src: "/opt/rh/rh-python38/root/usr/bin/python3.8"
+      dest: "/usr/bin/python3.8"
+      state: "link"
+    when:
+      - ansible_os_family in ['CentOS','RedHat']
+      - ansible_distribution_major_version|int == 7
+
+  - name: "Download get-pip.py in archivematica userdir"
+    become: "yes"
+    become_user: "archivematica"
     get_url:
-      url: "https://bootstrap.pypa.io/pip/3.6/get-pip.py"
+      url: "https://bootstrap.pypa.io/get-pip.py"
       force: "yes"
-      dest: "/root/get-pip.py"
+      dest: "/var/lib/archivematica/get-pip.py"
 
-  - name: "Install pip with get-pip.py"
+  - name: "Install pip with get-pip.py as archivematica user"
+    become: "yes"
+    become_user: "archivematica"
     command: "{{ archivematica_src_virtualenv_python }} get-pip.py pip=={{ archivematica_src_pip_version }}"
     args:
-      chdir: "/root/"
+      chdir: "/var/lib/archivematica"
 
   - name: "Install virtualenv with pip"
+    become: "yes"
+    become_user: "archivematica"
     pip:
       name: "virtualenv"
       executable: "{{ archivematica_src_pip }}"
+      extra_args: "--user --ignore-installed"
       state: "latest"
 
   #
@@ -91,6 +116,7 @@
       gpgkey: "{{ item.value.gpgkey|default('https://packages.archivematica.org/1.10.x/key.asc') }}"
       gpgcheck: "{{ item.value.gpgcheck|default('1') }}"
     loop: "{{ lookup('dict',archivematica_src_rpm_repositories) }}"
+    when: install_rpm_repositories|bool
 
   when: (archivematica_src_install_am == "rpm" or archivematica_src_install_ss == "rpm")
 
@@ -110,7 +136,7 @@
     - "httpd_setrlimit"                 # Allow nginx to change system limits
   when:
     - ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled'
-    - ansible_os_family == "RedHat"
+    - ansible_os_family in ['RedHat','Rocky']
 
 - name: "SELinux: Allow nginx to use ports 8000 and 8001"
   become: "yes"
@@ -121,11 +147,11 @@
     state: "present"
   when:
     - ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled'
-    - ansible_os_family == "RedHat"
+    - ansible_os_family in ['RedHat','Rocky']
 
 - name: "Change home dir perms (to make transfer source visible)"
   command: "chmod 755 $HOME"
   tags: "homeperms"
   become: "no"
   when:
-    - ansible_os_family == "RedHat"
+    - ansible_os_family in ['RedHat','Rocky']

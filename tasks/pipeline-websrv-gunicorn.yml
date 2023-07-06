@@ -5,7 +5,7 @@
 ###########################################################
 
 # Note: the playbook assumes the use of /etc/nginx/{sites-available|sites-enabled}
-#       directories for site config files, even on CentOS/RedHat
+#       directories for site config files, even on CentOS/RedHat/Rocky
 
 - name: "Template dashboard nginx sites-available config file (nossl)"
   template:
