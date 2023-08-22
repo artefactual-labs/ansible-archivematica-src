@@ -50,6 +50,8 @@ archivematica_src_am_db_host: "localhost"        # Archivematica database host
 archivematica_src_am_db_name: "MCP"              # Archivematica database name
 archivematica_src_am_db_user: "archivematica"    # Archivematica database user
 archivematica_src_am_db_password: "demo"         # Archivematica database password
+archivematica_src_am_db_encoding: "utf8mb4"      # Archivematica database encoding
+archivematica_src_am_db_collation: "utf8mb4_0900_ai_ci" # Archivematica database collation
 
 archivematica_src_ss_db_mysql_enabled: "true"    # Use MySQL SS database. Set as false for sqlite3
 archivematica_src_ss_db_host: "localhost"        # Archivematica Storage Service database host
@@ -57,6 +59,8 @@ archivematica_src_ss_db_name: "SS"               # Archivematica Storage Service
 archivematica_src_ss_db_user: "archivematica"    # Archivematica Storage Service database user
 archivematica_src_ss_db_password: "demo"         # Archivematica Storage Service database password
 archivematica_src_ss_db_port: 3306               # Archivematica Storage Service database password
+archivematica_src_ss_db_encoding: "utf8mb4"      # Archivematica Storage Service database encoding
+archivematica_src_ss_db_collation: "utf8mb4_0900_ai_ci" # Archivematica Storage Service database collation
 
 
 # Reset data options
