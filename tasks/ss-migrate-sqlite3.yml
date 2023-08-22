@@ -69,11 +69,15 @@
   mysql_db:
     name: "{{ archivematica_src_ss_db_name }}"
     state: absent
+    login_unix_socket: "{% if ansible_os_family == 'RedHat' %}/var/lib/mysql/mysql.sock{% else %}/var/run/mysqld/mysqld.sock{% endif %}"
 
 - name: "Create SS DB (mysql)"
   mysql_db:
     name: "{{ archivematica_src_ss_db_name }}"
     state: present
+    collation: "{{ archivematica_src_ss_db_collation }}"
+    encoding: "{{ archivematica_src_ss_db_encoding }}"
+    login_unix_socket: "{% if ansible_os_family == 'RedHat' %}/var/lib/mysql/mysql.sock{% else %}/var/run/mysqld/mysqld.sock{% endif %}"
 
 - name: "Run SS django database migrations (To syncdb database)"
   become: "yes"
