@@ -43,7 +43,7 @@
 
   - name: "Download get-pip.py"
     get_url:
-      url: "https://bootstrap.pypa.io/pip/3.6/get-pip.py"
+      url: "https://bootstrap.pypa.io/get-pip.py"
       force: "yes"
       dest: "/root/get-pip.py"
 
