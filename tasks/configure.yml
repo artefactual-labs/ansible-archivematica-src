@@ -152,7 +152,7 @@
 
 - name: "Create ssh key"
   user:
-    name: "archivematica"
+    name: "{{ archivematica_src_am_system_user }}"
     generate_ssh_key: "yes"
     ssh_key_file: ".ssh/id_rsa"
   when: archivematica_src_configure_dashboardsettings is defined
@@ -161,8 +161,8 @@
   lineinfile:
     create: "yes"
     path: "/var/lib/archivematica/.ssh/config"
-    owner: "archivematica"
-    group: "archivematica"
+    owner: "{{ archivematica_src_am_system_user }}"
+    group: "{{ archivematica_src_am_system_group }}"
     mode: "0600"
     line: "StrictHostKeyChecking no"
   when: archivematica_src_configure_dashboardsettings is defined

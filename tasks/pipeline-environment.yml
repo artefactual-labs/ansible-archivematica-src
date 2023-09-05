@@ -20,8 +20,8 @@
   file:
     dest: "{{ archivematica_src_shareddir }}"
     state: "directory"
-    owner: "archivematica"
-    group: "archivematica"
+    owner: "{{ archivematica_src_am_system_user }}"
+    group: "{{ archivematica_src_am_system_group }}"
     mode: "0755"
   when: "archivematica_src_reset_shareddir|bool or archivematica_src_reset_am_all|bool"
 
