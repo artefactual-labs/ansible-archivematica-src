@@ -56,8 +56,17 @@
       dest: "/usr/bin/python3.8"
       state: "link"
     when:
-      - ansible_os_family in ['CentOS','RedHat']
+      - ansible_os_family == 'RedHat'
       - ansible_distribution_major_version|int == 7
+
+  - name: "Set python3 as default python (CentOS/RHEL/Rocky) >= 8.0"
+    command: alternatives --set python /usr/bin/python3
+    changed_when: False
+    failed_when: false
+    check_mode: false
+    when:
+      - ansible_os_family in ['Rocky','RedHat']
+      - ansible_distribution_major_version|int >= 8
 
   - name: "Download get-pip.py in archivematica userdir"
     become: "yes"
