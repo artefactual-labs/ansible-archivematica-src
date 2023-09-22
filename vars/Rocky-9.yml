@@ -49,7 +49,7 @@ MCPClient_osdeps:
       enabled: "yes"
       gpgcheck: "no"
       name: "archivematica-extras"
-  packages_1:
+  packages:
     - atool
     - bulk_extractor
     - ffmpeg
