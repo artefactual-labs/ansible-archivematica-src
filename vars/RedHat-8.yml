@@ -111,7 +111,7 @@ storage_service_osdeps:
     - gettext
     - p7zip
     - p7zip-plugins
-    - gnupg
+    - gnupg1
     - rng-tools
     - openldap-devel
     - rclone
