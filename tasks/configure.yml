@@ -148,14 +148,18 @@
           --execute="update DashboardSettings set value=\"{{ item.value }}\" where name=\"{{ item.key }}\";"
   with_dict: "{{ archivematica_src_configure_dashboardsettings }}"
   no_log: True
-  when: archivematica_src_configure_dashboardsettings is defined
+  when:
+    - archivematica_src_configure_dashboard|bool
+    - archivematica_src_configure_dashboardsettings is defined
 
 - name: "Create ssh key"
   user:
     name: "archivematica"
     generate_ssh_key: "yes"
     ssh_key_file: ".ssh/id_rsa"
-  when: archivematica_src_configure_dashboardsettings is defined
+  when:
+    - archivematica_src_configure_dashboard|bool
+    - archivematica_src_configure_dashboardsettings is defined
 
 - name: "Use StrictHostKeyChecking=no ssh option for archivematica user"
   lineinfile:
@@ -165,24 +169,31 @@
     group: "archivematica"
     mode: "0600"
     line: "StrictHostKeyChecking no"
-  when: archivematica_src_configure_dashboardsettings is defined
+  when:
+    - archivematica_src_configure_dashboard|bool
+    - archivematica_src_configure_dashboardsettings is defined
 
 - name: "Register ssh key"
   command: cat /var/lib/archivematica/.ssh/id_rsa.pub
   register: ssh_key
-  when: archivematica_src_configure_dashboardsettings is defined
+  when:
+    - archivematica_src_configure_dashboard|bool
+    - archivematica_src_configure_dashboardsettings is defined
 
 - name: "Show ssh key"
   debug: msg={{ ssh_key.stdout_lines }}
-  when: archivematica_src_configure_dashboardsettings is defined
+  when:
+    - archivematica_src_configure_dashboard|bool
+    - archivematica_src_configure_dashboardsettings is defined
 
 # The rsync user is defined in the rsync_target, as user@host:/path 
 - name: "Get rsync user for dip upload"
   set_fact:
     atom_dipupload_ssh_user: "{{ archivematica_src_configure_dashboardsettings['rsync_target'].split('@')[0] }}"
   when:
-    -  archivematica_src_configure_dashboardsettings is defined
-    -  archivematica_src_configure_dashboardsettings['rsync_target'].split('@')[0] != archivematica_src_configure_dashboardsettings['rsync_target'] 
+    - archivematica_src_configure_dashboard|bool
+    - archivematica_src_configure_dashboardsettings is defined
+    - archivematica_src_configure_dashboardsettings['rsync_target'].split('@')[0] != archivematica_src_configure_dashboardsettings['rsync_target']
 
 
 - name: "Create archivematica user in AtoM server"
@@ -196,7 +207,8 @@
   delegate_to: "{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') }}"
   remote_user: "{{ archivematica_src_configure_atom_ssh_user | default('artefactual') }}"
   when:
-    -  archivematica_src_configure_dashboardsettings is defined
+    - archivematica_src_configure_dashboard|bool
+    - archivematica_src_configure_dashboardsettings is defined
 
 - name: "Add ssh key to AtoM server"
   authorized_key:
@@ -205,7 +217,9 @@
     key: "{{ ssh_key.stdout }}"
   delegate_to: "{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') }}"
   remote_user: "{{ archivematica_src_configure_atom_ssh_user | default('artefactual') }}"
-  when: archivematica_src_configure_dashboardsettings is defined
+  when:
+    - archivematica_src_configure_dashboard|bool
+    - archivematica_src_configure_dashboardsettings is defined
 
 #
 # Configure FPR
@@ -219,7 +233,9 @@
            --batch --skip-column-names
            --execute="update fpr_fpcommand set enabled={{ item.value.enabled }} where {{ item.value.field_name }}=\"{{ item.key }}\";"
   loop: "{{ lookup('dict',archivematica_src_configure_fpcommand|default({}),wantlist=True) }}"
-  when: archivematica_src_configure_fpcommand is defined
+  when:
+    - archivematica_src_configure_dashboard|bool
+    - archivematica_src_configure_fpcommand is defined
 #
 - name: "Configure fprule settings"
   command: >
@@ -230,7 +246,9 @@
            --batch --skip-column-names
            --execute="update fpr_fprule set enabled={{ item.value.enabled }} where {{ item.value.field_name }}=\"{{ item.key }}\";"
   loop: "{{ lookup('dict',archivematica_src_configure_fprule|default({}),wantlist=True) }}"
-  when: archivematica_src_configure_fprule is defined
+  when:
+    - archivematica_src_configure_dashboard|bool
+    - archivematica_src_configure_fprule is defined
 
 - name: "Configure locations"
   block:
