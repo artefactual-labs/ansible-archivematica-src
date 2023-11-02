@@ -2,6 +2,7 @@
 systemd_environment_path: "/etc/sysconfig"
 ansible_deps:
 #  - "epel-release"
+  - "acl"                     # Required to avoid using allow_world_readable_tmpfiles=True
   - "python3-setuptools"
   - "git"
   - "python3-PyMySQL"         # Required for mysql_db module
