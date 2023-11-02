@@ -69,12 +69,12 @@
       - ansible_distribution_major_version|int >= 8
 
   - name: "Download get-pip.py in archivematica userdir"
-    become: "yes"
-    become_user: "archivematica"
     get_url:
       url: "https://bootstrap.pypa.io/get-pip.py"
       force: "yes"
       dest: "/var/lib/archivematica/get-pip.py"
+      owner: "archivematica"
+      group: "archivematica"
 
   - name: "Install pip with get-pip.py as archivematica user"
     become: "yes"
