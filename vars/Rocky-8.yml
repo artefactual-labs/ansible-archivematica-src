@@ -1,6 +1,7 @@
 ---
 systemd_environment_path: "/etc/sysconfig"
 ansible_deps:
+  - "acl"                     # Required to avoid using allow_world_readable_tmpfiles=True
   - "epel-release"
   - "python3-setuptools"
   - "git"
