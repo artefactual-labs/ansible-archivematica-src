@@ -2,6 +2,7 @@
 systemd_environment_path: "/etc/default"
 __python_packages_prefix: "{% if ansible_python.version.major >= 3 %}python3{% else %}python{% endif %}"
 ansible_deps:
+  - "acl"        # Required to avoid using allow_world_readable_tmpfiles=True
   - "{{ __python_packages_prefix }}-pycurl"
   - "{{ __python_packages_prefix }}-setuptools"
   - "git"
