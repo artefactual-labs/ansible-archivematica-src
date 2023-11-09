@@ -5,11 +5,11 @@
 - name: "Get git config global safe directories dir"
   shell: "git config --global --get-all safe.directory || echo ''"
   register: "__git_config_global_safe_dir"
-  become_flags: "-E"
+  become_flags: "-ES"
 
 - name: "Set Automation-Tools source directory as git safe dir"
   command: "git config --global --add safe.directory {{ archivematica_src_dir }}/automation-tools"
-  become_flags: "-E"
+  become_flags: "-ES"
   when:
     - archivematica_src_dir + '/automation-tools' not in __git_config_global_safe_dir.stdout_lines
 
