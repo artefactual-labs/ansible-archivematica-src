@@ -16,12 +16,12 @@
 - name: "Get git config global safe directories dir"
   shell: "git config --global --get-all safe.directory || echo ''"
   register: "__git_config_global_safe_dir"
-  become_flags: "-E"
+  become_flags: "-ES"
   tags: "amsrc-ss-clone"
 
 - name: "Set AM source directory as git safe dir"
   command: "git config --global --add safe.directory {{ archivematica_src_dir }}/archivematica-storage-service"
-  become_flags: "-E"
+  become_flags: "-ES"
   when:
     - archivematica_src_dir + '/archivematica-storage-service' not in __git_config_global_safe_dir.stdout_lines
   tags: "amsrc-ss-clone"
@@ -33,7 +33,7 @@
     version: "{{ archivematica_src_ss_version }}"
     force: "yes"
     accept_hostkey: "yes"
-  become_flags: "-E"
+  become_flags: "-ES"
   tags: "amsrc-ss-clone"
 
 # For some reason, some dirs in the cloned source code

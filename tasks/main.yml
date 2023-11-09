@@ -18,7 +18,7 @@
   tags:
     - "always" # inocuous to use always here
 
-- include: "nodejs.yml"
+- include_tasks: "nodejs.yml"
   tags:
     - "amsrc-ss"
     - "amsrc-ss-websrv"
@@ -84,7 +84,7 @@
     - archivematica_src_ss_environment['SS_GUNICORN_WORKERS'] is not defined
   tags: "always"
 
-- include: "envs-patch-backward-compatibility.yml"
+- include_tasks: "envs-patch-backward-compatibility.yml"
   tags: "always"
 
 # Uncomment if you want to debug the environment strings.
@@ -111,7 +111,7 @@
   block:
 
   - name: "Include common-RHEL.yml for RHEL"
-    include: "common-RHEL.yml"
+    include_tasks: "common-RHEL.yml"
     when:
       - "ansible_distribution == 'RedHat'"
 
@@ -120,7 +120,7 @@
   # Using the install-packages.yml task file prepared for osdeps
 
   # Install necessary packages required by this ansible role
-  - include: "install-packages.yml"
+  - include_tasks: "install-packages.yml"
     vars:
       packages: "{{ ansible_deps }}"
       name: "Ansible dependencies"
@@ -128,7 +128,7 @@
       - ansible_deps|length>0
 
   - name: "Include common.yml common tasks for all components"
-    include: "common.yml"
+    include_tasks: "common.yml"
     tags: # do not use "always" tag in role, to avoid issues when including other roles in a playbook
       - "amsrc-common"
       - "amsrc-ss"
@@ -164,7 +164,7 @@
 # archivematica-storage-service
 #
 
-- include: "ss-main.yml"
+- include_tasks: "ss-main.yml"
   tags:
     - "amsrc-ss"
   when:
@@ -179,15 +179,15 @@
 
 - name: "Complete storage service deployment"
   block:
-  - include: "ss-db.yml"
+  - include_tasks: "ss-db.yml"
     tags:
       - "amsrc-ss"
       - "amsrc-ss-db"
-  - include: "ss-osconf.yml"
+  - include_tasks: "ss-osconf.yml"
     tags:
       - "amsrc-ss"
       - "amsrc-ss-osconf"
-  - include: "ss-websrv-gunicorn.yml"
+  - include_tasks: "ss-websrv-gunicorn.yml"
     tags:
       - "amsrc-ss"
       - "amsrc-ss-websrv"
@@ -195,7 +195,7 @@
     - "archivematica_src_install_ss|bool or
        archivematica_src_install_ss == 'rpm'"
 
-- include: "ss-migrate-sqlite3.yml"
+- include_tasks: "ss-migrate-sqlite3.yml"
   tags:
     - "amsrc-ss-migrate-sqlite3"
   when:
@@ -219,26 +219,26 @@
 #   6- web server config
 - name: "Install from source"
   block:
-  - include: "pipeline-clonecode.yml"
+  - include_tasks: "pipeline-clonecode.yml"
     tags:
       - "amsrc-pipeline"
       - "amsrc-pipeline-clonecode"
 
-  - include: "pipeline-osdeps.yml"
+  - include_tasks: "pipeline-osdeps.yml"
     tags:
       - "amsrc-pipeline"
       - "amsrc-pipeline-osdeps"
 
-  - include: "pipeline-pip-deps.yml"
+  - include_tasks: "pipeline-pip-deps.yml"
     tags:
       - "amsrc-pipeline"
       - "amsrc-pipeline-pipdeps"
-  - include: "pipeline-osconf.yml"
+  - include_tasks: "pipeline-osconf.yml"
     tags:
       - "amsrc-pipeline"
       - "amsrc-pipeline-osconf"
 
-  - include: "pipeline-instcode.yml"
+  - include_tasks: "pipeline-instcode.yml"
     tags:
       - "amsrc-pipeline"
       - "amsrc-pipeline-instcode"
@@ -254,22 +254,22 @@
 
 - name: "Complete AM deployment"
   block:
-  - include: "pipeline-dbconf.yml"
+  - include_tasks: "pipeline-dbconf.yml"
     tags:
       - "amsrc-pipeline"
       - "amsrc-pipeline-dbconf"
 
-  - include: "pipeline-es.yml"
+  - include_tasks: "pipeline-es.yml"
     tags:
       - "amsrc-pipeline"
       - "amsrc-pipeline-es"
 
-  - include: "pipeline-environment.yml"
+  - include_tasks: "pipeline-environment.yml"
     tags:
       - "amsrc-pipeline"
       - "amsrc-pipeline-environment"
 
-  - include: "pipeline-websrv-gunicorn.yml"
+  - include_tasks: "pipeline-websrv-gunicorn.yml"
     tags:
       - "amsrc-pipeline"
       - "amsrc-pipeline-websrv"
@@ -311,7 +311,7 @@
 # automation-tools
 #
 
-- include: "automation-tools.yml"
+- include_tasks: "automation-tools.yml"
   tags:
     - "amsrc-automationtools"
   when: "archivematica_src_install_automationtools|bool"
@@ -321,7 +321,7 @@
 # acceptance-tests
 #
 
-- include: "acceptance-tests.yml"
+- include_tasks: "acceptance-tests.yml"
   tags:
     - "amsrc-acceptancetests"
   when: "archivematica_src_install_acceptance_tests|bool"
@@ -331,7 +331,7 @@
 # fixity
 #
 
-- include: "fixity.yml"
+- include_tasks: "fixity.yml"
   tags:
     - "amsrc-fixity"
   when: "archivematica_src_install_fixity|bool"
@@ -340,7 +340,7 @@
 # Configure pipeline and SS
 #
 
-- include: "configure.yml"
+- include_tasks: "configure.yml"
   tags:
     - "amsrc-configure"
   when: "archivematica_src_configure_ss|bool or archivematica_src_configure_dashboard|bool"
@@ -349,7 +349,7 @@
 # Configure GPG locations
 #
 
-- include: "configure-gpg.yml"
+- include_tasks: "configure-gpg.yml"
   tags:
     - "amsrc-configure"
   when:
