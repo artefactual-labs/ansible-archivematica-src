@@ -51,7 +51,8 @@
       # Needed by fits, ffmpeg, mediainfo and mediaconch
       command: "dnf config-manager --set-enabled powertools"
       when:
-        - ansible_distribution in ['CentOS','Rocky']
+        - ansible_distribution not in ['Redhat']
+        - ansible_os_family == 'RedHat'
         - ansible_distribution_major_version|int == 8
 
     - name: "Enable CodeReady Linux Builder Repository on RHEL 8"
@@ -86,7 +87,7 @@
         - dashboard_osdeps.repos + MCPServer_osdeps.repos + MCPClient_osdeps.repos
 
   when:
-    - ansible_distribution in ['RedHat','CentOS','Rocky']
+    - ansible_os_family in [ 'RedHat', 'Rocky' ]
     - install_rpm_repositories|bool
 # End RH/CentOS/Rocky block
 
@@ -95,7 +96,7 @@
 # But yum or apt modules doesn't allow loops (deprecated) so the trick is using the
 # install-packages.yml task file
 
-- include: "install-packages.yml"
+- include_tasks: "install-packages.yml"
   vars:
     packages: "{{ item.packages }}"
     name: "{{ item.name }}"
