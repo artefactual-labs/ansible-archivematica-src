@@ -42,7 +42,7 @@
   # Using the install-packages.yml task file prepared for osdeps
 
   # Ensure Python 3 is installed
-  - include_tasks: "install-packages.yml"
+  - import_tasks: "install-packages.yml"
     vars:
       packages: "{{ archivematica_src_python_packages }}"
       name: "Python 3"

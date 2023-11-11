@@ -3,6 +3,7 @@
 - name: "archivematica_src_search_enabled"
   set_fact:
     "{{ item.name }}": "{{ item.dict|combine({item.key: archivematica_src_search_enabled}) }}"
+  no_log: true # Avoid printing passwords in ansible output
   when: "archivematica_src_search_enabled is defined"
   with_items:
     - name: "archivematica_src_am_mcpclient_environment"
@@ -18,6 +19,7 @@
 - name: "archivematica_src_am_es_server"
   set_fact:
     "{{ item.name }}": "{{ item.dict|combine({item.key: archivematica_src_am_es_server}) }}"
+  no_log: true # Avoid printing passwords in ansible output
   when: "archivematica_src_am_es_server is defined"
   with_items:
     - name: "archivematica_src_am_mcpclient_environment"
@@ -33,6 +35,7 @@
 - name: "Apply archivematica_src_am_db_host"
   set_fact:
     "{{ item.name }}": "{{ item.dict|combine({item.key: archivematica_src_am_db_host}) }}"
+  no_log: true # Avoid printing passwords in ansible output
   when: "archivematica_src_am_db_host is defined"
   with_items:
     - name: "archivematica_src_am_mcpclient_environment"
@@ -48,6 +51,7 @@
 - name: "Apply archivematica_src_am_db_name"
   set_fact:
     "{{ item.name }}": "{{ item.dict|combine({item.key: archivematica_src_am_db_name}) }}"
+  no_log: true # Avoid printing passwords in ansible output
   when: "archivematica_src_am_db_name is defined"
   with_items:
     - name: "archivematica_src_am_mcpclient_environment"
@@ -63,6 +67,7 @@
 - name: "Apply archivematica_src_am_db_user"
   set_fact:
     "{{ item.name }}": "{{ item.dict|combine({item.key: archivematica_src_am_db_user}) }}"
+  no_log: true # Avoid printing passwords in ansible output
   when: "archivematica_src_am_db_user is defined"
   with_items:
     - name: "archivematica_src_am_mcpclient_environment"
@@ -78,6 +83,7 @@
 - name: "Apply archivematica_src_am_db_password"
   set_fact:
     "{{ item.name }}": "{{ item.dict|combine({item.key: archivematica_src_am_db_password}) }}"
+  no_log: true # Avoid printing passwords in ansible output
   when: "archivematica_src_am_db_password is defined"
   with_items:
     - name: "archivematica_src_am_mcpclient_environment"
@@ -97,6 +103,7 @@
           item.key: archivematica_src_ca_custom_bundle|default(ca_custom_bundle)
         })
       }}"
+  no_log: true # Avoid printing passwords in ansible output
   with_items:
     - name: "archivematica_src_am_mcpclient_environment"
       dict: "{{ archivematica_src_am_mcpclient_environment }}"
