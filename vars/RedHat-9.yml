@@ -113,4 +113,4 @@ storage_service_osdeps:
     - openldap-devel
     - rclone
 
-nodejs_version: "14.x"
+nodejs_version: "20.x"

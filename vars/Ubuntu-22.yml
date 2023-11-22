@@ -112,4 +112,4 @@ storage_service_osdeps:
     - libldap2-dev
     - rclone
 
-nodejs_version: "14.x"
+nodejs_version: "20.x"
