@@ -5,7 +5,15 @@
     name: "{{ archivematica_src_am_amauat_deps }}"
     state: present
     update_cache: yes
-    cache_valid_time: 3600
+
+- name: "Get git config global safe directories dir"
+  shell: "git config --global --get-all safe.directory || echo ''"
+  register: "__git_config_global_safe_dir"
+
+- name: "Set Fixity source directory as git safe dir"
+  command: "git config --global --add safe.directory {{ archivematica_src_dir }}/archivematica-acceptance-tests"
+  when:
+    - archivematica_src_dir + '/fixity' not in __git_config_global_safe_dir.stdout_lines
 
 - name: "Checkout acceptance tests repository"
   git:
@@ -42,71 +50,57 @@
 #
 # Install Firefox
 #
-- name: "Check if firefox-mozilla-build is installed"
-  command: "dpkg-query -W firefox-mozilla-build"
-  register: firefox_check_deb
-  failed_when:
-    - firefox_check_deb.rc > 1
-  changed_when:
-    - firefox_check_deb.rc == 1
-
-- name: "Download Firefox 47 deb"
-  get_url:
-    url: "http://sourceforge.net/projects/ubuntuzilla/files/mozilla/apt/pool/main/f/firefox-mozilla-build/firefox-mozilla-build_47.0.1-0ubuntu1_amd64.deb"
-    dest: "/tmp/firefox-mozilla-build_47.0.1-0ubuntu1_amd64.deb"
-  when:
-    - firefox_check_deb.rc == 1
-    - "'Firefox' in archivematica_src_acceptance_tests_browser_list"
-
-- name: "Install Firefox 47"
-  command: "dpkg -i /tmp/firefox-mozilla-build_47.0.1-0ubuntu1_amd64.deb"
-  when:
-    - firefox_check_deb.rc == 1
-    - "'Firefox' in archivematica_src_acceptance_tests_browser_list"
-
-#
-# Install chrome
-#
-
-- name: "Add Google Chrome key"
-  apt_key:
-    url: "https://dl-ssl.google.com/linux/linux_signing_key.pub"
-    state: present
-  when:
-    - "'Chrome' in archivematica_src_acceptance_tests_browser_list"
-
-- name: "Add Google Chrome repo"
-  apt_repository:
-    repo: "deb http://dl.google.com/linux/chrome/deb/ stable main"
-    filename: "google-chrome"
-  when:
-    - "'Chrome' in archivematica_src_acceptance_tests_browser_list"
-
 - name: "Install packages"
-  apt:
-    pkg: "google-chrome-stable"
-    state: present
-    update_cache: yes
-    cache_valid_time: 3600
-  when: "'Chrome' in archivematica_src_acceptance_tests_browser_list"
+  block:
+  - name: "Install Firefox"
+    package:
+      name: "firefox"
+      state: present
+    when:
+      - "'Firefox' in archivematica_src_acceptance_tests_browser_list"
 
-- name: Download and install ChromeDriver
-  get_url:
-    url: "http://chromedriver.storage.googleapis.com/{{ archivematica_src_acceptance_tests_chromedriver_version }}/chromedriver_linux64.zip"
-    dest: "/tmp/chromedriver_linux64.zip"
-  when: "'Chrome' in archivematica_src_acceptance_tests_browser_list"
+  - name: "Install Chrome"
+    block:
+      - set_fact:
+          chrome_package: >-
+            {%- if ansible_os_family == "Debian" and ansible_architecture == "x86_64" -%}
+              https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+            {%- elif ansible_os_family in ['Redhat','Rocky']-%}
+              https://dl.google.com/linux/direct/google-chrome-stable_current_{{ ansible_architecture }}.rpm
+            {%- else -%}
+              google-chrome-stable
+            {%- endif -%}
 
-- command: "unzip /tmp/chromedriver_linux64.zip -d /usr/local/bin"
-  become: yes
-  args:
-    creates: "/usr/local/bin/chromedriver"
-  when: "'Chrome' in archivematica_src_acceptance_tests_browser_list"
+      - name: "Ensure dependencies are present"
+        package:
+          name:
+            - unzip
+          state: present
 
-- name: "Set permissions"
-  file:
-    path: "/usr/local/bin/chromedriver"
-    owner: root
-    group: root
-    mode: 0755
-    state: file
-  when: "'Chrome' in archivematica_src_acceptance_tests_browser_list"
+      - name: "Install Chrome (Deb)"
+        apt:
+          deb: "{{ chrome_package }}"
+          update_cache: yes
+        when: ansible_os_family == "Debian"
+
+      - name: "Install Chrome (RH)"
+        dnf:
+          name: "{{ chrome_package }}"
+          state: present
+          update_cache: yes
+        when: ansible_os_family in ['RedHat','Rocky']
+
+      - name: Download and install ChromeDriver
+        unarchive:
+          src: https://chromedriver.storage.googleapis.com/{{ archivematica_src_acceptance_tests_chromedriver_version }}/chromedriver_linux64.zip
+          dest: /usr/local/bin
+          remote_src: yes
+
+      - name: "Set permissions"
+        file:
+          path: "/usr/local/bin/chromedriver"
+          owner: root
+          group: root
+          mode: 0755
+          state: file
+    when: "'Chrome' in archivematica_src_acceptance_tests_browser_list"
