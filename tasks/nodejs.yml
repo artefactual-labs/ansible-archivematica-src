@@ -49,61 +49,34 @@
 
 - name: "Nodejs setup (CentOS/Rocky/RHEL)"
   block:
+    - name: "Remove conflicting packages"
+      dnf:
+        name: "nodejs*"
+        state: absent
 
-  - name: "Nodejs: Set up the Nodesource RPM directory"
-    set_fact:
-      nodejs_rhel_rpm_dir: "pub_{{ nodejs_version }}"
+    - name: "Get Nodesource script"
+      get_url:
+        url: "https://rpm.nodesource.com/nsolid_setup_rpm.sh"
+        dest: "/tmp/nsolid_setup_rpm.sh"
 
-  - name: "Nodejs: Import Nodesource RPM key (CentOS < 7)"
-    rpm_key:
-      key: http://rpm.nodesource.com/pub/el/NODESOURCE-GPG-SIGNING-KEY-EL
-      state: present
-    when: ansible_distribution_major_version | int < 7
+    - name: "Update Nodesource script permission"
+      file:
+        path: "/tmp/nsolid_setup_rpm.sh"
+        mode: "+x"
 
-  - name: "Nodejs: Import Nodesource RPM key (CentOS 7+)"
-    rpm_key:
-      key: https://rpm.nodesource.com/pub/el/NODESOURCE-GPG-SIGNING-KEY-EL
-      state: present
-    when:
-      - ansible_distribution_major_version | int >= 7
-      - install_rpm_repositories|bool
+    - name: "Install Node.js version {{ nodejs_version | regex_replace('.x', '')}} rpm package"
+      command: "sh /tmp/nsolid_setup_rpm.sh {{ nodejs_version | regex_replace('.x', '')}}"
 
-  - name: "Nodejs: Add Nodesource repositories for Node.js (CentOS < 7)"
-    yum:
-      name: "http://rpm.nodesource.com/{{ nodejs_rhel_rpm_dir }}/el/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/nodesource-release-el{{ ansible_distribution_major_version }}-1.noarch.rpm"
-      state: present
-    when:
-      - ansible_distribution_major_version | int < 7
-      - install_rpm_repositories|bool
-    register: node_repo
+    - name: "Ensure Node.js and npm are installed"
+      dnf:
+        name: "@nodejs:{{ nodejs_version | regex_replace('.x', '') }}/common"
+        state: present
+        enablerepo: nodesource
 
-  - name: "Nodejs: Add Nodesource repositories for Node.js (CentOS 7+)"
-    yum:
-      name: "https://rpm.nodesource.com/{{ nodejs_rhel_rpm_dir }}/el/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/nodesource-release-el{{ ansible_distribution_major_version }}-1.noarch.rpm"
-      state: present
-    when:
-      - ansible_distribution_major_version | int >= 7
-      - install_rpm_repositories|bool
-    register: node_repo
-
-  - name: "Nodejs: Update package cache if repo was added"
-    yum: update_cache=yes
-    when: node_repo is changed
-    tags: ['skip_ansible_lint']
-
-  - name: "Nodejs: Ensure Node.js AppStream module is disabled (CentOS 8+)"
-    command: yum module disable -y nodejs
-    register: module_disable
-    changed_when: "'Nothing to do.' not in module_disable.stdout"
-    when:
-      - ansible_distribution_major_version | int >= 8
-      - install_rpm_repositories|bool
-
-  - name: "Nodejs: Ensure Node.js and npm are installed"
-    yum:
-      name: "nodejs-{{ nodejs_version | regex_replace('x', '') }}*"
-      state: present
-      enablerepo: nodesource
+    - name: "Remove Nodesource script"
+      file:
+        path: "/tmp/nsolid_setup_rpm.sh"
+        state: absent
 
   when:
    - ansible_os_family in ['RedHat','Rocky']
