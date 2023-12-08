@@ -1,13 +1,27 @@
-#Create templates
+# Create templates.
 $template AMLOG,"{{ archivematica_src_syslog_logdir }}/%$YEAR%/%$MONTH%/%$DAY%/%programname%.log"
+{% if archivematica_src_syslog_nginx_enabled|bool %}
+$template NGINXAMLOG,"/var/log/archivematica/%$YEAR%/%$MONTH%/%$DAY%/%programname%-access.log"
+$template NGINXAMLOGERROR,"/var/log/archivematica/%$YEAR%/%$MONTH%/%$DAY%/%programname%-error.log"
 
-#Log each service on it's own file
+if (re_match($programname, '({{ archivematica_src_syslog_dashboard_nginx_identifier }}|{{ archivematica_src_syslog_storageservice_nginx_identifier }})') and $syslogseverity-text == 'error') then {
+  ?NGINXAMLOGERROR
+  stop
+}
+
+if (re_match($programname, '({{ archivematica_src_syslog_dashboard_nginx_identifier }}|{{ archivematica_src_syslog_storageservice_nginx_identifier }})')) then {
+  ?NGINXAMLOG
+  stop
+}
+{% endif %}
+
+# Log each service on its own file.
 {{ archivematica_src_syslog_storageservice_facility }}.*  -?AMLOG
 {{ archivematica_src_syslog_dashboard_facility }}.*  -?AMLOG
 {{ archivematica_src_syslog_mcpclient_facility }}.*  -?AMLOG
 {{ archivematica_src_syslog_mcpserver_facility }}.*  -?AMLOG
 
-#Stop processing
+# Stop processing.
 {{ archivematica_src_syslog_storageservice_facility }}.* stop
 {{ archivematica_src_syslog_dashboard_facility }}.* stop
 {{ archivematica_src_syslog_mcpclient_facility }}.* stop
