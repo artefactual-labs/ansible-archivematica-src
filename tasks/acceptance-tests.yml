@@ -65,7 +65,7 @@
           chrome_package: >-
             {%- if ansible_os_family == "Debian" and ansible_architecture == "x86_64" -%}
               https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-            {%- elif ansible_os_family in ['Redhat','Rocky']-%}
+            {%- elif ansible_os_family in ['RedHat','Rocky']-%}
               https://dl.google.com/linux/direct/google-chrome-stable_current_{{ ansible_architecture }}.rpm
             {%- else -%}
               google-chrome-stable
