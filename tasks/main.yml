@@ -84,7 +84,11 @@
     - archivematica_src_ss_environment['SS_GUNICORN_WORKERS'] is not defined
   tags: "always"
 
-- include_tasks: "envs-patch-backward-compatibility.yml"
+- name: "Append backward compatibility envs"
+  include_tasks: 
+    file: "envs-patch-backward-compatibility.yml"
+    apply:
+      tags: "always"
   tags: "always"
 
 # Uncomment if you want to debug the environment strings.
