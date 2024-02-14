@@ -9,11 +9,25 @@
 
 # ubuntu block
 - block:
-    - name: "Install mediaarea.net repo (mediaconch, mediainfo) (Ubuntu >=20.04)"
+    - name: "Install mediaarea.net repo (mediaconch, mediainfo) (Ubuntu >=20.04) (Fixed URL)"
       apt:
-        deb: "https://mediaarea.net/repo/deb/repo-mediaarea_1.0-21_all.deb"
+        deb: "{{ archivematica_src_mediainfo_repo_package_url }}"
       when:
         - "ansible_distribution_version is version('20.04', '>=')"
+        - not archivematica_src_mediainfo_repo_package_latest|bool
+
+    - name: "Get latest mediainfo repo package URL"
+      include_tasks: "pipeline-osdeps-get-latest-mediainfo-url.yml"
+      when:
+        - "ansible_distribution_version is version('20.04', '>=')"
+        - archivematica_src_mediainfo_repo_package_latest|bool
+
+    - name: "Install mediaarea.net repo (mediaconch, mediainfo) (Ubuntu >=20.04) (Latest)"
+      apt:
+        deb: "{{ archivematica_src_mediainfo_repo_package_url_latest | default(archivematica_src_mediainfo_repo_package_url) }}"
+      when:
+        - "ansible_distribution_version is version('20.04', '>=')"
+        - archivematica_src_mediainfo_repo_package_latest|bool
 
     - name: "Update apt cache (Ubuntu >=20.04)"
       apt:
