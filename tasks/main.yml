@@ -183,6 +183,8 @@
     tags:
       - "amsrc-ss"
       - "amsrc-ss-db"
+    when:
+      - "archivematica_src_configure_ss|bool"
   - include_tasks: "ss-osconf.yml"
     tags:
       - "amsrc-ss"
