@@ -49,7 +49,7 @@ MCPClient_osdeps:
       url: "https://packages.archivematica.org/GPG-KEY-archivematica"
       validate_certs: "no"
   repos:
-    - "deb [arch=amd64] http://packages.archivematica.org/1.15.x/ubuntu-externals focal main"
+    - "deb [arch=amd64] http://packages.archivematica.org/1.16.x/ubuntu-externals focal main"
   packages:
     - atool
     - bulk-extractor

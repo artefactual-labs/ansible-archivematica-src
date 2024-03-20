@@ -46,7 +46,7 @@ MCPClient_osdeps:
   repokeys:
     - "https://packages.archivematica.org/GPG-KEY-archivematica"
   repos:
-    - baseurl: "https://packages.archivematica.org/1.15.x/centos-extras"
+    - baseurl: "https://packages.archivematica.org/1.16.x/centos-extras"
       description: "archivematica extras"
       enabled: "yes"
       gpgcheck: "no"
