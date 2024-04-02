@@ -63,7 +63,7 @@
 # But yum or apt modules doesn't allow loops (deprecated) so the trick is using the
 # install-packages.yml task file
 
-- include_tasks: "install-packages.yml"
+- include_tasks: "install-packages.yml"  # Not using import_tasks because it contains dynamic data
   vars:
     packages: "{{ item.packages }}"
     name: "{{ item.name }}"
