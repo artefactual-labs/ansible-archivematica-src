@@ -55,7 +55,7 @@
 ###########################################################
 
 - name: "include ss-osdeps.yml"
-  include_tasks: "ss-osdeps.yml"
+  import_tasks: "ss-osdeps.yml"
   tags: "amsrc-ss-osdeps"
 
 
