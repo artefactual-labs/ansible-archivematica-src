@@ -37,10 +37,16 @@
     virtualenv_python: "{{ archivematica_src_virtualenv_python }}"
     state: "latest"
 
-- name: "Run setup.py"
-  shell: "{{ archivematica_src_fixity_virtualenv }}/bin/python setup.py install"
-  args:
+- name: "Install fixity using pip"
+  become: "yes"
+  become_user: "archivematica"
+  pip:
+    name: "fixity"
     chdir: "{{ archivematica_src_dir }}/fixity"
+    virtualenv: "{{ archivematica_src_fixity_virtualenv }}"
+    virtualenv_command: "{{ archivematica_src_virtualenv }}"
+    virtualenv_python: "{{ archivematica_src_virtualenv_python }}"
+    state: "latest"
 
 - name: "Change virtualenv owner to archivematica"
   file:
