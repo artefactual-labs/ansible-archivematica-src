@@ -36,7 +36,7 @@ dashboard_osdeps:
     - libxml2-dev
     - libxslt1-dev
     - libssl-dev
-    - python3.6-dev
+    - python3.9-dev
     - libsasl2-dev # Required to pip install python-ldap in virtualenv
     - libldap2-dev # Required to pip install python-ldap in virtualenv
     - unar
@@ -96,7 +96,7 @@ storage_service_osdeps:
     - unar
     - rsync
     - p7zip-full
-    - python3.6-dev
+    - python3.9-dev
     - build-essential # required to compile brotli (cc1plus)
     - libmysqlclient-dev
     - libxml2-dev
