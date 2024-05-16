@@ -35,8 +35,8 @@ archivematica_src_automation_tools_repo: "https://github.com/artefactual/automat
 install_rpm_repositories: "true"
 
 # Branches
-archivematica_src_am_version: "qa/1.x"
-archivematica_src_ss_version: "qa/0.x"
+archivematica_src_am_version: "stable/1.16.x"
+archivematica_src_ss_version: "stable/0.22.x"
 archivematica_src_automationtools_version: "master"
 archivematica_src_acceptance_tests_version: "master"
 
