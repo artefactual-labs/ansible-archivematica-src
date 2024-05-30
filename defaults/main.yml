@@ -51,6 +51,8 @@ archivematica_src_rpm_repositories:
     gpgkey: "https://packages.archivematica.org/1.10.x/key.asc"
     gpgcheck: 1
 
+archivematica_src_package_state: latest
+
 # Database settings
 archivematica_src_am_db_host: "localhost"        # Archivematica database host
 archivematica_src_am_db_name: "MCP"              # Archivematica database name

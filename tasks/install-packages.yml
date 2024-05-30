@@ -8,13 +8,13 @@
 - name: "Install/Upgrade Debian packages: {{ name }}"
   apt:
     name: "{{ packages }}"
-    state: "{{ state | default('latest') }}"
+    state: "{{ archivematica_src_package_state | default('latest') }}"
   when:
     - ansible_os_family == "Debian"
 
 - name: "Install/Upgrade RHEL/CentOS/Rocky packages: {{ name }}"
   yum:
     name: "{{ packages }}"
-    state: "{{ state | default('latest') }}"
+    state: "{{ archivematica_src_package_state | default('latest') }}"
   when:
     - ansible_os_family in ['RedHat','Rocky']
