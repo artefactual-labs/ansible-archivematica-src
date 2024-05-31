@@ -149,6 +149,17 @@ archivematica_src_ssl_include_acme_chlg_loc: "false"
 archivematica_src_pip_version: "21.3.1"
 archivematica_src_pip_tools_version: "6.4.0"
 
+#
+# Ubuntu mediainfo package
+#
+
+# Set archivematica_src_mediainfo_repo_package_latest=False if you want to use directly archivematica_src_mediainfo_repo_package_url URL.
+# When archivematica_src_mediainfo_repo_package_latest=True the latest mediainfo version is retrieved from github repo. Then that
+# repo package url is checked, when the package doesn't exist: archivematica_src_mediainfo_repo_package_url is used
+
+archivematica_src_mediainfo_repo_package_latest: True
+archivematica_src_mediainfo_repo_package_url: "https://mediaarea.net/repo/deb/repo-mediaarea_1.0-24_all.deb"
+
 # Sample data
 archivematica_src_install_sample_data_timeout: "3600"
 archivematica_src_sample_data_version: "master"
