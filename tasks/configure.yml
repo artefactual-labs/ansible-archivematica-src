@@ -211,6 +211,17 @@
     - archivematica_src_configure_dashboard|bool
     - archivematica_src_configure_dashboardsettings is defined
 
+- name: "Ensure 0755 permission on /home/{{ atom_dipupload_ssh_user | default('archivematica') }} dir"
+  file:
+    path: "/home/{{ atom_dipupload_ssh_user | default('archivematica') }}"
+    state: directory
+    mode: '0755'
+  delegate_to: "{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') }}"
+  remote_user: "{{ archivematica_src_configure_atom_ssh_user | default('artefactual') }}"
+  when:
+    - archivematica_src_configure_dashboard|bool
+    - archivematica_src_configure_dashboardsettings is defined
+
 - name: "Add ssh key to AtoM server"
   authorized_key:
     user: "{{ atom_dipupload_ssh_user | default('archivematica') }}"
