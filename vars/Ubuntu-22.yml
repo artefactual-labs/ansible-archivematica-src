@@ -111,5 +111,3 @@ storage_service_osdeps:
     - libsasl2-dev
     - libldap2-dev
     - rclone
-
-nodejs_version: "20.x"

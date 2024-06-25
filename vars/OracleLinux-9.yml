@@ -112,5 +112,3 @@ storage_service_osdeps:
     - rng-tools
     - openldap-devel
     - rclone
-
-nodejs_version: "20.x"
