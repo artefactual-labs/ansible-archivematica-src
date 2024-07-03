@@ -3,6 +3,8 @@
 [Unit]
 Description=Archivematica MCP Client Service
 After=syslog.target network.target
+StartLimitInterval=200
+StartLimitBurst=5
 
 [Service]
 Type=simple
@@ -20,6 +22,8 @@ SyslogIdentifier=MCPClientStdout
 SyslogFacility={{ archivematica_src_syslog_mcpclient_facility }}
 {% endif %}
 ExecStart={{ archivematica_src_am_mcpclient_virtualenv }}/bin/python {{ archivematica_src_am_mcpclient_app }}/archivematicaClient.py
+Restart=always
+RestartSec=30
 
 [Install]
 WantedBy=multi-user.target
