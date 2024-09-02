@@ -58,7 +58,6 @@ MCPClient_osdeps:
     - atool
     - bulk_extractor
     - ffmpeg
-    - fits
     - gearmand
     - ghostscript
     - ImageMagick
