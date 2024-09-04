@@ -280,6 +280,14 @@
 
 
 #
+# Remove FITS
+#
+- import_tasks: "fits.yml"
+  tags:
+    - "amsrc-fits"
+  when: "archivematica_src_uninstall_fits|bool"
+
+#
 # archivematica-sampledata
 #
 # Wait for git to finish sampledata clone

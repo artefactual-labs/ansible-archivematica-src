@@ -1,0 +1,10 @@
+---
+
+# Remove FITS
+
+- name: "Uninstall FITS and its dependencies"
+  package:
+    name:
+      - fits
+      - nailgun
+    state: absent

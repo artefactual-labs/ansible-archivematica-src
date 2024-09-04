@@ -101,6 +101,11 @@ archivematica_src_mcpclient_clamav_tcp_port: "3310"
 archivematica_src_audit: "false"
 
 #
+# Remove FITS
+
+archivematica_src_uninstall_fits: "false"
+
+#
 # Logging settings
 #
 
