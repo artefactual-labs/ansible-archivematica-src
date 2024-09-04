@@ -2,11 +2,19 @@
 
 # Remove FITS
 
+- name: "Check if the fits-nailgun service is enabled"
+  command: "systemctl is-enabled fits-nailgun"
+  register: "service_status"
+  failed_when: "service_status.rc not in [0, 1]"
+  changed_when: false
+  ignore_errors: true
+
 - name: "Stop and disable fits-nailgun service"
   service:
     name: "fits-nailgun"
     state: "stopped"
-    enabled: "no"
+    enabled: false
+  when: service_status.rc == 0
 
 - name: "Uninstall FITS and its dependencies"
   package:
