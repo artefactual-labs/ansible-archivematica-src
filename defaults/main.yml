@@ -103,7 +103,7 @@ archivematica_src_audit: "false"
 #
 # Remove FITS
 
-archivematica_src_uninstall_fits: "false"
+archivematica_src_uninstall_fits: "true"
 
 #
 # Logging settings

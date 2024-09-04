@@ -2,9 +2,15 @@
 
 # Remove FITS
 
+- name: "Stop and disable fits-nailgun service"
+  service:
+    name: "fits-nailgun"
+    state: "stopped"
+    enabled: "no"
+
 - name: "Uninstall FITS and its dependencies"
   package:
     name:
-      - fits
-      - nailgun
-    state: absent
+      - "fits"
+      - "nailgun"
+    state: "absent"
