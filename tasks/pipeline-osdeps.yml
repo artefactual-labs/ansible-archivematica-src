@@ -62,7 +62,7 @@
 # Centos/RH block
 - block:
     - name: "Enable powertools repo on Centos/Rocky 8"
-      # Needed by fits, ffmpeg, mediainfo and mediaconch
+      # Needed by ffmpeg, mediainfo and mediaconch
       command: "dnf config-manager --set-enabled powertools"
       when:
         - ansible_distribution not in ['RedHat']
@@ -70,7 +70,7 @@
         - ansible_distribution_major_version|int == 8
 
     - name: "Enable CodeReady Linux Builder Repository on RHEL 8"
-      # Needed by fits, ffmpeg, mediainfo and mediaconch
+      # Needed by ffmpeg, mediainfo and mediaconch
       command: "subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms"
       failed_when: false
       changed_when: false
@@ -126,24 +126,3 @@
     - { name: 'MCPClient osdeps 1', packages: "{{ MCPClient_osdeps.packages | default([]) }}" }
     - { name: 'MCPClient osdeps 2', packages: "{{ MCPClient_osdeps.packages_2 | default([]) }}" }
     - { name: 'MCPClient osdeps 3', packages: "{{ MCPClient_osdeps.packages_3 | default([]) }}" }
-
-#
-# FITS via Nailgun
-#
-
-- name: Create systemd init file for fits (Ubuntu 16.04)
-  template:
-     src: "etc/systemd/system/fits-nailgun.service.j2"
-     dest: "/etc/systemd/system/fits-nailgun.service"
-  when:
-    - ansible_service_mgr == "systemd" and ansible_distribution == "Ubuntu"
-
-- name: "Enable and start fits-nailgun (Systemd)"
-  systemd:
-    name: "fits-nailgun"
-    state: "started"
-    enabled: "yes"
-    daemon_reload: "yes"
-  when:
-    - ansible_service_mgr == "systemd"
-

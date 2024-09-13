@@ -171,7 +171,6 @@
   with_items:
     - "archivematica-mcp-server"
     - "archivematica-dashboard"
-    - "fits-nailgun"
   when:
     - ansible_service_mgr == "systemd"
 

@@ -101,6 +101,11 @@ archivematica_src_mcpclient_clamav_tcp_port: "3310"
 archivematica_src_audit: "false"
 
 #
+# Remove FITS
+
+archivematica_src_uninstall_fits: "true"
+
+#
 # Logging settings
 #
 
@@ -250,9 +255,6 @@ archivematica_src_syslog_mcpserver_level: "DEBUG"
 # Configure FPR
 #
 # archivematica_src_configure_fpcommand:
-#   FITS:
-#     enabled: '0'
-#     field_name: 'description'
 #   MediaInfo:
 #     enabled: '0'
 #     field_name: 'description'
@@ -260,9 +262,6 @@ archivematica_src_syslog_mcpserver_level: "DEBUG"
 #     enabled: '0'
 #     field_name: 'description'
 # archivematica_src_configure_fprule:
-#   c3b06895-ef9d-401e-8c51-ac585f955655: #Fits
-#     enabled: '0'
-#     field_name: 'uuid'
 #   114c9525-d676-4fac-9962-4672faa924bb: #MediaInfo
 #     enabled: '0'
 #     field_name: 'command_id'
