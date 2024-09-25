@@ -18,7 +18,7 @@ function get_emails(){
 
 function run_fixity() {
 	echo "Fixity scan starts at $HOSTNAME" | ts '[%Y-%m-%d %H:%M:%S %Z]' > $REPORTS/fixity-$START_DATE.txt
-	/usr/local/bin/fixity scanall 2>&1 >> $REPORTS/fixity-$START_DATE.txt
+	/usr/local/bin/fixity scanall --timestamps --sort 2>&1 >> $REPORTS/fixity-$START_DATE.txt
 	echo "Fixity scan finished" | ts '[%Y-%m-%d %H:%M:%S %Z]' >> $REPORTS/fixity-$START_DATE.txt
 }
 
