@@ -10,13 +10,14 @@ server {
 
   listen 80;
   server_name _;
-    {% if archivematica_src_syslog_enabled|bool %}
-    error_log syslog:server={{ archivematica_src_syslog_server }},tag=dashboard info;
-    access_log syslog:server={{ archivematica_src_syslog_server }},tag=dashboard combined;
-    {% endif %}
 
   # Adjust to taste
   client_max_body_size 256M;
+
+{% if archivematica_src_syslog_enabled|bool and archivematica_src_syslog_nginx_enabled|bool %}
+  access_log syslog:server={{ archivematica_src_syslog_server }},tag={{ archivematica_src_syslog_dashboard_nginx_identifier }},facility={{ archivematica_src_syslog_dashboard_nginx_facility }},severity={{ archivematica_src_syslog_dashboard_nginx_level }} combined;
+  error_log syslog:server={{ archivematica_src_syslog_server }},tag={{ archivematica_src_syslog_dashboard_nginx_identifier }},facility={{ archivematica_src_syslog_dashboard_nginx_facility }} info;
+{% endif %}
 
 {% if archivematica_src_ssl_include_acme_chlg_loc|bool %}
   # location for acme challenge (non-encrypted)
