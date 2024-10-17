@@ -47,7 +47,7 @@ MCPClient_osdeps:
   repokeys:
     - "https://packages.archivematica.org/GPG-KEY-archivematica-sha512"
   repos:
-    - baseurl: "https://packages.archivematica.org/1.16.x/rocky8-extras"
+    - baseurl: "https://packages.archivematica.org/1.17.x/rocky8-extras"
       description: "archivematica extras"
       enabled: "yes"
       gpgcheck: "no"
