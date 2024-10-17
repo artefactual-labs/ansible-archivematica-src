@@ -23,6 +23,12 @@ archivematica_src_ss_gunicorn_config: "/etc/archivematica/storage-service.gunico
 archivematica_src_am_amauat_deps: []
 archivematica_src_am_fixity_deps: []
 
+archivematica_fixity_cron_minute: "0"
+archivematica_fixity_cron_hour: "0"
+archivematica_fixity_cron_day: "*"
+archivematica_fixity_cron_month: "*/6"
+archivematica_fixity_cron_weekday: "*"
+
 archivematica_src_virtualenv: "/var/lib/archivematica/.local/bin/virtualenv"
 archivematica_src_pip: "/var/lib/archivematica/.local/bin/pip"
 # Ubuntu 18 and CentOS/RHEL 7 only have python3.8
