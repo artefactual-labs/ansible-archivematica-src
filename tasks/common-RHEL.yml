@@ -25,3 +25,24 @@
   check_mode: false
   when:
     - install_rpm_repositories|bool
+
+- name: "Enable crb repo on CentOS/Rocky/Almalinux >= 9"
+  command: "dnf config-manager --set-enabled crb"
+  when:
+    - ansible_distribution in ['CentOS','Rocky','AlmaLinux']
+    - ansible_facts['distribution_major_version'] >= "9"
+    - install_rpm_repositories|bool
+
+- name: "Enable crb repo on OracleLinux >= 9"
+  command: "dnf config-manager --set-enabled ol9_codeready_builder"
+  when:
+    - ansible_distribution in ['OracleLinux']
+    - ansible_facts['distribution_major_version'] >= "9"
+    - install_rpm_repositories|bool
+
+- name: "Enable crb repo on RHEL >= 9"
+  command: "subscription-manager repos --enable=codeready-builder-for-rhel-9-x86_64-rpms"
+  when:
+    - ansible_distribution in ['RedHat']
+    - ansible_facts['distribution_major_version'] >= "9"
+    - install_rpm_repositories|bool
