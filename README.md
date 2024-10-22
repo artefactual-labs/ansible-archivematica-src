@@ -7,7 +7,11 @@ Archivematica installation from its source code repositories.
 
 - [Role Variables](#role-variables)
 - [Environment variables](#environment-variables)
+- [Database requirements](#database-requirements)
 - [Backward-compatible logging](#backward-compatible-logging)
+- [Configure ClamAV](#configure-clamav)
+- [Disable Elasticsearch use](#disable-elasticsearch-use)
+- [Deploy separate SS and pipeline](#deploy-separate-ss-and-pipeline)
 - [Tags](#tags)
 - [Dependencies](#dependencies)
 - [Example Playbooks](#example-playbooks)
@@ -26,10 +30,10 @@ Environment variables
 
 The following are role variables that can be used to pass dictionaries containing environment variables that will be passed to the different Archivematica components:
 
-- [Dashboard](https://github.com/artefactual/archivematica/tree/stable/1.7.x/src/dashboard/install/README.md): `archivematica_src_am_dashboard_environment`
-- [MCPServer](https://github.com/artefactual/archivematica/tree/stable/1.7.x/src/MCPServer/install/README.md): `archivematica_src_am_mcpserver_environment`
-- [MCPClient](https://github.com/artefactual/archivematica/tree/stable/1.7.x/src/MCPClient/install/README.md): `archivematica_src_am_mcpclient_environment`
-- [Storage Service](https://github.com/artefactual/archivematica-storage-service/tree/stable/0.11.x/install/README.md): `archivematica_src_ss_environment`
+- [Dashboard](https://github.com/artefactual/archivematica/tree/stable/1.16.x/src/dashboard/install/README.md): `archivematica_src_am_dashboard_environment`
+- [MCPServer](https://github.com/artefactual/archivematica/tree/stable/1.16.x/src/MCPServer/install/README.md): `archivematica_src_am_mcpserver_environment`
+- [MCPClient](https://github.com/artefactual/archivematica/tree/stable/1.16.x/src/MCPClient/install/README.md): `archivematica_src_am_mcpclient_environment`
+- [Storage Service](https://github.com/artefactual/archivematica-storage-service/tree/stable/0.22.x/install/README.md): `archivematica_src_ss_environment`
 
 The default values for these dictionaries can be found in [`vars/envs.yml`](vars/envs.yml). The user-provided dictionaries are combined with the defaults.
 
@@ -145,6 +149,42 @@ Disable Elasticsearch use
 
 The default Archivematica install relies on Elasticsearch for different features (Archival storage, Backlog and Appraisal tabs). If you need to disable them, the role variable `archivematica_src_search_enabled` has to be set to `False`
 
+Deploy separate SS and pipeline
+-------------------------------
+
+To deploy a separate Storage Service and pipeline, configure the following variable and dictionary (see examples in `defaults/main.yml`):
+
+* `archivematica_src_remote_pipeline`: The FQDN or IP address of the pipeline.
+* `archivematica_src_remote_locations`: A dictionary containing the locations to be enabled within the pipeline local filesystem space.
+
+This is the procedure for deploying separate SS and pipeline VMs:
+
+1. **Deploy the Storage Service (SS) VM**: Run the playbook, disabling the `amsrc-remote-pipeline` tag. For example:
+
+    ```bash
+    ansible-playbook am-ss.yml -t archivematica-src --skip-tags=amsrc-remote-pipeline -l my_SS_in_inventory
+    ```
+
+2. **Deploy the Pipeline VM**: Register the pipeline in the SS. No additional steps are required if using the `amsrc-configure` variables to create users and register the pipeline.
+
+3. **Finalize Configuration on the SS VM**: After both the SS and pipeline are deployed and the pipeline is registered, rerun the role on the SS VM with the `amsrc-remote-pipeline` tag enabled. For example:
+
+    ```bash
+    ansible-playbook am-ss.yml -t amsrc-remote-pipeline -l my_SS_in_inventory
+    ```
+
+**NOTE**: It is possible to deploy and configure more than one pipeline. For instance, if the `archivematica_src_remote_locations` configuration is identical across VMs, you can set `archivematica_src_remote_pipeline` for a second pipeline as an extra variable:
+
+```bash
+ansible-playbook am-ss.yml -t amsrc-remote-pipeline -l my_SS_in_inventory -e archivematica_src_remote_pipeline=MY_SECOND_PIPELINE_FQDN
+```
+
+Alternatively, use separate configuration files for each pipeline, defining `archivematica_src_remote_pipeline` and `archivematica_src_remote_locations` as needed, and load them with:
+
+```bash
+ansible-playbook am-ss.yml -e @file/pipeline2.yml -t amsrc-remote-pipeline MORE_OPTIONS_HERE
+```
+
 Tags
 ----
 
@@ -170,6 +210,7 @@ Note that if something is disabled with the [role variables](#role-variables), i
     - `amsrc-pipeline-websrv`: Configure webserver
 - `amsrc-automationtools`: Automation tools install
 - `amsrc-configure`: Create SS superuser & create dashboard admin & register pipeline on SS
+- `amsrc-remote-pipeline`: Create pipeline localfilesystem space and configure remote locations in SS (separate SS and pipeline)
 
 
 Dependencies
