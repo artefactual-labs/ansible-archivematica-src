@@ -1,0 +1,121 @@
+---
+## Configure remote pipeline
+
+# Create and deploy key
+
+- name: "Create ssh key"
+  user:
+    name: "archivematica"
+    generate_ssh_key: "yes"
+    ssh_key_type: "ed25519"
+    ssh_key_file: ".ssh/id_ed25519"
+
+- name: "Populate known_hosts"
+  become: "yes"
+  become_user: "archivematica"
+  shell: "ssh-keyscan -H {{ archivematica_fqdn_host }} >> ~/.ssh/known_hosts"
+  ignore_errors: true
+
+- name: "Register ssh key"
+  command: cat /var/lib/archivematica/.ssh/id_ed25519.pub
+  register: ssh_key
+
+- name: "Show ssh key"
+  debug: msg={{ ssh_key.stdout_lines }}
+
+- name: "Add ssh key to pipeline server"
+  authorized_key:
+    user: "{{ atom_dipupload_ssh_user | default('archivematica') }}"
+    state: "present"
+    key: "{{ ssh_key.stdout }}"
+  delegate_to: "{{ item }}"
+  loop: "{{ groups['dashboard'] }}"
+  remote_user: "artefactual"
+
+- name: "Configure remote locations"
+  block:
+    # Get id of the first registered pipeline (id=1)
+    - name: "Configure AM: get default pipeline UUID from SS database"
+      become: "yes"
+      command:  mysql {{ archivematica_src_ss_db_name }} -Ns -e "select uuid from locations_pipeline where id='1';"
+      register: pipeline_uuid
+
+    - name: "Check if a remote space for this host exist"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/?access_protocol=PIPE_FS"
+        headers:
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+      register: "space_list"
+
+    - name: "Register remote hostname"
+      set_fact:
+        remote_hostname: "{{ space_list.json.objects|json_query('[*].remote_name')|regex_search('{{ archivematica_fqdn_host }}') }}"
+
+    - name: "Check uuid for local filesystem space"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/?access_protocol=FS"
+        headers:
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+      register: "local_space_list"
+      when: remote_hostname != "{{ archivematica_fqdn_host }}"
+
+    - name: "Set uuid for default filesystem space"
+      set_fact:
+         local_space_uuid: "{{ local_space_list.json.objects[0].uuid }}"
+      when: remote_hostname != "{{ archivematica_fqdn_host }}"
+
+    - name: "Disable current processing location on local fs"
+      mysql_query:
+        login_db: "{{ archivematica_src_ss_db_name }}"
+        login_user: "{{ archivematica_src_ss_db_user }}"
+        login_password: "{{ archivematica_src_ss_db_password }}"
+        query: >
+             UPDATE locations_location set enabled=0 where purpose = 'CP' and space_id=%(uuid)s;
+        named_args:
+          uuid: "{{ local_space_uuid }}"
+      when: remote_hostname != "{{ archivematica_fqdn_host }}"
+
+    - name: "Configure SS: add remote space"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/"
+        headers:
+          Content-Type: "application/json"
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+        body:
+          access_protocol: "PIPE_FS"
+          path: "/"
+          staging_path: "/var/archivematica/storage_service"
+          remote_name: "{{ archivematica_fqdn_host }}"
+          rsync_password: "{{ archivematica_fqdn_host }}"
+          assume_rsync_daemon: "False"
+          remote_user: "archivematica"
+        body_format: json
+        status_code: 201
+        method: POST
+      when: remote_hostname != "{{ archivematica_fqdn_host }}"
+      register: "space_created"
+
+    - name: "Set remote space uuid"
+      set_fact:
+        space_uuid: "{{ space_created.json.uuid }}"
+      when: remote_hostname != "{{ archivematica_fqdn_host }}"
+
+    - name: "Configure SS: add custom locations"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/location/"
+        headers:
+          Content-Type: "application/json"
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+        body:
+          pipeline: ["/api/v2/pipeline/{{ pipeline_uuid.stdout }}/"]
+          purpose: "{{ item.location_purpose }}"
+          relative_path: "{{ item.location_path | regex_replace('^\\/', '') }}"
+          description: "{{ item.location_description }}"
+          space: "/api/v2/space/{{ space_uuid }}/"
+          default: "{{ item.location_default }}"
+        body_format: json
+        status_code: 201
+        method: POST
+      with_items: "{{ am_ss_remote_locations }}"
+      tags: "configure-am"
+  when: am_ss_remote_locations is defined

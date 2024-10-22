@@ -353,6 +353,16 @@
     - "amsrc-configure"
   when: "archivematica_src_configure_ss|bool or archivematica_src_configure_dashboard|bool"
 
+
+# Configure remote pipeline spaces
+
+- import_tasks: "configure-remote-space.yml"
+  tags:
+    - "amsrc-remote-space"
+  when:
+    - am_ss_remote_locations is defined
+    - archivematica_src_configure_ss|bool
+
 #
 # Configure GPG locations
 #
