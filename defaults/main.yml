@@ -210,6 +210,8 @@ archivematica_src_configure_am_org_name: "test org"          # Dashboard admin O
 archivematica_src_configure_am_org_id: "test id"             # Dashboard admin Org id
 archivematica_src_configure_am_whitelist: '""'               # Dashboard API whitelist, IP address or hostnames separated by blank spaces and inside quotes
 
+
+
 # Configure GPG
 # Uncomment this to add GPG AIPs Store and Backlog locations.
 #archivematica_src_configure_gpg:
@@ -276,4 +278,14 @@ archivematica_src_syslog_mcpserver_level: "DEBUG"
 #  - { location_purpose: "RP", location_path: "/replicator", location_description: "Replicator location", location_default: "false" }
 #  - { location_purpose: "AS", location_path: "/aipstore", location_description: "AipStore", location_default: "true" }
 #  - { location_purpose: "TS", location_path: "/transfer-source/", location_description: "Transfer Source", location_default: "false" }
+
+
+# Configure Remote pipeline
+#
+# The pipeline must be already registered in the SS!
+#archivematica_src_remote_pipeline: "archivematica.example.com"
+archivematica_src_remote_locations:
+  - { location_purpose: "CP", location_path: "/var/archivematica/sharedDirectory", location_description: "Remote processing", location_default: "true" }
+  - { location_purpose: "BL", location_path: "/var/archivematica/sharedDirectory/www/AIPsStore/transferBacklog", location_description: "Remote transfer backlog", location_default: "true" }
+#  - { location_purpose: "TS", location_path: "/home", location_description: "Remote transfer source", location_default: "true" }
 
