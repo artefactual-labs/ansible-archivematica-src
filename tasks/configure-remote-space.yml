@@ -61,7 +61,8 @@
 
     - name: "Configure SS remote pipeline: Register remote hostname"
       set_fact:
-        remote_hostname: "{{ space_list.json.objects|json_query('[*].remote_name')|regex_search('{{ am_ss_remote_pipeline }}') }}"
+        remote_hostname: "{{ space_list.json.objects[0].remote_name }}"
+
 
     - name: "Configure SS remote pipeline: Check uuid for local filesystem space"
       uri:
