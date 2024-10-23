@@ -81,8 +81,9 @@
         login_db: "{{ archivematica_src_ss_db_name }}"
         login_user: "{{ archivematica_src_ss_db_user }}"
         login_password: "{{ archivematica_src_ss_db_password }}"
-        query: >
-             UPDATE locations_location set enabled=0 where purpose = 'CP' and space_id=%(uuid)s;
+        query:
+           - UPDATE locations_location set enabled=0 where purpose = 'CP' and space_id=%(uuid)s
+           - UPDATE locations_location set enabled=0 where purpose = 'BL' and space_id=%(uuid)s
         named_args:
           uuid: "{{ local_space_uuid }}"
       when: remote_hostname != "{{ am_ss_remote_pipeline }}"
