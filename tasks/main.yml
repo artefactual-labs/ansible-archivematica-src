@@ -359,6 +359,7 @@
 - import_tasks: "configure-remote-space.yml"
   tags:
     - "amsrc-remote-space"
+    - "amsrc-configure"
   when:
     - am_ss_remote_locations is defined
     - archivematica_src_configure_ss|bool

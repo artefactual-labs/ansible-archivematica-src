@@ -32,14 +32,15 @@
   loop: "{{ groups['dashboard'] }}"
   remote_user: "artefactual"
 
+# Get id of the first registered pipeline (id=1)
+- name: "Configure AM: get default pipeline UUID from SS database"
+  become: "yes"
+  command:  mysql {{ archivematica_src_ss_db_name }} -Ns -e "select uuid from locations_pipeline where id='1';"
+  register: pipeline_uuid
+
+# If pipeline_uuid exists, configure the remote locations
 - name: "Configure remote locations"
   block:
-    # Get id of the first registered pipeline (id=1)
-    - name: "Configure AM: get default pipeline UUID from SS database"
-      become: "yes"
-      command:  mysql {{ archivematica_src_ss_db_name }} -Ns -e "select uuid from locations_pipeline where id='1';"
-      register: pipeline_uuid
-
     - name: "Check if a remote space for this host exist"
       uri:
         url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/?access_protocol=PIPE_FS"
@@ -118,4 +119,5 @@
         method: POST
       with_items: "{{ am_ss_remote_locations }}"
       tags: "configure-am"
-  when: am_ss_remote_locations is defined
+      when: am_ss_remote_locations is defined
+  when: pipeline_uuid.stdout != ""
