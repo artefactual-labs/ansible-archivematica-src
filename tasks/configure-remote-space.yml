@@ -23,6 +23,7 @@
     login_db: "{{ archivematica_src_ss_db_name }}"
     login_user: "{{ archivematica_src_ss_db_user }}"
     login_password: "{{ archivematica_src_ss_db_password }}"
+    login_host: "{{ archivematica_src_ss_db_host }}"
     query: >
            SELECT uuid FROM locations_pipeline WHERE remote_name like %(pipeline)s;
     named_args:
@@ -82,6 +83,7 @@
         login_db: "{{ archivematica_src_ss_db_name }}"
         login_user: "{{ archivematica_src_ss_db_user }}"
         login_password: "{{ archivematica_src_ss_db_password }}"
+        login_host: "{{ archivematica_src_ss_db_host }}"
         query:
            - UPDATE locations_location set enabled=0 where purpose = 'CP' and space_id=%(uuid)s
            - UPDATE locations_location set enabled=0 where purpose = 'BL' and space_id=%(uuid)s
