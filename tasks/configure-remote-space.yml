@@ -49,9 +49,8 @@
         user: "archivematica"
         state: "present"
         key: "{{ ssh_key.stdout }}"
-      delegate_to: "{{ item }}"
-      loop: "{{ groups['dashboard'] }}"
-      remote_user: "{{ ansible_ssh_user }}"
+      delegate_to: "{{ am_ss_remote_pipeline }}"
+      remote_user: "{{ ansible_ssh_user | default('artefactual') }}"
 
     - name: "Check if a remote space for this host exist"
       uri:
