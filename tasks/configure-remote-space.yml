@@ -32,7 +32,7 @@
 - name: "Set pipeline_uuid"
   set_fact:
     pipeline_uuid: "{{ (pipeline_uuid_query.query_result |flatten | first).uuid }}"
-  when: pipeline_uuid_query.rowcount|int > 0
+  when: pipeline_uuid_query.rowcount[0] > 0
  
 # If pipeline_uuid exists, configure the space and locations
 - name: "Configure SS: Configure pipeline local filesystem space and locations"
@@ -132,4 +132,4 @@
       with_items: "{{ am_ss_remote_locations }}"
       tags: "configure-am"
       when: am_ss_remote_locations is defined
-  when: pipeline_uuid_query.rowcount|int > 0
+  when: pipeline_uuid_query.rowcount[0] > 0
