@@ -39,12 +39,6 @@
 - name: "Configure SS: Configure pipeline local filesystem space and locations"
   block:
 
-    - name: "Configure SS remote pipeline: Populate known_hosts"
-      become: "yes"
-      become_user: "archivematica"
-      shell: "ssh-keyscan -H {{ am_ss_remote_pipeline }} >> ~/.ssh/known_hosts"
-      ignore_errors: true
-
     - name: "Configure SS remote pipeline: Add ssh key to pipeline server"
       authorized_key:
         user: "archivematica"
@@ -53,6 +47,14 @@
       delegate_to: "{{ am_ss_remote_pipeline }}"
       remote_user: "{{ ansible_ssh_user | default('artefactual') }}"
 
+    - name: "Configure SS remote pipeline: Fetch and add pipeline hostname to .ssh/known_hosts"
+      become: "yes"
+      become_user: "archivematica"
+      known_hosts:
+        name: "{{ am_ss_remote_pipeline }}"
+        key: "{{ lookup('pipe', 'ssh-keyscan -H ' + am_ss_remote_pipeline) }}"  # Fetch the SSH key automatically
+        path: "~/.ssh/known_hosts"
+
     - name: "Configure SS remote pipeline: Check if the remote space already exist"
       uri:
         url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/?access_protocol=PIPE_FS"
@@ -60,10 +62,15 @@
           Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
       register: "space_list"
 
-    - name: "Configure SS remote pipeline: Register remote hostname"
+    - name: "Configure SS remote pipeline: Init remote_hostname var"
       set_fact:
-        remote_hostname: "{{ space_list.json.objects[0].remote_name }}"
+        remote_hostname: "no_pipeline_in_space"
 
+    - name: "Configure SS remote pipeline: Update remote_hostname when exist in space_list"
+      set_fact:
+        remote_hostname: "{{ item.remote_name }}"
+      when: item.remote_name == am_ss_remote_pipeline
+      loop: "{{ space_list.json.objects }}"
 
     - name: "Configure SS remote pipeline: Check uuid for local filesystem space"
       uri:
@@ -102,7 +109,7 @@
           path: "/"
           staging_path: "/var/archivematica/storage_service"
           remote_name: "{{ am_ss_remote_pipeline }}"
-          rsync_password: "{{ am_ss_remote_pipeline }}"
+          rsync_password: ""
           assume_rsync_daemon: "False"
           remote_user: "archivematica"
         body_format: json
