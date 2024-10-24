@@ -280,8 +280,8 @@ archivematica_src_syslog_mcpserver_level: "DEBUG"
 #  - { location_purpose: "TS", location_path: "/transfer-source/", location_description: "Transfer Source", location_default: "false" }
 
 #am_ss_remote_pipeline: "archivematica.example.com"
-#am_ss_remote_locations:
-#  - { location_purpose: "CP", location_path: "/var/archivematica/sharedDirectory", location_description: "Remote processing", location_default: "true" }
-#  - { location_purpose: "BL", location_path: "/var/archivematica/sharedDirectory/www/AIPsStore/transferBacklog", location_description: "Remote transfer backlog", location_default: "true" }
+am_ss_remote_locations:
+  - { location_purpose: "CP", location_path: "/var/archivematica/sharedDirectory", location_description: "Remote processing", location_default: "true" }
+  - { location_purpose: "BL", location_path: "/var/archivematica/sharedDirectory/www/AIPsStore/transferBacklog", location_description: "Remote transfer backlog", location_default: "true" }
 #  - { location_purpose: "TS", location_path: "/home", location_description: "Remote transfer source", location_default: "true" }
 
