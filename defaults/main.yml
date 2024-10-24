@@ -279,6 +279,10 @@ archivematica_src_syslog_mcpserver_level: "DEBUG"
 #  - { location_purpose: "AS", location_path: "/aipstore", location_description: "AipStore", location_default: "true" }
 #  - { location_purpose: "TS", location_path: "/transfer-source/", location_description: "Transfer Source", location_default: "false" }
 
+
+# Configure Remote pipeline
+#
+# The pipeline must be already registered in the SS!
 #archivematica_src_remote_pipeline: "archivematica.example.com"
 archivematica_src_remote_locations:
   - { location_purpose: "CP", location_path: "/var/archivematica/sharedDirectory", location_description: "Remote processing", location_default: "true" }
