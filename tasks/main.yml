@@ -361,7 +361,7 @@
     - "amsrc-remote-space"
     - "amsrc-configure"
   when:
-    - am_ss_remote_pipeline is defined
+    - archivematica_src_remote_pipeline is defined
     - archivematica_src_configure_ss|bool
 
 #
