@@ -356,9 +356,9 @@
 
 # Configure remote pipeline spaces
 
-- import_tasks: "configure-remote-space.yml"
+- import_tasks: "configure-remote-pipeline.yml"
   tags:
-    - "amsrc-remote-space"
+    - "amsrc-remote-pipeline"
     - "amsrc-configure"
   when:
     - archivematica_src_remote_pipeline is defined
