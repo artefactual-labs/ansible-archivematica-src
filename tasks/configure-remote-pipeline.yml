@@ -1,0 +1,145 @@
+---
+## Configure remote pipeline
+
+# Create key
+
+- name: "Configure SS: Create ssh key"
+  user:
+    name: "archivematica"
+    generate_ssh_key: "yes"
+    ssh_key_type: "ed25519"
+    ssh_key_file: ".ssh/id_ed25519"
+
+- name: "Configure SS: Register ssh key"
+  command: cat /var/lib/archivematica/.ssh/id_ed25519.pub
+  register: ssh_key
+
+- name: "Configure SS: Show ssh key"
+  debug: msg={{ ssh_key.stdout_lines }}
+
+# Get id of the associated pipeline
+- name: "Configure SS: Get default pipeline UUID from SS database"
+  mysql_query:
+    login_db: "{{ archivematica_src_ss_db_name }}"
+    login_user: "{{ archivematica_src_ss_db_user }}"
+    login_password: "{{ archivematica_src_ss_db_password }}"
+    login_host: "{{ archivematica_src_ss_db_host }}"
+    query: >
+           SELECT uuid FROM locations_pipeline WHERE remote_name like %(pipeline)s;
+    named_args:
+      pipeline: "%{{ archivematica_src_remote_pipeline }}%"
+  register: __pipeline_uuid_query
+
+- name: "Configure SS: Set pipeline_uuid"
+  set_fact:
+    __pipeline_uuid: "{{ (__pipeline_uuid_query.query_result |flatten | first).uuid }}"
+  when: __pipeline_uuid_query.rowcount[0] > 0
+ 
+# If pipeline_uuid exists, configure the space and locations
+- name: "Configure SS: Configure pipeline local filesystem space and locations"
+  block:
+
+    - name: "Configure SS remote pipeline: Add ssh key to pipeline server"
+      authorized_key:
+        user: "archivematica"
+        state: "present"
+        key: "{{ ssh_key.stdout }}"
+      delegate_to: "{{ archivematica_src_remote_pipeline }}"
+      remote_user: "{{ ansible_ssh_user | default('artefactual') }}"
+
+    - name: "Configure SS remote pipeline: Fetch and add pipeline hostname to .ssh/known_hosts"
+      become: "yes"
+      become_user: "archivematica"
+      known_hosts:
+        name: "{{ archivematica_src_remote_pipeline }}"
+        key: "{{ lookup('pipe', 'ssh-keyscan -H ' + archivematica_src_remote_pipeline) }}"  # Fetch the SSH key automatically
+        path: "~/.ssh/known_hosts"
+
+    - name: "Configure SS remote pipeline: Check if the remote space already exist"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/?access_protocol=PIPE_FS"
+        headers:
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+      register: "__space_list"
+
+    - name: "Configure SS remote pipeline: Init remote_hostname var"
+      set_fact:
+        __remote_hostname: "no_pipeline_in_space"
+
+    - name: "Configure SS remote pipeline: Update remote_hostname when exist in space_list"
+      set_fact:
+        __remote_hostname: "{{ item.remote_name }}"
+      when: item.remote_name == archivematica_src_remote_pipeline
+      loop: "{{ __space_list.json.objects }}"
+
+    - name: "Configure SS remote pipeline: Check uuid for local filesystem space"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/?access_protocol=FS"
+        headers:
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+      register: "__local_space_list"
+      when: __remote_hostname  !=  archivematica_src_remote_pipeline
+
+    - name: "Configure SS remote pipeline: Set uuid for default filesystem space"
+      set_fact:
+         __local_space_uuid: "{{ __local_space_list.json.objects[0].uuid }}"
+      when: __remote_hostname != archivematica_src_remote_pipeline
+
+    - name: "Configure SS remote pipeline: Disable unused locations on local space "
+      mysql_query:
+        login_db: "{{ archivematica_src_ss_db_name }}"
+        login_user: "{{ archivematica_src_ss_db_user }}"
+        login_password: "{{ archivematica_src_ss_db_password }}"
+        login_host: "{{ archivematica_src_ss_db_host }}"
+        query:
+           - UPDATE locations_location set enabled=0 where purpose = 'CP' and space_id=%(uuid)s
+           - UPDATE locations_location set enabled=0 where purpose = 'BL' and space_id=%(uuid)s
+        named_args:
+          uuid: "{{ __local_space_uuid }}"
+      when: __remote_hostname != archivematica_src_remote_pipeline
+
+    - name: "Configure SS remote pipeline: Add remote space"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/"
+        headers:
+          Content-Type: "application/json"
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+        body:
+          access_protocol: "PIPE_FS"
+          path: "/"
+          staging_path: "/var/archivematica/storage_service"
+          remote_name: "{{ archivematica_src_remote_pipeline }}"
+          rsync_password: ""
+          assume_rsync_daemon: "False"
+          remote_user: "archivematica"
+        body_format: json
+        status_code: 201
+        method: POST
+      when: __remote_hostname != archivematica_src_remote_pipeline
+      register: "space_created"
+
+    - name: "Configure SS remote pipeline: Get remote space uuid"
+      set_fact:
+        __space_uuid: "{{ space_created.json.uuid }}"
+      when: __remote_hostname != archivematica_src_remote_pipeline
+
+    - name: "Configure SS remote pipeline: Add custom locations"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/location/"
+        headers:
+          Content-Type: "application/json"
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+        body:
+          pipeline: ["/api/v2/pipeline/{{ __pipeline_uuid }}/"]
+          purpose: "{{ item.location_purpose }}"
+          relative_path: "{{ item.location_path | regex_replace('^\\/', '') }}"
+          description: "{{ item.location_description }}"
+          space: "/api/v2/space/{{ __space_uuid }}/"
+          default: "{{ item.location_default }}"
+        body_format: json
+        status_code: 201
+        method: POST
+      with_items: "{{ archivematica_src_remote_locations }}"
+      tags: "configure-am"
+      when: __remote_hostname != archivematica_src_remote_pipeline
+  when: __pipeline_uuid_query.rowcount[0] > 0
