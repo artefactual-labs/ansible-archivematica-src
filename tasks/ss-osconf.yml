@@ -26,6 +26,7 @@
     src: "{{ item }}"
     dest: "/etc/archivematica/storageService.logging.json"
     backup: "yes"
+    mode: '644'
   with_first_found:
     - files:
         - "templates/{{ inventory_hostname }}/storageService.logging.json.j2"

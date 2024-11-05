@@ -59,6 +59,7 @@
   file:
     dest: "{{ item }}"
     state: "directory"
+    mode: '0755'
   with_items:
     - "/etc/archivematica/automation-tools"
 
@@ -67,6 +68,7 @@
     src: "{{ item }}.j2"
     dest: "/{{ item }}"
     backup: "yes"
+    mode: '644'
   with_items:
     - "etc/archivematica/automation-tools/transfers.conf"
     - "etc/archivematica/automation-tools/transfer-script.sh"
