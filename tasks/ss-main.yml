@@ -95,7 +95,7 @@
     virtualenv: "{{ archivematica_src_ss_virtualenv }}"
     virtualenv_command: "{{ archivematica_src_virtualenv }}"
     virtualenv_python: "{{ archivematica_src_virtualenv_python }}"
-    name: 
+    name:
       - "pip=={{ archivematica_src_pip_version }}"
       - "pip-tools=={{ archivematica_src_pip_tools_version }}"
   tags: "amsrc-ss-pydep"
@@ -146,6 +146,7 @@
   file:
     dest: "{{ item }}"
     state: "directory"
+    mode: '0755'
   with_items:
     - "/etc/archivematica"
   tags: "amsrc-ss-osconf"
@@ -201,6 +202,7 @@
     backup: "yes"
     force: "yes"
     remote_src: "yes"
+    mode: '0644'
   tags: "amsrc-ss-websrv"
 
 
