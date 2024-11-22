@@ -1,0 +1,82 @@
+---
+## Configure default locations
+# Get id of the associated pipeline
+- name: "Configure SS: Get default pipeline UUID from SS database"
+  mysql_query:
+    login_db: "{{ archivematica_src_ss_db_name }}"
+    login_user: "{{ archivematica_src_ss_db_user }}"
+    login_password: "{{ archivematica_src_ss_db_password }}"
+    login_host: "{{ archivematica_src_ss_db_host }}"
+    query: >
+           SELECT uuid FROM locations_pipeline WHERE remote_name like %(pipeline)s;
+    named_args:
+      pipeline: "%{{ archivematica_src_remote_pipeline }}%"
+  register: __pipeline_uuid_query
+
+- name: "Configure SS: Set pipeline_uuid"
+  set_fact:
+    __pipeline_uuid: "{{ (__pipeline_uuid_query.query_result |flatten | first).uuid }}"
+  when: __pipeline_uuid_query.rowcount[0] > 0
+ 
+# If pipeline_uuid exists, configure the space and locations
+- name: "Configure SS: Configure pipeline local filesystem space and locations"
+  block:
+    - name: "Configure SS default spaces: Check if the  space already exist"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/?access_protocol=FS"
+        headers:
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+      register: "__space_list"
+
+
+    - name: "Configure SS remote pipeline: Check uuid for local filesystem space"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/?access_protocol=FS"
+        headers:
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+      register: "__local_space_list"
+
+    - name: "Configure SS remote pipeline: Set uuid for default filesystem space"
+      set_fact:
+         __local_space_uuid: "{{ __local_space_list.json.objects[0].uuid }}"
+    - name: "Configure AM: get all TS descriptions from SS database"
+      become: "yes"
+      command:  mysql {{ archivematica_src_ss_db_name }} -Ns -e "select description from locations_location;"
+      register: location_descriptions
+      tags: "configure-am"
+
+    - name: "Configure SS default locations: Add custom locations"
+      uri:
+        url: "{{ archivematica_src_configure_ss_url }}/api/v2/location/"
+        headers:
+          Content-Type: "application/json"
+          Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
+        body:
+          pipeline: ["/api/v2/pipeline/{{ __pipeline_uuid }}/"]
+          purpose: "{{ item.location_purpose }}"
+          relative_path: "{{ item.location_path | regex_replace('^\\/', '') }}"
+          description: "{{ item.location_description }}"
+          space: "/api/v2/space/{{ __local_space_uuid }}/"
+          default: "{{ item.location_default }}"
+        body_format: json
+        status_code: 201
+        method: POST
+      with_items: "{{ am_ss_default_locations }}"
+      when: not location_descriptions.stdout | join('') | regex_search( '(^|\n)'+item.location_description+'(\n|$)' )
+      tags: "configure-am"
+    - name: "Configure SS: configure replication locations "
+      mysql_query:
+        login_db: "{{ archivematica_src_ss_db_name }}"
+        login_user: "{{ archivematica_src_ss_db_user }}"
+        login_password: "{{ archivematica_src_ss_db_password }}"
+        login_host: "{{ archivematica_src_ss_db_host }}"
+        query:
+           - INSERT IGNORE INTO locations_location_replicators(from_location_id,to_location_id) VALUES ((SELECT id FROM locations_location where description = %(aipstore)s and purpose = "AS"),(SELECT id FROM locations_location where description = %(replica)s and purpose = "RP" ));
+        named_args:
+          aipstore: "{{ item.location_replication_from }}"
+          replica: "{{ item.location_description }}"
+      when:
+        - item.location_replication_from is defined
+      with_items:
+        - "{{ am_ss_default_locations }}"
+  when: __pipeline_uuid_query.rowcount[0] > 0
