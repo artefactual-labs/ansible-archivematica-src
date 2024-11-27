@@ -278,6 +278,11 @@ archivematica_src_syslog_mcpserver_level: "DEBUG"
 #  - { location_purpose: "RP", location_path: "/replicator", location_description: "Replicator location", location_default: "false", location_replication_from: "AipStore" }
 #  - { location_purpose: "AS", location_path: "/aipstore", location_description: "AipStore", location_default: "true" }
 #  - { location_purpose: "TS", location_path: "/transfer-source/", location_description: "Transfer Source", location_default: "false" }
+#  - { location_purpose: "AS", location_description: "Store AIP in standard Archivematica Directory", location_enabled: "false" }
+#  - { location_purpose: "DS", location_description: "Store DIP in standard Archivematica Directory", location_enabled: "false" }
+#  - { location_purpose: "TS", location_description: "Default transfer source", location_enabled: "false" }
+#  - { location_purpose: "BL", location_description: "Default transfer backlog", location_enabled: "false" }
+
 
 
 # Configure Remote pipeline
