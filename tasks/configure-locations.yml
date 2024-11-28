@@ -1,7 +1,7 @@
 ---
 ## Configure default locations
 # Get id of the associated pipeline
-- name: "Configure SS: Get default pipeline UUID from SS database"
+- name: "Configure SS locations: Get default pipeline UUID from SS database"
   mysql_query:
     login_db: "{{ archivematica_src_ss_db_name }}"
     login_user: "{{ archivematica_src_ss_db_user }}"
@@ -11,15 +11,15 @@
            SELECT uuid FROM locations_pipeline WHERE id=1;
   register: __pipeline_uuid_query
 
-- name: "Configure SS: Set pipeline_uuid"
+- name: "Configure SS locations: Set pipeline_uuid"
   set_fact:
     __pipeline_uuid: "{{ (__pipeline_uuid_query.query_result |flatten | first).uuid }}"
   when: __pipeline_uuid_query.rowcount[0] > 0
  
 # If pipeline_uuid exists, configure the space and locations
-- name: "Configure SS: Configure pipeline local filesystem space and locations"
+- name: "Configure SS locations: Configure pipeline local filesystem space and locations"
   block:
-    - name: "Configure SS default spaces: Check if the  space already exist"
+    - name: "Configure SS locations: Check if the  space already exist"
       uri:
         url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/?access_protocol=FS"
         headers:
@@ -27,23 +27,23 @@
       register: "__space_list"
 
 
-    - name: "Configure SS remote pipeline: Check uuid for local filesystem space"
+    - name: "Configure SS locations: Check uuid for local filesystem space"
       uri:
         url: "{{ archivematica_src_configure_ss_url }}/api/v2/space/?access_protocol=FS"
         headers:
           Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
       register: "__local_space_list"
 
-    - name: "Configure SS remote pipeline: Set uuid for default filesystem space"
+    - name: "Configure SS locations: Set uuid for default filesystem space"
       set_fact:
          __local_space_uuid: "{{ __local_space_list.json.objects[0].uuid }}"
-    - name: "Configure AM: get all TS descriptions from SS database"
+    - name: "Configure SS locations: get all location descriptions from SS database"
       become: "yes"
       command:  mysql {{ archivematica_src_ss_db_name }} -Ns -e "select description from locations_location;"
       register: location_descriptions
       tags: "configure-am"
 
-    - name: "Configure SS default locations: Add custom locations"
+    - name: "Configure SS locations: Add custom locations"
       uri:
         url: "{{ archivematica_src_configure_ss_url }}/api/v2/location/"
         headers:
@@ -62,7 +62,7 @@
       with_items: "{{ am_ss_default_locations }}"
       when: not location_descriptions.stdout | join('') | regex_search( '(^|\n)'+item.location_description+'(\n|$)' )
       tags: "configure-am"
-    - name: "Configure SS: configure replication locations "
+    - name: "Configure SS locations: configure replication locations "
       mysql_query:
         login_db: "{{ archivematica_src_ss_db_name }}"
         login_user: "{{ archivematica_src_ss_db_user }}"
@@ -77,7 +77,7 @@
         - item.location_replication_from is defined
       with_items:
         - "{{ am_ss_default_locations }}"
-    - name: "Configure SS: disable unused locations "
+    - name: "Configure SS locations: disable unused locations "
       mysql_query:
         login_db: "{{ archivematica_src_ss_db_name }}"
         login_user: "{{ archivematica_src_ss_db_user }}"

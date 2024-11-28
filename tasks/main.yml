@@ -354,11 +354,13 @@
   when: "archivematica_src_configure_ss|bool or archivematica_src_configure_dashboard|bool"
 
 
-- import_tasks: "configure-aipstores.yml"
+- import_tasks: "configure-locations.yml"
   tags:
     - "amsrc-configure"
+    - "amsrc-configure-locations"
   when:
     - archivematica_src_configure_ss|bool
+    - am_ss_default_locations is defined
 
 
 # Configure remote pipeline spaces
