@@ -113,7 +113,7 @@
   - name: "Include common-RHEL.yml for RHEL"
     import_tasks: "common-RHEL.yml"
     when:
-      - "ansible_distribution == 'RedHat'"
+      - "ansible_os_family in ['RedHat','Rocky']"
 
   # Not using package in next task because it is slower than apt or yum modules.
   # The package module is not installing the every list of packages at the same time
