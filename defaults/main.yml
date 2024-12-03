@@ -294,3 +294,5 @@ archivematica_src_remote_locations:
   - { location_purpose: "BL", location_path: "/var/archivematica/sharedDirectory/www/AIPsStore/transferBacklog", location_description: "Remote transfer backlog", location_default: "true" }
 #  - { location_purpose: "TS", location_path: "/home", location_description: "Remote transfer source", location_default: "true" }
 
+# Use systemd credentials
+archivematica_src_systemd_credentials: false

@@ -10,6 +10,16 @@
   when:
     - ansible_service_mgr == "systemd"
 
+- name: "Include systemd-creds config"
+  include: systemd-creds.yml
+  vars:
+    service: archivematica-storage-service
+    secret_name: ss
+    credentials:
+      SS_DB_URL: "mysql://{{ archivematica_src_ss_db_user }}:{{ archivematica_src_ss_db_password }}@{{ archivematica_src_ss_db_host }}:{{ archivematica_src_ss_db_port }}/{{ archivematica_src_ss_db_name }}"
+      DJANGO_SECRET_KEY: "{{ archivematica_src_ss_django_secret_key }}"
+  when: archivematica_src_systemd_credentials|bool
+
 - name: "Add storage service gunicorn systemd env file"
   template:
     src: "etc/sysconfig/archivematica-storage-service.j2"

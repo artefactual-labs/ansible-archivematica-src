@@ -1,0 +1,25 @@
+- name: "Set fact with secure elements"
+  set_fact:
+    secret: |
+       {% for key, value in credentials.items() %}
+       {{ key }}={{ value }}
+       {% endfor %}
+  no_log: true
+
+- name: Register secure credential
+  shell: echo "{{ secret }}" | systemd-creds encrypt -p --name={{ secret_name }} - -
+  register: secured_credentials
+  no_log: true
+
+- name: "Create override dir"
+  file:
+    path: /etc/systemd/system/{{ service }}.service.d/
+    state: directory
+
+- name: "Template override file"
+  template:
+    src: etc/systemd/system/override.conf.j2
+    dest: /etc/systemd/system/{{ service }}.service.d/override.conf
+
+    
+
