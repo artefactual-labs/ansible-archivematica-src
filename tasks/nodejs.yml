@@ -80,6 +80,17 @@
 
   when:
    - ansible_os_family in ['RedHat','Rocky']
+   - install_rpm_repositories|bool
+
+
+- name: "Nodejs install (Offline CentOS/Rocky/RHEL)"
+  dnf:
+    name: "@nodejs:{{ nodejs_version | regex_replace('.x', '') }}/common"
+    state: present
+  when:
+   - ansible_os_family in ['RedHat','Rocky']
+   - not install_rpm_repositories|bool
+
 
 - name: "Nodejs: Define nodejs_install_npm_user"
   set_fact:
