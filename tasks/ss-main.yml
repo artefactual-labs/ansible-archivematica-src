@@ -86,6 +86,7 @@
     owner: "archivematica"
     group: "archivematica"
     state: "directory"
+    recurse: true
   tags: "amsrc-ss-pydep"
 
 - name: "Create virtualenv and install pip-tools"
