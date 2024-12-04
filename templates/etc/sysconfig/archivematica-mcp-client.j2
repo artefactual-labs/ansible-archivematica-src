@@ -6,7 +6,9 @@ LC_ALL="en_US.UTF-8"
 LC_LANG="en_US.UTF-8"
 
 {% for key, value in archivematica_src_am_mcpclient_environment.items() %}
+{% if (key != "ARCHIVEMATICA_MCPCLIENT_CLIENT_PASSWORD") %}
 {{ key }}={{ value }}
+{% endif %}
 {% endfor %}
 
 {% if clamav_uses_file_socket is not defined or archivematica_src_mcpclient_clamav_use_tcp|bool %}

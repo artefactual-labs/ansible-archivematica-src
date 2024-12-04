@@ -21,7 +21,11 @@ StandardError=syslog
 SyslogIdentifier=MCPClientStdout
 SyslogFacility={{ archivematica_src_syslog_mcpclient_facility }}
 {% endif %}
+{% if archivematica_src_systemd_credentials|bool %}
+ExecStart=sh -c 'export $(cat $SECRETS); {{ archivematica_src_am_virtualenv }}/bin/python -m archivematica.MCPClient.archivematicaClient'
+{% else %}
 ExecStart={{ archivematica_src_am_virtualenv }}/bin/python -m archivematica.MCPClient.archivematicaClient
+{% endif %}
 Restart=always
 RestartSec=30
 
