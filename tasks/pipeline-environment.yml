@@ -54,6 +54,29 @@
       ARCHIVEMATICA_MCPSERVER_CLIENT_PASSWORD: "{{ archivematica_src_am_db_password }}"
   when: archivematica_src_systemd_credentials|bool
 
+- name: "Configure single MCPClients secure credentials"
+  include: systemd-creds.yml
+  vars:
+    service: archivematica-mcp-client
+    secret_name: mcpc
+    credentials:
+      ARCHIVEMATICA_MCPCLIENT_CLIENT_PASSWORD: "{{ archivematica_src_am_db_password }}"
+  when:
+    - archivematica_src_systemd_credentials|bool
+    - archivematica_src_am_mcpclient_instances == 1
+
+- name: "Configure multi MCPClients secure credentials"
+  include: systemd-creds.yml
+  vars:
+    service: archivematica-mcp-client-{{ '%1d' | format(item) }}
+    secret_name: mcpc
+    credentials:
+      ARCHIVEMATICA_MCPCLIENT_CLIENT_PASSWORD: "{{ archivematica_src_am_db_password }}"
+  loop: "{{ range(1, archivematica_src_am_mcpclient_instances|int  + 1, 1)|list }}"
+  when:
+    - archivematica_src_systemd_credentials|bool
+    - archivematica_src_am_mcpclient_instances > 1
+
 
 - name: "Configure environment vars"
   template:
