@@ -134,6 +134,12 @@
   environment: "{{ archivematica_src_am_dashboard_environment }}"
   when: archivematica_src_configure_dashboard|bool and dashboard_user.stdout == "" and dashboard_ss_url.stdout == ""
 
+# Configure systemd-tmpfiles to not delete AM Prometheus data files.
+- name: "Set up systemd-tmpfiles configuration"
+  template:
+    src: "etc/tmpfiles.d/am-prometheus.conf"
+    dest: "/etc/tmpfiles.d/am-prometheus.conf"
+
 
 #
 #  Configure AtoM DIP Upload
