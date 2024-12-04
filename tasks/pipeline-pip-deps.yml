@@ -22,6 +22,7 @@
     owner: "archivematica"
     group: "archivematica"
     state: "directory"
+    recurse: true
 
 - name: "Create virtualenv and install pip-tools"
   become: "yes"

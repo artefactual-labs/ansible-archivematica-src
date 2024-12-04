@@ -34,6 +34,7 @@
     owner: "archivematica"
     group: "archivematica"
     state: "directory"
+    recurse: true
   tags: "amsrc-ss-pydep"
 
 - name: "Install pip dependencies in virtualenv"
