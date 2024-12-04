@@ -15,7 +15,11 @@ StandardError=syslog
 SyslogIdentifier=MCPServerStdout
 SyslogFacility={{ archivematica_src_syslog_mcpserver_facility }}
 {% endif %}
+{% if archivematica_src_systemd_credentials|bool %}
+ExecStart=sh -c 'export $(cat $SECRETS); {{ archivematica_src_am_virtualenv }}/bin/python -m archivematica.MCPServer.archivematicaMCP'
+{% else %}
 ExecStart={{ archivematica_src_am_virtualenv }}/bin/python -m archivematica.MCPServer.archivematicaMCP
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target
