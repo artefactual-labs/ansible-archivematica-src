@@ -163,7 +163,7 @@ archivematica_src_pip_tools_version: "6.4.0"
 # repo package url is checked, when the package doesn't exist: archivematica_src_mediainfo_repo_package_url is used
 
 archivematica_src_mediainfo_repo_package_latest: True
-archivematica_src_mediainfo_repo_package_url: "https://mediaarea.net/repo/deb/repo-mediaarea_1.0-24_all.deb"
+archivematica_src_mediainfo_repo_package_url: "https://mediaarea.net/repo/deb/repo-mediaarea_1.0-25_all.deb"
 
 # Sample data
 archivematica_src_install_sample_data_timeout: "3600"
