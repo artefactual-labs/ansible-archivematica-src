@@ -6,7 +6,11 @@ LC_ALL="en_US.UTF-8"
 LC_LANG="en_US.UTF-8"
 
 {% for key, value in archivematica_src_am_dashboard_environment.items() %}
+{% if (archivematica_src_systemd_credentials)  %}
 {% if (key != "ARCHIVEMATICA_DASHBOARD_CLIENT_PASSWORD") and (key != "ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY" ) %}
+{{ key }}={{ value }}
+{% endif %}
+{% else %}
 {{ key }}={{ value }}
 {% endif %}
 {% endfor %}
