@@ -5,7 +5,11 @@ LC_ALL="en_US.UTF-8"
 LC_LANG="en_US.UTF-8"
 
 {% for key, value in archivematica_src_am_mcpserver_environment.items() %}
+{% if (archivematica_src_systemd_credentials)  %}
 {% if (key != "ARCHIVEMATICA_MCPSERVER_CLIENT_PASSWORD") %}
+{{ key }}={{ value }}
+{% endif %}
+{% else %}
 {{ key }}={{ value }}
 {% endif %}
 {% endfor %}

@@ -5,7 +5,11 @@ LC_ALL="en_US.UTF-8"
 LC_LANG="en_US.UTF-8"
 
 {% for key, value in archivematica_src_ss_environment.items() %}
+{% if (archivematica_src_systemd_credentials)  %}
 {% if (key != "SS_DB_URL") and (key != "DJANGO_SECRET_KEY" ) %}
+{{ key }}={{ value }}
+{% endif %}
+{% else %}
 {{ key }}={{ value }}
 {% endif %}
 {% endfor %}
