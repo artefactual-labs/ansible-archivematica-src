@@ -1,28 +1,25 @@
-- name: "Get the latest release of MediaInfo from GitHub"
+- name: "mediaarea repo: Fetch the repos.html.twig file from GitHub"
+  ansible.builtin.uri:
+    url: https://raw.githubusercontent.com/MediaArea/MediaArea-Website/master/src/AppBundle/Resources/views/Default/repos.html.twig
+    return_content: yes
+  register: repo_page
+
+- name: "mediaarea repo: Extract the latest deb package URL"
+  ansible.builtin.set_fact:
+    __mediainfo_latest_deb_url: "{{ repo_page.content | regex_search('https:\\/\\/mediaarea\\.net\\/repo\\/deb\\/repo-mediaarea_\\S+\\.deb') }}"
+
+- name: "mediaarea repo: Check if the repo package URL is valid"
   uri:
-    url: https://api.github.com/repos/MediaArea/MediaInfo/releases/latest
-    method: GET
-    headers:
-      Accept: application/vnd.github.v3+json
-  register: __mediainfo_result
-
-
-- name: "Extract MediaInfo major version number"
-  set_fact:
-    __mediainfo_major_version: "{{ (__mediainfo_result.json.tag_name | regex_search('^[vV]?(\\d+)', '\\1') | first) | string }}"
-
-- name: "Check if the repo package URL is valid"
-  uri:
-    url: "https://mediaarea.net/repo/deb/repo-mediaarea_1.0-{{ __mediainfo_major_version }}_all.deb"
+    url: "{{ __mediainfo_latest_deb_url }}"
     method: HEAD
   register: __mediainfo_url_response
 
-- name: "Set variable if URL when package exists"
+- name: "mediaarea repo: Set variable if URL when package exists"
   set_fact:
-    archivematica_src_mediainfo_repo_package_url_latest: "https://mediaarea.net/repo/deb/repo-mediaarea_1.0-{{ __mediainfo_major_version }}_all.deb"   
+    archivematica_src_mediainfo_repo_package_url_latest: "{{ __mediainfo_latest_deb_url }}"
   when: __mediainfo_url_response.status == 200
 
-- name: "Set variable if URL is not valid"
+- name: "mediaarea repo: Set variable if URL is not valid"
   set_fact:
     archivematica_src_mediainfo_repo_package_url_latest: "{{ archivematica_src_mediainfo_repo_package_url }}"
   when: __mediainfo_url_response.status != 200
