@@ -16,6 +16,10 @@
     enabled: false
   when: service_status.rc == 0
 
+- name: "Reset failed state for fits-nailgun service"
+  command: "systemctl reset-failed fits-nailgun"
+  when: service_status.rc == 0
+
 - name: "Uninstall FITS and its dependencies"
   package:
     name:
