@@ -12,19 +12,19 @@
   with_items:
 
     # archivematicaCommon
-    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon/lib"
+    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon"
       dest: "{{ archivematica_src_am_common_app }}"
 
     # Dashboard
-    - src: "{{ archivematica_src_dir }}/archivematica/src/dashboard/src"
+    - src: "{{ archivematica_src_dir }}/archivematica/src/dashboard"
       dest: "{{ archivematica_src_am_dashboard_app }}"
 
     # MCPServer
-    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer/lib"
+    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer"
       dest: "{{ archivematica_src_am_mcpserver_app }}"
 
     # MCPClient
-    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/lib/"
+    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/"
       dest: "{{ archivematica_src_am_mcpclient_app }}"
 
 
@@ -48,7 +48,7 @@
     group: "archivematica"
     recurse: "yes"
   with_items:
-    - "{{ archivematica_src_dir }}/archivematica/src/dashboard/src/media"
+    - "{{ archivematica_src_dir }}/archivematica/src/dashboard/media"
     - "{{ archivematica_src_dir }}/archivematica/src/dashboard/frontend"
 
 - name: "Install front-end dependencies"
