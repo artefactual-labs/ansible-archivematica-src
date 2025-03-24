@@ -17,7 +17,7 @@ archivematica_src_am_mcpclient_modules_app: "/usr/lib/archivematica/MCPClient/cl
 archivematica_src_am_common_app: "/usr/lib/archivematica/archivematicaCommon"
 
 archivematica_src_ss_virtualenv: "/usr/share/archivematica/virtualenvs/archivematica-storage-service"
-archivematica_src_ss_app: "/usr/lib/archivematica/storage-service"
+archivematica_src_ss_app: "/usr/lib/archivematica/storage_service"
 archivematica_src_ss_gunicorn_config: "/etc/archivematica/storage-service.gunicorn-config.py"
 
 archivematica_src_am_amauat_deps: []

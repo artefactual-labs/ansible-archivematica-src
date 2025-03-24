@@ -12,25 +12,25 @@
   with_items:
 
     # archivematicaCommon
-    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematicaCommon"
+    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematica/archivematicaCommon"
       dest: "{{ archivematica_src_am_common_app }}"
 
     # Dashboard
-    - src: "{{ archivematica_src_dir }}/archivematica/src/dashboard"
+    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematica/dashboard"
       dest: "{{ archivematica_src_am_dashboard_app }}"
 
     # MCPServer
-    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPServer"
+    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematica/MCPServer"
       dest: "{{ archivematica_src_am_mcpserver_app }}"
 
     # MCPClient
-    - src: "{{ archivematica_src_dir }}/archivematica/src/MCPClient/"
+    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematica/MCPClient/"
       dest: "{{ archivematica_src_am_mcpclient_app }}"
 
 
 - name: "Copy gunicorn configuration file"
   copy:
-    src: "{{ archivematica_src_dir }}/archivematica/src/dashboard/install/dashboard.gunicorn-config.py"
+    src: "{{ archivematica_src_dir }}/archivematica/src/archivematica/dashboard/install/dashboard.gunicorn-config.py"
     dest: "{{ archivematica_src_am_dashboard_gunicorn_config }}"
     backup: "yes"
     force: "yes"
@@ -48,8 +48,8 @@
     group: "archivematica"
     recurse: "yes"
   with_items:
-    - "{{ archivematica_src_dir }}/archivematica/src/dashboard/media"
-    - "{{ archivematica_src_dir }}/archivematica/src/dashboard/frontend"
+    - "{{ archivematica_src_dir }}/archivematica/src/archivematica/dashboard/media"
+    - "{{ archivematica_src_dir }}/archivematica/src/archivematica/dashboard/frontend"
 
 - name: "Install front-end dependencies"
   become: "yes"
@@ -58,7 +58,7 @@
   args:
     chdir: "{{ item }}"
   with_items:
-    - "{{ archivematica_src_dir }}/archivematica/src/dashboard/frontend"
+    - "{{ archivematica_src_dir }}/archivematica/src/archivematica/dashboard/frontend"
 
 #
 # collectstatic
