@@ -6,6 +6,7 @@
 _archivematica_src_am_dashboard_environment:
   DJANGO_SETTINGS_MODULE: "settings.production"
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_ALLOWED_HOSTS: "*"
+  PYTHONPATH: "/usr/lib:/usr/share"
 
 
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY: '{{ archivematica_src_am_django_secret_key | default("CHANGE_ME_WITH_A_SECRET_KEY") }}'
@@ -43,3 +44,5 @@ _archivematica_src_ss_environment:
   EMAIL_HOST_USER: ""
   EMAIL_PORT: "25"
   SS_AUDIT_LOG_MIDDLEWARE: "{{ archivematica_src_audit|default('false') }}"
+  SS_GUNICORN_CHDIR: "/usr/lib/"
+  PYTHONPATH: "/usr/lib:/usr/share"

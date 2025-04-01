@@ -129,7 +129,6 @@
       --ss-api-key="{{ archivematica_src_configure_ss_api_key }}"
       --whitelist="{{archivematica_src_configure_am_whitelist}}"
     app_path: "{{ archivematica_src_am_dashboard_app }}"
-    pythonpath: "{{ archivematica_src_am_common_app }}"
     virtualenv: "{{ archivematica_src_am_dashboard_virtualenv }}"
   environment: "{{ archivematica_src_am_dashboard_environment }}"
   when: archivematica_src_configure_dashboard|bool and dashboard_user.stdout == "" and dashboard_ss_url.stdout == ""
