@@ -61,6 +61,27 @@
     - "{{ archivematica_src_dir }}/archivematica/src/archivematica/dashboard/frontend"
 
 #
+# update logging configuration (Archivematica 1.18.0)
+#
+
+- name: "Check if logging files exist"
+  stat:
+    path: "{{ item }}"
+  register: logging_files_stats
+  loop:
+    - "/etc/archivematica/dashboard.logging.json"
+    - "/etc/archivematica/serverConfig.logging.json"
+    - "/etc/archivematica/clientConfig.logging.json"
+
+- name: "Update the custom_handlers class path in logging files"
+  replace:
+    path: "{{ item.stat.path }}"
+    regexp: '"class": "custom_handlers.GroupWriteRotatingFileHandler",$'
+    replace: '"class": "archivematica.archivematicaCommon.custom_handlers.GroupWriteRotatingFileHandler",'
+  when: item.stat.exists
+  loop: "{{ logging_files_stats.results }}"
+
+#
 # collectstatic
 #
 

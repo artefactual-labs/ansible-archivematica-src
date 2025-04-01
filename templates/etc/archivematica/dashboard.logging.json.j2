@@ -37,7 +37,7 @@
     },
     "logfile": {
       "backupCount": 5,
-      "class": "custom_handlers.GroupWriteRotatingFileHandler",
+      "class": "archivematica.archivematicaCommon.custom_handlers.GroupWriteRotatingFileHandler",
       "filename": "{{ archivematica_src_dashboard_logdir }}/dashboard.log",
       "formatter": "detailed",
       "level": "INFO",
@@ -56,7 +56,7 @@
     },
     "verboselogfile": {
       "backupCount": 5,
-      "class": "custom_handlers.GroupWriteRotatingFileHandler",
+      "class": "archivematica.archivematicaCommon.custom_handlers.GroupWriteRotatingFileHandler",
       "filename": "{{ archivematica_src_dashboard_logdir }}/dashboard.debug.log",
       "formatter": "detailed",
       "level": "DEBUG",
