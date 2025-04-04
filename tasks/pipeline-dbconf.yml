@@ -33,7 +33,6 @@
   django_manage:
     command: "migrate"
     app_path: "{{ archivematica_src_am_dashboard_app }}"
-    pythonpath: "{{ archivematica_src_am_common_app }}"
     virtualenv: "{{ archivematica_src_am_dashboard_virtualenv }}"
   environment: "{{ archivematica_src_am_dashboard_environment }}"
   tags: "amsrc-pipeline-dbconf-syncdb"

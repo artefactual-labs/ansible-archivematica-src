@@ -24,7 +24,7 @@
 {% endif %}
     "logfile": {
       "backupCount": 5,
-      "class": "custom_handlers.GroupWriteRotatingFileHandler",
+      "class": "archivematica.archivematicaCommon.custom_handlers.GroupWriteRotatingFileHandler",
       "filename": "{{ archivematica_src_mcpclient_logdir }}/MCPClient.log",
       "formatter": "detailed",
       "level": "INFO",
@@ -32,7 +32,7 @@
     },
     "verboselogfile": {
       "backupCount": 5,
-      "class": "custom_handlers.GroupWriteRotatingFileHandler",
+      "class": "archivematica.archivematicaCommon.custom_handlers.GroupWriteRotatingFileHandler",
       "filename": "{{ archivematica_src_mcpclient_logdir }}/MCPClient.debug.log",
       "formatter": "detailed",
       "level": "DEBUG",

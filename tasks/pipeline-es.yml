@@ -11,7 +11,6 @@
     django_manage:
       command: "reindex_from_remote_cluster -t 60 -s 1 {{ archivematica_src_am_elasticserch_source }}"
       app_path: "{{ archivematica_src_am_dashboard_app }}"
-      pythonpath: "{{ archivematica_src_am_common_app }}"
       virtualenv: "{{ archivematica_src_am_dashboard_virtualenv }}"
     environment: "{{ archivematica_src_am_dashboard_environment }}"
 
