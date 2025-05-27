@@ -326,3 +326,35 @@
       with_items:
         - "{{ am_ss_default_locations }}"
   when: am_ss_default_locations is defined
+
+# Configure rclone locations
+
+- name: "Configure SS: Get default pipeline UUID from SS database"
+  mysql_query:
+    login_db: "{{ archivematica_src_ss_db_name }}"
+    login_user: "{{ archivematica_src_ss_db_user }}"
+    login_password: "{{ archivematica_src_ss_db_password }}"
+    login_host: "{{ archivematica_src_ss_db_host }}"
+    query: >
+           SELECT uuid FROM locations_pipeline WHERE remote_name like %(pipeline)s;
+    named_args:
+      pipeline: "%{{ archivematica_src_remote_pipeline }}%"
+  register: __pipeline_uuid_query
+- name: "Configure SS: Set pipeline_uuid"
+  set_fact:
+    __pipeline_uuid: "{{ (__pipeline_uuid_query.query_result |flatten | first).uuid }}"
+  when: __pipeline_uuid_query.rowcount[0] > 0
+
+
+- name: "Include rclone configuration"
+  include_tasks: configure-rclone-locations.yml
+  vars:
+    location_purpose: "{{ item.location_purpose }}"
+    location_description: "{{ item.location_description }}"
+    location_path: "{{ item.location_path }}"
+    location_default: "{{ item.location_default }}"
+    path: "{{ item.location_path }}"
+    remote_name: "{{ item.location_remote_name }}"
+    container: "{{ item.location_container }}"
+  with_items: "{{ archivematica_src_rclone_locations }}"
+  when: archivematica_src_rclone_locations is defined
