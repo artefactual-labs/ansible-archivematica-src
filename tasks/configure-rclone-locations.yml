@@ -63,7 +63,7 @@
           Content-Type: "application/json"
           Authorization: "ApiKey {{ archivematica_src_configure_ss_user }}:{{ archivematica_src_configure_ss_api_key }}"
         body:
-          pipeline: ["/api/v2/pipeline/{{ __pipeline_uuid }}/"]
+          pipeline: ["/api/v2/pipeline/{{ pipeline_uuid.stdout }}/"]
           purpose: "{{ location_purpose }}"
           relative_path: "/"
           description: "{{ location_description }}"
