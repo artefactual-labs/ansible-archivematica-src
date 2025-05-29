@@ -1,0 +1,6 @@
+[Service]
+# Load secure credentials for {{ service }}
+
+{{secured_credentials.stdout }}
+
+Environment=SECRETS=%d/{{ secret_name }}

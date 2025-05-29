@@ -18,7 +18,11 @@ SyslogIdentifier=DashboardStdout
 SyslogFacility={{ archivematica_src_syslog_dashboard_facility }}
 {% endif %}
 WorkingDirectory={{ archivematica_src_am_dashboard_app }}
+{% if archivematica_src_systemd_credentials|bool %}
+ExecStart=sh -c 'export $(cat $SECRETS); {{ dashboard_gunicorn_path }} --config {{ archivematica_src_am_dashboard_gunicorn_config }} wsgi:application'
+{% else %}
 ExecStart={{ dashboard_gunicorn_path }} --config {{ archivematica_src_am_dashboard_gunicorn_config }} wsgi:application
+{% endif %}
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
 PrivateTmp=true
