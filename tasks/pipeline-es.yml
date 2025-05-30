@@ -8,10 +8,11 @@
 
 - block:
   - name: "pipeline-es | Migrate elasticsearch indexes from remote server"
-    django_manage:
-      command: "reindex_from_remote_cluster -t 60 -s 1 {{ archivematica_src_am_elasticserch_source }}"
-      app_path: "{{ archivematica_src_am_dashboard_app }}"
-      virtualenv: "{{ archivematica_src_am_dashboard_virtualenv }}"
+    shell: >
+      {{ archivematica_src_am_dashboard_virtualenv }}/bin/python -m archivematica.dashboard.manage
+      reindex_from_remote_cluster -t 60 -s 1 {{ archivematica_src_am_elasticserch_source }}
+    args:
+      executable: /bin/bash
     environment: "{{ archivematica_src_am_dashboard_environment }}"
 
   - name: "pipeline-es | Verify aip reindex from remote server (system)"

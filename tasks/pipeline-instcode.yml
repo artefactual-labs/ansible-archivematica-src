@@ -68,10 +68,11 @@
 #
 
 - name: "Collect static files"
-  django_manage:
-    command: "collectstatic"
-    app_path: "{{ archivematica_src_am_dashboard_app }}"
-    virtualenv: "{{ archivematica_src_am_dashboard_virtualenv }}"
+  shell: >
+    {{ archivematica_src_am_dashboard_virtualenv }}/bin/python -m archivematica.dashboard.manage
+    collectstatic
+  args:
+    executable: /bin/bash
   environment: "{{ archivematica_src_am_dashboard_environment }}"
 
 #
@@ -79,8 +80,9 @@
 #
 
 - name: "Compile gettext po files (compilemessages)"
-  django_manage:
-    command: "compilemessages"
-    app_path: "{{ archivematica_src_am_dashboard_app }}"
-    virtualenv: "{{ archivematica_src_am_dashboard_virtualenv }}"
+  shell: >
+    {{ archivematica_src_am_dashboard_environment }}/bin/python -m archivematica.dashboard.manage
+    compilemessages
+  args:
+    executable: /bin/bash
   environment: "{{ archivematica_src_am_dashboard_environment }}"

@@ -195,18 +195,20 @@
   tags: "amsrc-ss-code"
 
 - name: "Run SS django collectstatic"
-  django_manage:
-    command: "collectstatic"
-    app_path: "{{ archivematica_src_ss_app }}"
-    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+  shell: >
+    {{ archivematica_src_ss_virtualenv }}/bin/python -m archivematica.storage_service.manage
+    collectstatic
+  args:
+    executable: /bin/bash
   environment: "{{ archivematica_src_ss_environment }}"
   tags: ["amsrc-ss-code", "amsrc-ss-code-collectstatic"]
 
 - name: "Run SS django compilemessages"
-  django_manage:
-    command: "compilemessages"
-    app_path: "{{ archivematica_src_ss_app }}"
-    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+  shell: >
+    {{ archivematica_src_ss_virtualenv }}/bin/python -m archivematica.storage_service.manage
+    compilemessages
+  args:
+    executable: /bin/bash
   environment: "{{ archivematica_src_ss_environment }}"
   tags: ["amsrc-ss-code", "amsrc-ss-code-compilemessages"]
 
