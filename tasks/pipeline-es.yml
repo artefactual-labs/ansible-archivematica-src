@@ -9,7 +9,7 @@
 - block:
   - name: "pipeline-es | Migrate elasticsearch indexes from remote server"
     shell: >
-      {{ archivematica_src_am_dashboard_virtualenv }}/bin/python -m archivematica.dashboard.manage
+      {{ archivematica_src_am_virtualenv }}/bin/python -m archivematica.dashboard.manage
       reindex_from_remote_cluster -t 60 -s 1 {{ archivematica_src_am_elasticserch_source }}
     args:
       executable: /bin/bash

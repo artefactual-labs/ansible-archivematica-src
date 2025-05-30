@@ -2,13 +2,7 @@
 ansible_deps: []
 
 archivematica_src_am_virtualenv: "/usr/share/archivematica/virtualenvs/archivematica"
-
-archivematica_src_am_dashboard_virtualenv: "{{ archivematica_src_am_virtualenv }}"
 archivematica_src_am_dashboard_gunicorn_config: "/etc/archivematica/dashboard.gunicorn-config.py"
-
-archivematica_src_am_mcpserver_virtualenv: "{{ archivematica_src_am_virtualenv }}"
-
-archivematica_src_am_mcpclient_virtualenv: "{{ archivematica_src_am_virtualenv }}"
 
 archivematica_src_ss_virtualenv: "/usr/share/archivematica/virtualenvs/archivematica-storage-service"
 archivematica_src_ss_gunicorn_config: "/etc/archivematica/storage-service.gunicorn-config.py"

@@ -69,8 +69,8 @@
 
 - name: "Collect static files"
   shell: >
-    {{ archivematica_src_am_dashboard_virtualenv }}/bin/python -m archivematica.dashboard.manage
-    collectstatic
+    {{ archivematica_src_am_virtualenv }}/bin/python -m archivematica.dashboard.manage
+    collectstatic --noinput
   args:
     executable: /bin/bash
   environment: "{{ archivematica_src_am_dashboard_environment }}"
@@ -81,7 +81,7 @@
 
 - name: "Compile gettext po files (compilemessages)"
   shell: >
-    {{ archivematica_src_am_dashboard_environment }}/bin/python -m archivematica.dashboard.manage
+    {{ archivematica_src_am_virtualenv }}/bin/python -m archivematica.dashboard.manage
     compilemessages
   args:
     executable: /bin/bash
