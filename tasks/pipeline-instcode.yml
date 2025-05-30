@@ -4,29 +4,22 @@
 #   4- Code install
 ###########################################################
 
-- name: "Symlink source files"
+- name: "Change archivematica-source owner to archivematica"
   file:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    state: "link"
-  with_items:
+    dest: "{{ archivematica_src_dir }}"
+    state: "directory"
+    owner: "archivematica"
+    group: "archivematica"
+    recurse: "yes"
 
-    # archivematicaCommon
-    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematica/archivematicaCommon"
-      dest: "{{ archivematica_src_am_common_app }}"
-
-    # Dashboard
-    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematica/dashboard"
-      dest: "{{ archivematica_src_am_dashboard_app }}"
-
-    # MCPServer
-    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematica/MCPServer"
-      dest: "{{ archivematica_src_am_mcpserver_app }}"
-
-    # MCPClient
-    - src: "{{ archivematica_src_dir }}/archivematica/src/archivematica/MCPClient/"
-      dest: "{{ archivematica_src_am_mcpclient_app }}"
-
+- name: "Install archivematica Python package"
+  become: "yes"
+  become_user: "archivematica"
+  pip:
+    virtualenv: "{{ archivematica_src_am_virtualenv }}"
+    chdir: "{{ archivematica_src_dir }}/archivematica"
+    name: .
+    editable: yes
 
 - name: "Copy gunicorn configuration file"
   copy:
@@ -39,17 +32,6 @@
 #
 # front-end
 #
-
-- name: "Change archivematica-source owner to archivematica"
-  file:
-    dest: "{{ archivematica_src_dir }}"
-    state: "directory"
-    owner: "archivematica"
-    group: "archivematica"
-    recurse: "yes"
-  with_items:
-    - "{{ archivematica_src_dir }}/archivematica/src/archivematica/dashboard/media"
-    - "{{ archivematica_src_dir }}/archivematica/src/archivematica/dashboard/frontend"
 
 - name: "Install front-end dependencies"
   become: "yes"
