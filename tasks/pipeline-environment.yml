@@ -6,10 +6,6 @@
 #  - services
 #
 
-- name: "set_fact: set gunicorn path to correct value"
-  set_fact:
-    dashboard_gunicorn_path: "{{ archivematica_src_am_dashboard_virtualenv }}/bin/gunicorn"
-
 - name: "Clear shared directory"
   file:
     dest: "{{ archivematica_src_shareddir }}"
