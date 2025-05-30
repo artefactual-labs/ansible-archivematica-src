@@ -132,14 +132,6 @@
 #   3- OS configuration (user/directory/file creation/permissions/ownership)
 ###########################################################
 
-- name: "Create subdirectory for archivematica-storage-service source files"
-  file:
-    dest: "{{ item }}"
-    state: "directory"
-  with_items:
-    - "/usr/lib/archivematica"
-  tags: "amsrc-ss-osconf"
-
 - name: "Create subdirectory for archivematica-storage-service database file"
   file:
     dest: "{{ item }}"
@@ -183,16 +175,6 @@
 ###########################################################
 #   4- SS code install
 ###########################################################
-
-- name: "Copy archivematica-storage-service source files"
-  file:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    state: "link"
-  with_items:
-    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/src/archivematica/storage_service"
-      dest: "{{ archivematica_src_ss_app }}"
-  tags: "amsrc-ss-code"
 
 - name: "Run SS django collectstatic"
   shell: >

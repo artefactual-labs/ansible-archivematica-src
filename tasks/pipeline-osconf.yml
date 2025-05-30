@@ -10,7 +10,6 @@
     state: "directory"
   with_items:
     - "/usr/lib/archivematica"
-    - "/usr/share/archivematica/archivematicaCommon"
     - "/usr/share/archivematica"
     - "/etc/archivematica"
     - "/var/lib/archivematica"
