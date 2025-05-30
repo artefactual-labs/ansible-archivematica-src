@@ -17,8 +17,7 @@ StandardError=syslog
 SyslogIdentifier=DashboardStdout
 SyslogFacility={{ archivematica_src_syslog_dashboard_facility }}
 {% endif %}
-WorkingDirectory={{ archivematica_src_am_dashboard_app }}
-ExecStart={{ dashboard_gunicorn_path }} --config {{ archivematica_src_am_dashboard_gunicorn_config }} wsgi:application
+ExecStart={{ dashboard_gunicorn_path }} --config {{ archivematica_src_am_dashboard_gunicorn_config }} archivematica.dashboard.wsgi:application
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
 PrivateTmp=true
