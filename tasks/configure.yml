@@ -330,6 +330,14 @@
 
 # Configure rclone locations
 
+- name: "Create rclone config folder"
+  file:
+    path: "/var/lib/archivematica/.config/rclone/"
+    state: directory
+    owner: "archivematica"
+    group: "archivematica"
+  when: archivematica_src_rclone_configfile is defined
+
 - name: "Update rclone config file"
   template:
     src: "{{ archivematica_src_rclone_configfile }}"
