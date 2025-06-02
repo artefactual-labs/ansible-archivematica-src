@@ -336,15 +336,15 @@
     state: directory
     owner: "archivematica"
     group: "archivematica"
-  when: archivematica_src_rclone_configfile is defined
+  when: archivematica_src_rclone_config is defined
 
 - name: "Update rclone config file"
   template:
-    src: "{{ archivematica_src_rclone_configfile }}"
+    src: "templates/rclone.conf.j2"
     dest: "/var/lib/archivematica/.config/rclone/rclone.conf"
     owner: "archivematica"
     group: "archivematica"
-  when: archivematica_src_rclone_configfile is defined
+  when: archivematica_src_rclone_config is defined
 
 
 - name: "Include rclone configuration"
