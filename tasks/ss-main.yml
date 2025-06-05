@@ -179,7 +179,7 @@
 - name: "Run SS django collectstatic"
   shell: >
     {{ archivematica_src_ss_virtualenv }}/bin/python -m archivematica.storage_service.manage
-    collectstatic
+    collectstatic --noinput
   args:
     executable: /bin/bash
   environment: "{{ archivematica_src_ss_environment }}"
