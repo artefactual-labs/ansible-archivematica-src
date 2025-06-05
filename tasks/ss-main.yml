@@ -111,17 +111,26 @@
     LANG: "en_US.utf8"
   tags: "amsrc-ss-pydep"
 
+- name: "Change archivematica source owner to archivematica"
+  file:
+    dest: "{{ archivematica_src_dir }}"
+    state: "directory"
+    owner: "archivematica"
+    group: "archivematica"
+    recurse: "yes"
+
+- name: "Install archivematica-storage-service Python package"
+  become: "yes"
+  become_user: "archivematica"
+  pip:
+    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
+    name: .
+    editable: yes
+
 ###########################################################
 #   3- OS configuration (user/directory/file creation/permissions/ownership)
 ###########################################################
-
-- name: "Create subdirectory for archivematica-storage-service source files"
-  file:
-    dest: "{{ item }}"
-    state: "directory"
-  with_items:
-    - "/usr/lib/archivematica"
-  tags: "amsrc-ss-osconf"
 
 - name: "Create subdirectory for archivematica-storage-service database file"
   file:
@@ -167,29 +176,21 @@
 #   4- SS code install
 ###########################################################
 
-- name: "Copy archivematica-storage-service source files"
-  file:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    state: "link"
-  with_items:
-    - src: "{{ archivematica_src_dir }}/archivematica-storage-service/src/archivematica/storage_service"
-      dest: "{{ archivematica_src_ss_app }}"
-  tags: "amsrc-ss-code"
-
 - name: "Run SS django collectstatic"
-  django_manage:
-    command: "collectstatic"
-    app_path: "{{ archivematica_src_ss_app }}"
-    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+  shell: >
+    {{ archivematica_src_ss_virtualenv }}/bin/python -m archivematica.storage_service.manage
+    collectstatic --noinput
+  args:
+    executable: /bin/bash
   environment: "{{ archivematica_src_ss_environment }}"
   tags: ["amsrc-ss-code", "amsrc-ss-code-collectstatic"]
 
 - name: "Run SS django compilemessages"
-  django_manage:
-    command: "compilemessages"
-    app_path: "{{ archivematica_src_ss_app }}"
-    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+  shell: >
+    {{ archivematica_src_ss_virtualenv }}/bin/python -m archivematica.storage_service.manage
+    compilemessages
+  args:
+    executable: /bin/bash
   environment: "{{ archivematica_src_ss_environment }}"
   tags: ["amsrc-ss-code", "amsrc-ss-code-compilemessages"]
 

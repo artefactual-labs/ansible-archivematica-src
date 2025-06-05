@@ -30,9 +30,10 @@
 ###########################################################
 
 - name: "Run migrations"
-  django_manage:
-    command: "migrate"
-    app_path: "{{ archivematica_src_am_dashboard_app }}"
-    virtualenv: "{{ archivematica_src_am_dashboard_virtualenv }}"
+  shell: >
+    {{ archivematica_src_am_virtualenv }}/bin/python -m archivematica.dashboard.manage
+    migrate
+  args:
+    executable: /bin/bash
   environment: "{{ archivematica_src_am_dashboard_environment }}"
   tags: "amsrc-pipeline-dbconf-syncdb"
