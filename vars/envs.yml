@@ -10,7 +10,7 @@ _archivematica_src_am_dashboard_environment:
 
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY: '{{ archivematica_src_am_django_secret_key | default("CHANGE_ME_WITH_A_SECRET_KEY") }}'
   AM_GUNICORN_BIND: "127.0.0.1:8002"
-  ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER: "127.0.0.1:9200"
+  ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER: "http://127.0.0.1:9200"
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_STORAGE_SERVICE_CLIENT_QUICK_TIMEOUT: "{{ archivematica_src_ss_client_quick_timeout | default(20) }}"
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_TIMEOUT: "{{ archivematica_src_elasticsearch_timeout | default('30') }}"
   ARCHIVEMATICA_DASHBOARD_DASHBOARD_AUDIT_LOG_MIDDLEWARE: "{{ archivematica_src_audit|default('false') }}"
