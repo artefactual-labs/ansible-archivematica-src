@@ -20,6 +20,7 @@
     chdir: "{{ archivematica_src_dir }}/archivematica"
     name: .
     editable: yes
+    extra_args: "--no-deps"
 
 - name: "Copy gunicorn configuration file"
   copy:
