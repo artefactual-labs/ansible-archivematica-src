@@ -5,6 +5,7 @@
     src: "{{ item }}"
     dest: "/etc/rsyslog.d/archivematica.conf"
     backup: "yes"
+    mode: '644'
   with_first_found:
     - files:
         - "templates/{{ inventory_hostname }}/rsyslog.conf.j2"
@@ -42,19 +43,19 @@
   become: yes
   remote_user: "{{ archivematica_src_configure_ss_ssh_user | default('artefactual') }}"
   register: archivematica_src_configure_ss_api_key_temp
-  when: 
+  when:
      - "archivematica_src_configure_dashboard|bool or archivematica_src_configure_ss|bool"
      - "archivematica_src_configure_ss_api_key is undefined"
      - ss_user.stdout != ""
 
 - set_fact: archivematica_src_configure_ss_api_key="{{ archivematica_src_configure_ss_api_key_temp.stdout }}"
-  when: 
+  when:
     - "archivematica_src_configure_dashboard|bool"
     - "archivematica_src_configure_ss_api_key_temp.stdout is defined"
 
 # Create api-key if not defined and SS user was not already configured
 - set_fact: archivematica_src_configure_ss_api_key={{ 999999999999999999999 | random | to_uuid | hash('md5') }}
-  when: 
+  when:
     - "archivematica_src_configure_ss_api_key is undefined"
     - "archivematica_src_configure_ss|bool"
 
@@ -190,7 +191,7 @@
     - archivematica_src_configure_dashboard|bool
     - archivematica_src_configure_dashboardsettings is defined
 
-# The rsync user is defined in the rsync_target, as user@host:/path 
+# The rsync user is defined in the rsync_target, as user@host:/path
 - name: "Get rsync user for dip upload"
   set_fact:
     atom_dipupload_ssh_user: "{{ archivematica_src_configure_dashboardsettings['rsync_target'].split('@')[0] }}"
