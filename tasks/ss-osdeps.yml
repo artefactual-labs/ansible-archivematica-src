@@ -15,7 +15,7 @@
       with_items:
         - "{{ storage_service_osdeps.repokeys }}"
       when:
-        - storage_service_osdeps.repokeys
+        - storage_service_osdeps.repokeys | length>0
 
     - name: "Add External dependency repos (Ubuntu)"
       apt_repository:
@@ -66,7 +66,7 @@
 - include_tasks: "install-packages.yml"  # Not using import_tasks because it contains dynamic data
   vars:
     packages: "{{ item.packages }}"
-    name: "{{ item.name }}"
+    packages_name: "{{ item.name }}"
   when:
     - item.packages|length>0
   loop:

@@ -2,7 +2,7 @@
 
 - name: "archivematica_src_search_enabled"
   set_fact:
-    "{{ item.name }}": "{{ item.dict|combine({item.key: archivematica_src_search_enabled}) }}"
+    "{{ item.name }}": "{{ item.dict|combine({item.key: archivematica_src_search_enabled|default('yes') }) }}"
   when: "archivematica_src_search_enabled is defined"
   with_items:
     - name: "archivematica_src_am_mcpclient_environment"
@@ -17,7 +17,7 @@
 
 - name: "archivematica_src_am_es_server"
   set_fact:
-    "{{ item.name }}": "{{ item.dict|combine({item.key: archivematica_src_am_es_server}) }}"
+    "{{ item.name }}": "{{ item.dict|combine({item.key: archivematica_src_am_es_server|default('127.0.0.1:9200') }) }}"
   when: "archivematica_src_am_es_server is defined"
   with_items:
     - name: "archivematica_src_am_mcpclient_environment"

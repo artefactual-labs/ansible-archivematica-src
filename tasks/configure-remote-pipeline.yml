@@ -44,7 +44,7 @@
         user: "archivematica"
         state: "present"
         key: "{{ ssh_key.stdout }}"
-      delegate_to: "{{ archivematica_src_remote_pipeline }}"
+      delegate_to: "{{ archivematica_src_remote_pipeline | default(omit) }}"
       remote_user: "{{ ansible_ssh_user | default('artefactual') }}"
 
     - name: "Configure SS remote pipeline: Fetch and add pipeline hostname to .ssh/known_hosts"
@@ -52,7 +52,7 @@
       become_user: "archivematica"
       known_hosts:
         name: "{{ archivematica_src_remote_pipeline }}"
-        key: "{{ lookup('pipe', 'ssh-keyscan -H ' + archivematica_src_remote_pipeline) }}"  # Fetch the SSH key automatically
+        key: "{{ lookup('pipe', 'ssh-keyscan -H ' + archivematica_src_remote_pipeline | default(omit)) }}"  # Fetch the SSH key automatically
         path: "~/.ssh/known_hosts"
 
     - name: "Configure SS remote pipeline: Check if the remote space already exist"
