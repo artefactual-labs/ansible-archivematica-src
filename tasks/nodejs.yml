@@ -115,7 +115,7 @@
 
 - name: "Nodejs: Install packages defined in a given package.json"
   npm:
-    path: "{{ nodejs_package_json_path | default(pmit) }}"
+    path: "{{ nodejs_package_json_path | default(omit) }}"
   when:
     - nodejs_package_json_path is defined
     - nodejs_package_json_path | length > 0
