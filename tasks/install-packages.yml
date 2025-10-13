@@ -5,14 +5,14 @@
 # - packages: List (or string when having a single package) of packages
 # - state: state os the package "latest,present,..". Optional, default: latest
 
-- name: "Install/Upgrade Debian packages: {{ name }}"
+- name: "Install/Upgrade Debian packages: {{packages_name }}"
   apt:
     name: "{{ packages }}"
     state: "{{ state | default('latest') }}"
   when:
     - ansible_os_family == "Debian"
 
-- name: "Install/Upgrade RHEL/CentOS/Rocky packages: {{ name }}"
+- name: "Install/Upgrade RHEL/CentOS/Rocky packages: {{ packages_name }}"
   yum:
     name: "{{ packages }}"
     state: "{{ state | default('latest') }}"
