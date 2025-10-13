@@ -45,7 +45,7 @@
   - include_tasks: "install-packages.yml"
     vars:
       packages: "{{ archivematica_src_python_packages }}"
-      name: "Python 3"
+      packages_name: "Python 3"
       state: "present"
     when:
       - archivematica_src_python_packages|length>0

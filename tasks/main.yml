@@ -123,7 +123,7 @@
   - include_tasks: "install-packages.yml"
     vars:
       packages: "{{ ansible_deps }}"
-      name: "Ansible dependencies"
+      packages_name: "Ansible dependencies"
     when:
       - ansible_deps|length>0
 

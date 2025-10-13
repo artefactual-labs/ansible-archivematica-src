@@ -44,7 +44,7 @@
       with_items: 
         - "{{ dashboard_osdeps.repokeys + MCPServer_osdeps.repokeys + MCPClient_osdeps.repokeys }}"
       when:
-        - dashboard_osdeps.repokeys + MCPServer_osdeps.repokeys + MCPClient_osdeps.repokeys
+        - (dashboard_osdeps.repokeys + MCPServer_osdeps.repokeys + MCPClient_osdeps.repokeys) | length > 0
 
     - name: "Add External dependency repos (Ubuntu)"
       apt_repository:
@@ -53,7 +53,7 @@
       with_items:
         - "{{ dashboard_osdeps.repos + MCPServer_osdeps.repos + MCPClient_osdeps.repos }}"
       when:
-        - dashboard_osdeps.repos + MCPServer_osdeps.repos + MCPClient_osdeps.repos
+        - (dashboard_osdeps.repos + MCPServer_osdeps.repos + MCPClient_osdeps.repos) | length > 0
 
   when:
     - ansible_distribution == "Ubuntu"
@@ -86,7 +86,7 @@
       with_items:
         - "{{ dashboard_osdeps.repokeys + MCPServer_osdeps.repokeys + MCPClient_osdeps.repokeys }}"
       when:
-        - dashboard_osdeps.repokeys + MCPServer_osdeps.repokeys + MCPClient_osdeps.repokeys
+        - (dashboard_osdeps.repokeys + MCPServer_osdeps.repokeys + MCPClient_osdeps.repokeys) | length > 0
 
     - name: "Add External dependency repos (RH/CentOS/Rocky)"
       yum_repository:
@@ -98,7 +98,7 @@
       with_items:
         - "{{ dashboard_osdeps.repos + MCPServer_osdeps.repos + MCPClient_osdeps.repos }}"
       when:
-        - dashboard_osdeps.repos + MCPServer_osdeps.repos + MCPClient_osdeps.repos
+        - (dashboard_osdeps.repos + MCPServer_osdeps.repos + MCPClient_osdeps.repos) | length > 0
 
   when:
     - ansible_os_family in [ 'RedHat', 'Rocky' ]
@@ -113,7 +113,7 @@
 - include_tasks: "install-packages.yml"  # We need to use include_tasks and not import_tasks because it contains dynamic data in loop
   vars:
     packages: "{{ item.packages }}"
-    name: "{{ item.name }}"
+    packages_name: "{{ item.name }}"
   when:
     - item.packages|length>0
   loop:

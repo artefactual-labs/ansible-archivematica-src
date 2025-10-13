@@ -141,97 +141,76 @@
 #
 #  Configure AtoM DIP Upload
 #
-- name: "Configure Dashboard settings"
-  command: >
-    mysql --user="{{archivematica_src_am_db_user }}"
-          --password="{{ archivematica_src_am_db_password }}"
-          --host="{{ archivematica_src_am_db_host }}"
-          "{{ archivematica_src_am_db_name }}"
-          --batch --skip-column-names
-          --execute="update DashboardSettings set value=\"{{ item.value }}\" where name=\"{{ item.key }}\";"
-  with_dict: "{{ archivematica_src_configure_dashboardsettings }}"
-  no_log: True
-  when:
-    - archivematica_src_configure_dashboard|bool
-    - archivematica_src_configure_dashboardsettings is defined
+- name: "Configure AtoM DIP Upload"
+  block:
+    - name: "Configure Dashboard settings"
+      command: >
+        mysql --user="{{archivematica_src_am_db_user }}"
+              --password="{{ archivematica_src_am_db_password }}"
+              --host="{{ archivematica_src_am_db_host }}"
+              "{{ archivematica_src_am_db_name }}"
+              --batch --skip-column-names
+              --execute="update DashboardSettings set value=\"{{ item.value }}\" where name=\"{{ item.key }}\";"
+      with_dict: "{{ archivematica_src_configure_dashboardsettings }}"
+      no_log: True
 
-- name: "Create ssh key"
-  user:
-    name: "archivematica"
-    generate_ssh_key: "yes"
-    ssh_key_type: "ed25519"
-    ssh_key_file: ".ssh/id_ed25519"
-  when:
-    - archivematica_src_configure_dashboard|bool
-    - archivematica_src_configure_dashboardsettings is defined
+    - name: "Create ssh key"
+      user:
+        name: "archivematica"
+        generate_ssh_key: "yes"
+        ssh_key_type: "ed25519"
+        ssh_key_file: ".ssh/id_ed25519"
 
-- name: "Use StrictHostKeyChecking=no ssh option for archivematica user"
-  lineinfile:
-    create: "yes"
-    path: "/var/lib/archivematica/.ssh/config"
-    owner: "archivematica"
-    group: "archivematica"
-    mode: "0600"
-    line: "StrictHostKeyChecking no"
-  when:
-    - archivematica_src_configure_dashboard|bool
-    - archivematica_src_configure_dashboardsettings is defined
+    - name: "Use StrictHostKeyChecking=no ssh option for archivematica user"
+      lineinfile:
+        create: "yes"
+        path: "/var/lib/archivematica/.ssh/config"
+        owner: "archivematica"
+        group: "archivematica"
+        mode: "0600"
+        line: "StrictHostKeyChecking no"
 
-- name: "Register ssh key"
-  command: cat /var/lib/archivematica/.ssh/id_ed25519.pub
-  register: ssh_key
-  when:
-    - archivematica_src_configure_dashboard|bool
-    - archivematica_src_configure_dashboardsettings is defined
+    - name: "Register ssh key"
+      command: cat /var/lib/archivematica/.ssh/id_ed25519.pub
+      register: ssh_key
 
-- name: "Show ssh key"
-  debug: msg={{ ssh_key.stdout_lines }}
-  when:
-    - archivematica_src_configure_dashboard|bool
-    - archivematica_src_configure_dashboardsettings is defined
+    - name: "Show ssh key"
+      debug: msg={{ ssh_key.stdout_lines }}
 
-# The rsync user is defined in the rsync_target, as user@host:/path 
-- name: "Get rsync user for dip upload"
-  set_fact:
-    atom_dipupload_ssh_user: "{{ archivematica_src_configure_dashboardsettings['rsync_target'].split('@')[0] }}"
-  when:
-    - archivematica_src_configure_dashboard|bool
-    - archivematica_src_configure_dashboardsettings is defined
-    - archivematica_src_configure_dashboardsettings['rsync_target'].split('@')[0] != archivematica_src_configure_dashboardsettings['rsync_target']
+    # The rsync user is defined in the rsync_target, as user@host:/path
+    - name: "Get rsync user for dip upload"
+      set_fact:
+        atom_dipupload_ssh_user: "{{ archivematica_src_configure_dashboardsettings['rsync_target'].split('@')[0] }}"
+      when:
+        - archivematica_src_configure_dashboardsettings['rsync_target'].split('@')[0] != archivematica_src_configure_dashboardsettings['rsync_target']
 
 
-- name: "Create archivematica user in AtoM server"
-  user:
-    name: "{{ atom_dipupload_ssh_user | default('archivematica') }}"
-    group: "users"
-    system: True
-    home: "/home/{{ atom_dipupload_ssh_user | default('archivematica') }}"
-    createhome: True
-    shell: "/bin/bash"
-  delegate_to: "{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') }}"
-  remote_user: "{{ archivematica_src_configure_atom_ssh_user | default('artefactual') }}"
-  when:
-    - archivematica_src_configure_dashboard|bool
-    - archivematica_src_configure_dashboardsettings is defined
+    - name: "Create archivematica user in AtoM server"
+      user:
+        name: "{{ atom_dipupload_ssh_user | default('archivematica') }}"
+        group: "users"
+        system: True
+        home: "/home/{{ atom_dipupload_ssh_user | default('archivematica') }}"
+        createhome: True
+        shell: "/bin/bash"
+      delegate_to: "{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') | default(omit) }}"
+      remote_user: "{{ archivematica_src_configure_atom_ssh_user | default('artefactual') }}"
 
-- name: "Ensure 0755 permission on /home/{{ atom_dipupload_ssh_user | default('archivematica') }} dir"
-  file:
-    path: "/home/{{ atom_dipupload_ssh_user | default('archivematica') }}"
-    state: directory
-    mode: '0755'
-  delegate_to: "{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') }}"
-  remote_user: "{{ archivematica_src_configure_atom_ssh_user | default('artefactual') }}"
-  when:
-    - archivematica_src_configure_dashboard|bool
-    - archivematica_src_configure_dashboardsettings is defined
+    - name: "Ensure 0755 permission on /home/{{ atom_dipupload_ssh_user | default('archivematica') }} dir"
+      file:
+        path: "/home/{{ atom_dipupload_ssh_user | default('archivematica') }}"
+        state: directory
+        mode: '0755'
+      delegate_to: "{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') | default(omit) }}"
+      remote_user: "{{ archivematica_src_configure_atom_ssh_user | default('artefactual') }}"
 
-- name: "Add ssh key to AtoM server"
-  authorized_key:
-    user: "{{ atom_dipupload_ssh_user | default('archivematica') }}"
-    state: "present"
-    key: "{{ ssh_key.stdout }}"
-  delegate_to: "{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') }}"
-  remote_user: "{{ archivematica_src_configure_atom_ssh_user | default('artefactual') }}"
+    - name: "Add ssh key to AtoM server"
+      authorized_key:
+        user: "{{ atom_dipupload_ssh_user | default('archivematica') }}"
+        state: "present"
+        key: "{{ ssh_key.stdout }}"
+      delegate_to: "{{ archivematica_src_configure_dashboardsettings['url']|urlsplit('hostname') | default(omit) }}"
+      remote_user: "{{ archivematica_src_configure_atom_ssh_user | default('artefactual') }}"
   when:
     - archivematica_src_configure_dashboard|bool
     - archivematica_src_configure_dashboardsettings is defined
@@ -239,6 +218,7 @@
 #
 # Configure FPR
 #
+
 - name: "Configure fpcommand settings"
   command: >
      mysql --user="{{archivematica_src_am_db_user }}"
@@ -264,6 +244,11 @@
   when:
     - archivematica_src_configure_dashboard|bool
     - archivematica_src_configure_fprule is defined
+
+
+#
+# Configure Locations
+#
 
 - name: "Configure locations"
   block:
@@ -316,10 +301,10 @@
         query:
            - INSERT IGNORE INTO locations_location_replicators(from_location_id,to_location_id) VALUES ((SELECT id FROM locations_location where description = %(aipstore)s and purpose = "AS"),(SELECT id FROM locations_location where description = %(replica)s and purpose = "RP" ));
         named_args:
-          aipstore: "{{ item.location_replication_from }}"
-          replica: "{{ item.location_description }}"
+          aipstore: "{{ item.location_replication_from | default(omit) }}"
+          replica: "{{ item.location_description | default(omit) }}"
       when:
         - item.location_replication_from is defined
       with_items:
-        - "{{ am_ss_default_locations }}"
+        - "{{ am_ss_default_locations | default({}) }}"
   when: am_ss_default_locations is defined
