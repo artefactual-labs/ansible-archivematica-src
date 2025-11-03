@@ -32,7 +32,7 @@
 
 
 - name: "Configure dashboard secure credentials"
-  include: systemd-creds.yml
+  include_tasks: systemd-creds.yml
   vars:
     service: archivematica-dashboard
     secret_name: dashboard
@@ -42,7 +42,7 @@
   when: archivematica_src_systemd_credentials|bool
 
 - name: "Configure MCPServer secure credentials"
-  include: systemd-creds.yml
+  include_tasks: systemd-creds.yml
   vars:
     service: archivematica-mcp-server
     secret_name: mcps
@@ -51,7 +51,7 @@
   when: archivematica_src_systemd_credentials|bool
 
 - name: "Configure single MCPClients secure credentials"
-  include: systemd-creds.yml
+  include_tasks: systemd-creds.yml
   vars:
     service: archivematica-mcp-client
     secret_name: mcpc
@@ -62,7 +62,7 @@
     - archivematica_src_am_mcpclient_instances == 1
 
 - name: "Configure multi MCPClients secure credentials"
-  include: systemd-creds.yml
+  include_tasks: systemd-creds.yml
   vars:
     service: archivematica-mcp-client-{{ '%1d' | format(item) }}
     secret_name: mcpc

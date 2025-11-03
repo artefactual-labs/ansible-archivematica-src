@@ -11,7 +11,7 @@
     - ansible_service_mgr == "systemd"
 
 - name: "Include systemd-creds config"
-  include: systemd-creds.yml
+  include_tasks: systemd-creds.yml
   vars:
     service: archivematica-storage-service
     secret_name: ss
