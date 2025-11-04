@@ -85,6 +85,7 @@
       path: "{{ systemd_environment_path }}/{{ 'archivematica-mcp-client-%1d' | format(item) }}"
       regexp: "^ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_PROMETHEUS_BIND_PORT="
       line: "ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_PROMETHEUS_BIND_PORT=96{{ '%02d' | format(item|int) }}"
+      backrefs: true  # If no line matches the regexp, the module does nothing at all — it will not add a new line.
     loop: "{{ range(1, archivematica_src_am_mcpclient_instances|int  + 1, 1)|list }}"
 
   when: archivematica_src_am_mcpclient_instances > 1
