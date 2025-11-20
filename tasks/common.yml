@@ -50,15 +50,6 @@
     when:
       - archivematica_src_python_packages|length>0
 
-  - name: "Create python38 symbolic link in CentOS/RHEL7"
-    file:
-      src: "/opt/rh/rh-python38/root/usr/bin/python3.8"
-      dest: "/usr/bin/python3.8"
-      state: "link"
-    when:
-      - ansible_os_family == 'RedHat'
-      - ansible_distribution_major_version|int == 7
-
   - name: "Set python3 as default python (CentOS/RHEL/Rocky) >= 8.0"
     command: alternatives --set python /usr/bin/python3
     changed_when: False

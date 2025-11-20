@@ -18,8 +18,7 @@ archivematica_src_am_fixity_deps:
   - "moreutils"
   - "mailutils"
 archivematica_src_python_packages:
-  - "python3.9-dev"
-  - "python3.9-distutils"
+  - "python3.12-dev"
   - "python3-setuptools"
   - "pkg-config"
 
@@ -36,7 +35,7 @@ dashboard_osdeps:
     - libxml2-dev
     - libxslt1-dev
     - libssl-dev
-    - python3.9-dev
+    - python3.12-dev
     - libsasl2-dev # Required to pip install python-ldap in virtualenv
     - libldap2-dev # Required to pip install python-ldap in virtualenv
     - unar
@@ -94,7 +93,7 @@ storage_service_osdeps:
     - unar
     - rsync
     - p7zip-full
-    - python3.9-dev
+    - python3.12-dev
     - build-essential # required to compile brotli (cc1plus)
     - libmysqlclient-dev
     - libxml2-dev

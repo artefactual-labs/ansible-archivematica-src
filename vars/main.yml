@@ -12,8 +12,7 @@ archivematica_src_am_fixity_deps: []
 
 archivematica_src_virtualenv: "/var/lib/archivematica/.local/bin/virtualenv"
 archivematica_src_pip: "/var/lib/archivematica/.local/bin/pip"
-# Ubuntu 18 and CentOS/RHEL 7 only have python3.8
-archivematica_src_virtualenv_python: "{{ 'python3.8' if ansible_distribution_major_version|string in ['7','18'] else 'python3.9' }}"
+archivematica_src_virtualenv_python: "python3.12"
 archivematica_src_python_packages: []  # Distro specific (see Debian.yml and RedHat.yml).
 
 #
