@@ -18,9 +18,8 @@ archivematica_src_am_fixity_deps:
   - "moreutils"
   - "s-nail"                  # Replaces mailx
 archivematica_src_python_packages:
-  - "python3-devel"
-  - "python3-distutils-extra"
-  - "python3-setuptools"
+  - "python3.12-devel"
+  - "python3.12-setuptools"
   - "pkgconfig"
 
 dashboard_osdeps:
@@ -36,7 +35,7 @@ dashboard_osdeps:
     - libxml2-devel
     - libxslt-devel
     - openssl-devel
-    - python3-devel
+    - python3.12-devel
     - openldap-devel
     - unar
     - coreutils
@@ -96,7 +95,7 @@ storage_service_osdeps:
     - nginx
     - unar
     - rsync
-    - python3-devel
+    - python3.12-devel
     - libxml2-devel
     - libxslt-devel
     - zlib-devel
