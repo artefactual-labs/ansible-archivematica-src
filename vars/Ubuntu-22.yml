@@ -20,6 +20,7 @@ archivematica_src_am_fixity_deps:
 archivematica_src_python_packages:
   - "python3.12-dev"
   - "python3-setuptools"
+  - "python3.12-venv"
   - "pkg-config"
 
 

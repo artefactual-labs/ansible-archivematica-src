@@ -5,6 +5,7 @@ ansible_deps:
   - "epel-release"
   - "python3-setuptools"
   - "git"
+  - "curl"
   - "python3-PyMySQL"         # Required for mysql_db module
   - "sqlite"                  # Required for am-configure and fixity
   - "p7zip-plugins"

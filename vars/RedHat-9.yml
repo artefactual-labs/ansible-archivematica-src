@@ -5,6 +5,7 @@ ansible_deps:
   - "acl"                     # Required to avoid using allow_world_readable_tmpfiles=True
   - "python3-setuptools"
   - "git"
+  - "curl"
   - "python3-PyMySQL"         # Required for mysql_db module
   - "sqlite"                  # Required for am-configure and fixity
   - "p7zip-plugins"

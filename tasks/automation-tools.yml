@@ -28,16 +28,19 @@
     state: "directory"
     recurse: true
 
+- name: "Create virtualenv for automation-tools with uv"
+  become: "yes"
+  become_user: "archivematica"
+  command: "{{ archivematica_src_uv }} venv --python {{ archivematica_src_virtualenv_python }} /usr/share/archivematica/virtualenvs/automation-tools"
+  args:
+    creates: "/usr/share/archivematica/virtualenvs/automation-tools/bin/python"
+
 - name: "Install pip dependencies in virtualenv"
   become: "yes"
   become_user: "archivematica"
-  pip:
+  command: "{{ archivematica_src_uv }} pip install --python /usr/share/archivematica/virtualenvs/automation-tools/bin/python -r requirements.txt"
+  args:
     chdir: "{{ archivematica_src_dir }}/automation-tools"
-    requirements: "requirements.txt"
-    virtualenv: "/usr/share/archivematica/virtualenvs/automation-tools"
-    virtualenv_command: "{{ archivematica_src_virtualenv }}"
-    virtualenv_python: "{{ archivematica_src_virtualenv_python }}"
-    state: latest
 
 - name: "symlink automation-tools source to /usr/lib/archivematica"
   file:

@@ -92,19 +92,20 @@
 - name: "Create virtualenv and install pip-tools"
   become: "yes"
   become_user: "archivematica"
-  pip:
-    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
-    virtualenv_command: "{{ archivematica_src_virtualenv }}"
-    virtualenv_python: "{{ archivematica_src_virtualenv_python }}"
-    name: 
-      - "pip=={{ archivematica_src_pip_version }}"
-      - "pip-tools=={{ archivematica_src_pip_tools_version }}"
+  block:
+    - name: "Create virtualenv with uv"
+      command: "{{ archivematica_src_uv }} venv --python {{ archivematica_src_virtualenv_python }} {{ archivematica_src_ss_virtualenv }}"
+      args:
+        creates: "{{ archivematica_src_ss_virtualenv }}/bin/python"
+
+    - name: "Install pip-tools with uv"
+      command: "{{ archivematica_src_uv }} pip install --python {{ archivematica_src_ss_virtualenv }}/bin/python pip-tools=={{ archivematica_src_pip_tools_version }}"
   tags: "amsrc-ss-pydep"
 
 - name: "Synchronize requirements"
   become: "yes"
   become_user: "archivematica"
-  command: "{{ archivematica_src_ss_virtualenv }}/bin/pip-sync {{ 'requirements-dev.txt' if is_dev else 'requirements.txt' }}"
+  command: "{{ archivematica_src_uv }} pip sync --python {{ archivematica_src_ss_virtualenv }}/bin/python {{ 'requirements-dev.txt' if is_dev else 'requirements.txt' }}"
   args:
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
   environment:
@@ -123,12 +124,9 @@
 - name: "Install archivematica-storage-service Python package"
   become: "yes"
   become_user: "archivematica"
-  pip:
-    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+  command: "{{ archivematica_src_uv }} pip install --python {{ archivematica_src_ss_virtualenv }}/bin/python --no-deps --editable ."
+  args:
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-    name: .
-    editable: yes
-    extra_args: "--no-deps"
 
 ###########################################################
 #   3- OS configuration (user/directory/file creation/permissions/ownership)

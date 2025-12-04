@@ -6,6 +6,7 @@ ansible_deps:
   - "{{ __python_packages_prefix }}-pycurl"
   - "{{ __python_packages_prefix }}-setuptools"
   - "git"
+  - "curl"
   - "{{ __python_packages_prefix }}-mysqldb"  # Required for mysql_db module
   - "sqlite3"                                 # Required for am-configure and fixity
   - "ca-certificates"                         # Required for apt-get
@@ -20,6 +21,7 @@ archivematica_src_am_fixity_deps:
 archivematica_src_python_packages:
   - "python3.12-dev"
   - "python3-setuptools"
+  - "python3.12-venv"
   - "pkg-config"
 
 

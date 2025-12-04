@@ -12,6 +12,8 @@ archivematica_src_am_fixity_deps: []
 
 archivematica_src_virtualenv: "/var/lib/archivematica/.local/bin/virtualenv"
 archivematica_src_pip: "/var/lib/archivematica/.local/bin/pip"
+archivematica_src_uv: "/usr/local/bin/uv"
+archivematica_src_uv_version: "0.9.15"
 archivematica_src_virtualenv_python: "python3.12"
 archivematica_src_python_packages: []  # Distro specific (see Debian.yml and RedHat.yml).
 

@@ -59,29 +59,36 @@
       - ansible_os_family in ['Rocky','RedHat']
       - ansible_distribution_major_version|int >= 8
 
-  - name: "Download get-pip.py in archivematica userdir"
-    get_url:
-      url: "https://bootstrap.pypa.io/get-pip.py"
-      force: "yes"
-      dest: "/var/lib/archivematica/get-pip.py"
-      owner: "archivematica"
-      group: "archivematica"
+  - name: "Check if uv already installed"
+    stat:
+      path: "{{ archivematica_src_uv }}"
+    register: uv_exists
 
-  - name: "Install pip with get-pip.py as archivematica user"
+  - name: "Install uv globally via curl"
     become: "yes"
-    become_user: "archivematica"
-    command: "{{ archivematica_src_virtualenv_python }} get-pip.py pip=={{ archivematica_src_pip_version }}"
+    shell: |
+      export UV_INSTALL_DIR=/usr/local/bin
+      curl -LsSf https://astral.sh/uv/{{ archivematica_src_uv_version }}/install.sh | \
+        UV_NO_MODIFY_PATH=1 sh
     args:
-      chdir: "/var/lib/archivematica"
+      executable: /bin/bash
+    register: uv_install_result
+    retries: 5
+    delay: 10
+    until: uv_install_result.rc == 0
+    when: not uv_exists.stat.exists
 
-  - name: "Install virtualenv with pip"
-    become: "yes"
-    become_user: "archivematica"
-    pip:
-      name: "virtualenv"
-      executable: "{{ archivematica_src_pip }}"
-      extra_args: "--user --ignore-installed"
-      state: "latest"
+  - name: "Stat uv after curl installer"
+    stat:
+      path: "{{ archivematica_src_uv }}"
+    register: uv_exists_after
+    when: not uv_exists.stat.exists
+
+  - name: "Re-stat uv to confirm installation"
+    stat:
+      path: "{{ archivematica_src_uv }}"
+    register: uv_exists_final
+    when: not uv_exists.stat.exists
 
   #
   # Prepare `archivematica_src_dir`

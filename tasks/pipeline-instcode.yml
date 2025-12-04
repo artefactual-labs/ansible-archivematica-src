@@ -15,12 +15,9 @@
 - name: "Install archivematica Python package"
   become: "yes"
   become_user: "archivematica"
-  pip:
-    virtualenv: "{{ archivematica_src_am_virtualenv }}"
+  command: "{{ archivematica_src_uv }} pip install --python {{ archivematica_src_am_virtualenv }}/bin/python --no-deps --editable ."
+  args:
     chdir: "{{ archivematica_src_dir }}/archivematica"
-    name: .
-    editable: yes
-    extra_args: "--no-deps"
 
 - name: "Copy gunicorn configuration file"
   copy:
