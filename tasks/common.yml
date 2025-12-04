@@ -67,12 +67,24 @@
       owner: "archivematica"
       group: "archivematica"
 
-  - name: "Install pip with get-pip.py as archivematica user"
+  - name: "Install pip with get-pip.py as archivematica user (All Os except Ubuntu >=24.04)"
     become: "yes"
     become_user: "archivematica"
     command: "{{ archivematica_src_virtualenv_python }} get-pip.py pip=={{ archivematica_src_pip_version }}"
     args:
       chdir: "/var/lib/archivematica"
+    when:
+      - ansible_distribution_major_version|int < 24
+
+  - name: "Install pip with get-pip.py as archivematica user (Ubuntu >=24.04)"
+    become: "yes"
+    become_user: "archivematica"
+    command: "{{ archivematica_src_virtualenv_python }} get-pip.py pip=={{ archivematica_src_pip_version }} --break-system-packages"
+    args:
+      chdir: "/var/lib/archivematica"
+    when:
+      - ansible_distribution_major_version|int >= 24
+
 
   - name: "Install virtualenv with pip"
     become: "yes"
