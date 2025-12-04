@@ -21,6 +21,7 @@ archivematica_src_am_fixity_deps:
 archivematica_src_python_packages:
   - "python3.12-devel"
   - "python3.12-setuptools"
+  - "python-unversioned-command"  # Required for sampledata make target
   - "pkgconfig"
 
 dashboard_osdeps:
