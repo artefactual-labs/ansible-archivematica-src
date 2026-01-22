@@ -34,14 +34,13 @@
 # front-end
 #
 
-- name: "Install front-end dependencies"
+- name: "Install and build Vue front-end"
   become: "yes"
   become_user: "archivematica"
-  command: npm install
+  shell: "npm clean-install && npm run build"
   args:
-    chdir: "{{ item }}"
-  with_items:
-    - "{{ archivematica_src_dir }}/archivematica/src/archivematica/dashboard/frontend"
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/archivematica/dashboard/vue"
+    executable: /bin/bash
 
 #
 # update logging configuration (Archivematica 1.18.0)
