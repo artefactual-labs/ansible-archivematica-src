@@ -103,7 +103,7 @@ storage_service_osdeps:
     - libssl-dev
     - gcc   # required to build some pip dependencies
     - gettext
-    - gnupg1
+    - gnupg2
     - rng-tools-debian
     - libsasl2-dev
     - libldap2-dev
