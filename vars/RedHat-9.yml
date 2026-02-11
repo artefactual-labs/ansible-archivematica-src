@@ -18,6 +18,7 @@ archivematica_src_am_fixity_deps:
   - "moreutils"
   - "s-nail"                  # Replaces mailx
 archivematica_src_python_packages:
+  - "python3.12"
   - "python3.12-devel"
   - "python3.12-setuptools"
   - "pkgconfig"

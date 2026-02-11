@@ -17,7 +17,7 @@
     home: "/var/lib/archivematica"
 
 #
-# Prepare pip
+# Prepare Python environment
 #
 
 - name: "Common configuration for source installs"
@@ -58,30 +58,6 @@
     when:
       - ansible_os_family in ['Rocky','RedHat']
       - ansible_distribution_major_version|int >= 8
-
-  - name: "Download get-pip.py in archivematica userdir"
-    get_url:
-      url: "https://bootstrap.pypa.io/get-pip.py"
-      force: "yes"
-      dest: "/var/lib/archivematica/get-pip.py"
-      owner: "archivematica"
-      group: "archivematica"
-
-  - name: "Install pip with get-pip.py as archivematica user"
-    become: "yes"
-    become_user: "archivematica"
-    command: "{{ archivematica_src_virtualenv_python }} get-pip.py pip=={{ archivematica_src_pip_version }}"
-    args:
-      chdir: "/var/lib/archivematica"
-
-  - name: "Install virtualenv with pip"
-    become: "yes"
-    become_user: "archivematica"
-    pip:
-      name: "virtualenv"
-      executable: "{{ archivematica_src_pip }}"
-      extra_args: "--user --ignore-installed"
-      state: "latest"
 
   #
   # Prepare `archivematica_src_dir`
