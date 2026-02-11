@@ -20,6 +20,7 @@ archivematica_src_am_fixity_deps:
 archivematica_src_python_packages:
   - "python36"        # Required for ansible package module
   - "python3-dnf"     # Required for ansible package module
+  - "python3.12"
   - "python3.12-devel"
   - "python3.12-setuptools"
   - "pkgconfig"
