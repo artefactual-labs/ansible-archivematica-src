@@ -51,7 +51,7 @@
 - block:
     - name: "pipeline-es | Reset Elasticsearch indexes"
       uri:
-        url: "http://{{ es_host }}:{{es_port}}/{{ item }}"
+        url: "{{ es_host }}:{{es_port}}/{{ item }}"
         method: "DELETE"
       with_items:
         - "aips"
