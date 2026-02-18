@@ -177,6 +177,14 @@
 #   4- SS code install
 ###########################################################
 
+- name: "Install and build frontend"
+  become: "yes"
+  become_user: "archivematica"
+  shell: "npm clean-install && npm run build"
+  args:
+    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service/src/archivematica/storage_service/frontend"
+    executable: /bin/bash
+
 - name: "Run SS django collectstatic"
   shell: >
     {{ archivematica_src_ss_virtualenv }}/bin/python -m archivematica.storage_service.manage
