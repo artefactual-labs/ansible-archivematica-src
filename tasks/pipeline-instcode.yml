@@ -34,12 +34,12 @@
 # front-end
 #
 
-- name: "Install and build Vue front-end"
+- name: "Install and build frontend"
   become: "yes"
   become_user: "archivematica"
   shell: "npm clean-install && npm run build"
   args:
-    chdir: "{{ archivematica_src_dir }}/archivematica/src/archivematica/dashboard/vue"
+    chdir: "{{ archivematica_src_dir }}/archivematica/src/archivematica/dashboard/frontend"
     executable: /bin/bash
 
 #
