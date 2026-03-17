@@ -20,6 +20,9 @@ archivematica_src_am_mcpclient_instances: 1
 archivematica_src_configure_dashboard: "no"
 archivematica_src_configure_ss: "no"
 
+# Install systemd-tmpfiles config to preserve AM Prometheus stats files.
+archivematica_src_am_prometheus_tmpfiles_enabled: "true"
+
 # Define the type of environment: "production" or "development". The latter will deploy some extra stuff to make the development workflow easier.
 archivematica_src_environment_type: "production"
 
@@ -288,4 +291,3 @@ archivematica_src_remote_locations:
   - { location_purpose: "CP", location_path: "/var/archivematica/sharedDirectory", location_description: "Remote processing", location_default: "true" }
   - { location_purpose: "BL", location_path: "/var/archivematica/sharedDirectory/www/AIPsStore/transferBacklog", location_description: "Remote transfer backlog", location_default: "true" }
 #  - { location_purpose: "TS", location_path: "/home", location_description: "Remote transfer source", location_default: "true" }
-

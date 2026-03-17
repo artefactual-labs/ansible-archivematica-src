@@ -207,6 +207,7 @@ Note that if something is disabled with the [role variables](#role-variables), i
     - `amsrc-pipeline-instcode`: Install source code
     - `amsrc-pipeline-dbconf`: Configure database
         - `amsrc-pipeline-dbconf-syncdb`: Only run Django's syncdb/migrations
+    - `amsrc-pipeline-tmpfiles`: Install systemd-tmpfiles configuration for AM Prometheus data; can be run independently
     - `amsrc-pipeline-websrv`: Configure webserver
 - `amsrc-automationtools`: Automation tools install
 - `amsrc-configure`: Create SS superuser & create dashboard admin & register pipeline on SS
