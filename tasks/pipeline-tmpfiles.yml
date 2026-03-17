@@ -1,0 +1,7 @@
+---
+- name: "Set up systemd-tmpfiles configuration"
+  template:
+    src: "etc/tmpfiles.d/am-prometheus.conf"
+    dest: "/etc/tmpfiles.d/am-prometheus.conf"
+  when:
+    - (ansible_service_mgr | default('')) == "systemd"

@@ -280,6 +280,18 @@
 
 
 #
+# Configure AM Prometheus tmpfiles
+#
+
+- import_tasks: "pipeline-tmpfiles.yml"
+  tags:
+    - "amsrc-pipeline"
+    - "amsrc-pipeline-tmpfiles"
+  when:
+    - "archivematica_src_am_prometheus_tmpfiles_enabled|bool"
+
+
+#
 # Remove FITS
 #
 - import_tasks: "fits.yml"
