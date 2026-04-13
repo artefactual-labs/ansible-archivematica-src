@@ -92,8 +92,14 @@ MCPServer_osdeps:
   packages: []
 
 storage_service_osdeps:
-  repokeys: []
-  repos: []
+  repokeys:
+    - "https://packages.archivematica.org/GPG-KEY-archivematica-sha512"
+  repos:
+    - baseurl: "https://packages.archivematica.org/1.18.x/rocky8-extras"
+      description: "archivematica extras"
+      enabled: "yes"
+      gpgcheck: "no"
+      name: "archivematica-extras"
   packages:
     - epel-release  # required by unar and nginx
   packages_2:
