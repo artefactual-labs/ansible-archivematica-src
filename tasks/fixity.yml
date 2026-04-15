@@ -83,23 +83,26 @@
     - "fixity"
     - "fixity-cron"
 
-- name: "Create cron job"
-  cron:
-     name: "Run fixity"
-     job: "/usr/local/bin/fixity-cron"
-     minute: "0"
-     hour: "3"
-     day: "1"
-     month: "*/3"
-     user: "archivematica"
-     cron_file: "fixity"
-     state: "present"
-
-- name: "Create cron job"
-  cron:
-     name: "SHELL"
-     env: yes
-     value: "/bin/bash"
-     cron_file: "fixity"
-     user: "archivematica"
-     state: "present"
+# DO NOT SETUP CRON JOB FOR FIXITY
+# (TO NOT OVERWRITE CLIENT CUSTOM CONFIG) 
+#
+# - name: "Create cron job"
+#   cron:
+#      name: "Run fixity"
+#      job: "/usr/local/bin/fixity-cron"
+#      minute: "0"
+#      hour: "3"
+#      day: "1"
+#      month: "*/3"
+#      user: "archivematica"
+#      cron_file: "fixity"
+#      state: "present"
+#
+# - name: "Create cron job"
+#   cron:
+#      name: "SHELL"
+#      env: yes
+#      value: "/bin/bash"
+#      cron_file: "fixity"
+#      user: "archivematica"
+#      state: "present"
