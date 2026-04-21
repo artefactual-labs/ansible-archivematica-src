@@ -50,7 +50,7 @@
       dest: "{{ systemd_environment_path }}/archivematica-mcp-client"
     - src: "etc/systemd/system/archivematica-mcp-client.service.j2"
       dest: "/etc/systemd/system/archivematica-mcp-client.service"
-  when: "archivematica_src_am_mcpclient_instances == 1"
+  when: "archivematica_src_am_mcpclient_instances|int == 1"
   tags: amsrc-mcp-client
 
 - name: "Configure mcp-clients (multiple)"
@@ -84,7 +84,7 @@
       backrefs: true  # If no line matches the regexp, the module does nothing at all — it will not add a new line.
     loop: "{{ range(1, archivematica_src_am_mcpclient_instances|int  + 1, 1)|list }}"
 
-  when: archivematica_src_am_mcpclient_instances > 1
+  when: archivematica_src_am_mcpclient_instances|int > 1
   tags: amsrc-mcp-client
 
 
@@ -179,7 +179,7 @@
     daemon_reload: "yes"
   when:
     - ansible_service_mgr == "systemd"
-    - archivematica_src_am_mcpclient_instances ==  1
+    - archivematica_src_am_mcpclient_instances|int ==  1
   tags: amsrc-mcp-client
 
 - name: "Enable mcpclient service (multiple)"
@@ -191,6 +191,6 @@
   loop: "{{ range(1, archivematica_src_am_mcpclient_instances|int  + 1, 1)|list }}"
   when:
     - ansible_service_mgr == "systemd"
-    - archivematica_src_am_mcpclient_instances > 1
+    - archivematica_src_am_mcpclient_instances|int > 1
   tags: amsrc-mcp-client
 
