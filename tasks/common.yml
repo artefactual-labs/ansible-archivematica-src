@@ -70,7 +70,7 @@
 
   - name: "Download get-pip.py in archivematica userdir"
     get_url:
-      url: "https://bootstrap.pypa.io/get-pip.py"
+      url: "https://bootstrap.pypa.io/pip/3.9/get-pip.py"
       force: "yes"
       dest: "/var/lib/archivematica/get-pip.py"
       owner: "archivematica"
