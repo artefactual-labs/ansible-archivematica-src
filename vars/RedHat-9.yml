@@ -68,7 +68,7 @@ MCPClient_osdeps:
     - mediainfo
     - mediaconch
     - nfs-utils
-    - java-1.8.0-openjdk-headless
+    - java-17-openjdk-headless
     - openjpeg2
     - p7zip
     - p7zip-plugins
