@@ -15,7 +15,7 @@ StandardError=syslog
 SyslogIdentifier=MCPServerStdout
 SyslogFacility={{ archivematica_src_syslog_mcpserver_facility }}
 {% endif %}
-WorkingDirectory=/var/lib/archivematica
+WorkingDirectory={{ archivematica_src_am_virtualenv }}
 ExecStart={{ archivematica_src_am_virtualenv }}/bin/python -m archivematica.MCPServer.archivematicaMCP
 
 [Install]

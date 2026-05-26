@@ -17,7 +17,7 @@ StandardError=syslog
 SyslogIdentifier=DashboardStdout
 SyslogFacility={{ archivematica_src_syslog_dashboard_facility }}
 {% endif %}
-WorkingDirectory=/var/lib/archivematica
+WorkingDirectory={{ archivematica_src_am_virtualenv }}
 ExecStart={{ archivematica_src_am_virtualenv }}/bin/gunicorn --config {{ archivematica_src_am_dashboard_gunicorn_config }} archivematica.dashboard.wsgi:application
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
