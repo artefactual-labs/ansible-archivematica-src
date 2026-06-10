@@ -66,7 +66,7 @@ MCPClient_osdeps:
     - mediaconch
     - mediainfo
     - nfs-common
-    - openjdk-8-jre-headless
+    - openjdk-17-jre-headless     # for jhove
     - p7zip-full
     - pbzip2
     - postfix
