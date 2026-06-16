@@ -307,4 +307,6 @@
         - item.location_replication_from is defined
       with_items:
         - "{{ am_ss_default_locations | default({}) }}"
-  when: am_ss_default_locations is defined
+  when:
+    - archivematica_src_configure_ss|bool
+    - am_ss_default_locations is defined
