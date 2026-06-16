@@ -303,4 +303,6 @@
       when: not location_descriptions.stdout | join('') | regex_search( '(^|\n)'+item.location_description+'(\n|$)' )
       with_items: "{{ am_ss_default_locations }}"
       tags: "configure-am"
-  when: am_ss_default_locations is defined
+  when:
+    - archivematica_src_configure_ss|bool
+    - am_ss_default_locations is defined
