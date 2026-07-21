@@ -13,6 +13,7 @@ ca_custom_bundle: "/etc/ssl/certs/ca-certificates.crt"
 archivematica_src_am_amauat_deps:
   - "tightvncserver"
   - "icewm"
+  - "make"
 archivematica_src_am_fixity_deps:
   - "sqlite3"
   - "moreutils"

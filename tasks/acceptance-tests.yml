@@ -37,15 +37,20 @@
     recurse: true
   tags: "amsrc-ss-pydep"
 
-- name: "Install pip dependencies in virtualenv"
+- name: "Synchronize locked acceptance test dependencies"
   become: "yes"
   become_user: "archivematica"
-  pip:
+  command: >-
+    make sync-runtime
+    UV={{ archivematica_src_uv }}
+  register: "__archivematica_src_acceptance_tests_sync"
+  changed_when: >-
+    'Installed ' in __archivematica_src_acceptance_tests_sync.stderr or
+    'Uninstalled ' in __archivematica_src_acceptance_tests_sync.stderr
+  args:
     chdir: "{{ archivematica_src_dir }}/archivematica-acceptance-tests"
-    requirements: "requirements.txt"
-    virtualenv: "/usr/share/archivematica/virtualenvs/archivematica-acceptance-tests"
-    virtualenv_command: "{{ archivematica_src_virtualenv }}"
-    state: latest
+  environment:
+    UV_PROJECT_ENVIRONMENT: "/usr/share/archivematica/virtualenvs/archivematica-acceptance-tests"
 
 #
 # Install Firefox

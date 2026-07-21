@@ -7,7 +7,8 @@ archivematica_src_am_dashboard_gunicorn_config: "/etc/archivematica/dashboard.gu
 archivematica_src_ss_virtualenv: "/usr/share/archivematica/virtualenvs/archivematica-storage-service"
 archivematica_src_ss_gunicorn_config: "/etc/archivematica/storage-service.gunicorn-config.py"
 
-archivematica_src_am_amauat_deps: []
+archivematica_src_am_amauat_deps:
+  - "make"
 archivematica_src_am_fixity_deps: []
 
 archivematica_src_virtualenv: "{{ archivematica_src_virtualenv_python }} -m venv"
