@@ -1,0 +1,216 @@
+---
+
+- name: "Resolve uv release asset"
+  set_fact:
+    __archivematica_src_uv_release_filename: "{{ __archivematica_src_uv_architecture_map.get(ansible_architecture) }}"
+  vars:
+    __archivematica_src_uv_architecture_map:
+      x86_64: "uv-x86_64-unknown-linux-gnu.tar.gz"
+      amd64: "uv-x86_64-unknown-linux-gnu.tar.gz"
+      aarch64: "uv-aarch64-unknown-linux-gnu.tar.gz"
+      arm64: "uv-aarch64-unknown-linux-gnu.tar.gz"
+      armv7: "uv-armv7-unknown-linux-gnueabihf.tar.gz"
+      armv7l: "uv-armv7-unknown-linux-gnueabihf.tar.gz"
+      i386: "uv-i686-unknown-linux-gnu.tar.gz"
+      i486: "uv-i686-unknown-linux-gnu.tar.gz"
+      i586: "uv-i686-unknown-linux-gnu.tar.gz"
+      i686: "uv-i686-unknown-linux-gnu.tar.gz"
+      ppc64le: "uv-powerpc64le-unknown-linux-gnu.tar.gz"
+      powerpc64le: "uv-powerpc64le-unknown-linux-gnu.tar.gz"
+      riscv64: "uv-riscv64gc-unknown-linux-gnu.tar.gz"
+      s390x: "uv-s390x-unknown-linux-gnu.tar.gz"
+
+- name: "Fail when uv architecture is unsupported"
+  fail:
+    msg: >-
+      Unsupported architecture {{ ansible_architecture }}. Supported options
+      are x86_64/amd64, aarch64/arm64, armv7/armv7l, i386/i486/i586/i686,
+      ppc64le/powerpc64le, riscv64, and s390x.
+  when: not __archivematica_src_uv_release_filename
+
+- name: "Check for existing uv path"
+  stat:
+    path: "{{ archivematica_src_uv }}"
+    get_checksum: no
+    get_mime: no
+    get_attributes: no
+  register: "__archivematica_src_uv_binary"
+
+- name: "Validate existing uv path"
+  assert:
+    that:
+      - >-
+        __archivematica_src_uv_binary.stat.isreg or
+        __archivematica_src_uv_binary.stat.islnk
+    msg: >-
+      The existing uv path {{ archivematica_src_uv }} is not a regular file or
+      symbolic link.
+  when: __archivematica_src_uv_binary.stat.exists
+
+- name: "Ensure existing uv binary permissions"
+  file:
+    path: "{{ archivematica_src_uv }}"
+    state: "file"
+    mode: "0755"
+  when: __archivematica_src_uv_binary.stat.isreg | default(false)
+
+- name: "Validate existing uv symbolic link"
+  assert:
+    that:
+      - __archivematica_src_uv_binary.stat.executable
+    msg: >-
+      The existing uv symbolic link {{ archivematica_src_uv }} does not resolve
+      to an executable file.
+  when: __archivematica_src_uv_binary.stat.islnk | default(false)
+
+- name: "Resolve latest uv release"
+  uri:
+    url: "https://github.com/astral-sh/uv/releases/latest"
+    method: "HEAD"
+    follow_redirects: "all"
+    status_code: 200
+    timeout: 30
+  register: "__archivematica_src_uv_latest_release"
+  retries: 3
+  delay: 3
+  until: __archivematica_src_uv_latest_release is success
+  changed_when: false
+  check_mode: no
+
+- name: "Record latest uv release"
+  set_fact:
+    __archivematica_src_uv_latest_tag: >-
+      {{ __archivematica_src_uv_latest_release.url | basename }}
+    __archivematica_src_uv_latest_version: >-
+      {{ (__archivematica_src_uv_latest_release.url | basename) | regex_replace('^v', '') }}
+
+- name: "Query installed uv version"
+  command: "{{ archivematica_src_uv }} --version"
+  register: "__archivematica_src_uv_installed_version_command"
+  changed_when: false
+  failed_when: false
+  check_mode: no
+
+- name: "Record installed uv version"
+  set_fact:
+    __archivematica_src_uv_installed_version: >-
+      {{ __archivematica_src_uv_installed_version_command.stdout.split()[1]
+         if __archivematica_src_uv_installed_version_command.rc == 0 and
+         (__archivematica_src_uv_installed_version_command.stdout.split() | length) > 1
+         else '' }}
+
+- name: "Determine whether uv installation is required"
+  set_fact:
+    __archivematica_src_uv_install_required: >-
+      {{ __archivematica_src_uv_installed_version != __archivematica_src_uv_latest_version }}
+
+- name: "Report required uv installation in check mode"
+  debug:
+    msg: >-
+      uv {{ __archivematica_src_uv_latest_version }} would be installed at
+      {{ archivematica_src_uv }}.
+  changed_when: true
+  when:
+    - __archivematica_src_uv_install_required
+    - ansible_check_mode
+
+- name: "Ensure uv install directory exists"
+  file:
+    path: "{{ archivematica_src_uv | dirname }}"
+    state: "directory"
+    mode: "0755"
+  when: __archivematica_src_uv_install_required
+
+- name: "Install latest uv release"
+  block:
+    - name: "Create temporary directory for uv download"
+      tempfile:
+        state: "directory"
+        suffix: "-uv-download"
+      register: "__archivematica_src_uv_tempdir"
+
+    - name: "Set uv download variables"
+      set_fact:
+        __archivematica_src_uv_archive_url: >-
+          https://github.com/astral-sh/uv/releases/download/{{ __archivematica_src_uv_latest_tag }}/{{ __archivematica_src_uv_release_filename }}
+        __archivematica_src_uv_checksum_url: >-
+          https://github.com/astral-sh/uv/releases/download/{{ __archivematica_src_uv_latest_tag }}/{{ __archivematica_src_uv_release_filename }}.sha256
+        __archivematica_src_uv_archive_path: >-
+          {{ __archivematica_src_uv_tempdir.path }}/{{ __archivematica_src_uv_release_filename }}
+        __archivematica_src_uv_checksum_path: >-
+          {{ __archivematica_src_uv_tempdir.path }}/{{ __archivematica_src_uv_release_filename }}.sha256
+        __archivematica_src_uv_extracted_binary_path: >-
+          {{ __archivematica_src_uv_tempdir.path }}/{{ __archivematica_src_uv_release_filename | regex_replace('[.]tar[.]gz$', '') }}/uv
+
+    - name: "Download uv checksum"
+      get_url:
+        url: "{{ __archivematica_src_uv_checksum_url }}"
+        dest: "{{ __archivematica_src_uv_checksum_path }}"
+        mode: "0644"
+        timeout: 30
+      register: "__archivematica_src_uv_checksum_download"
+      retries: 3
+      delay: 3
+      until: __archivematica_src_uv_checksum_download is success
+
+    - name: "Read uv checksum file"
+      slurp:
+        src: "{{ __archivematica_src_uv_checksum_path }}"
+      register: "__archivematica_src_uv_checksum_file"
+
+    - name: "Record expected uv checksum"
+      set_fact:
+        __archivematica_src_uv_expected_checksum: >-
+          {{ (__archivematica_src_uv_checksum_file.content | b64decode).split()[0] }}
+
+    - name: "Download uv archive"
+      get_url:
+        url: "{{ __archivematica_src_uv_archive_url }}"
+        dest: "{{ __archivematica_src_uv_archive_path }}"
+        mode: "0644"
+        checksum: "sha256:{{ __archivematica_src_uv_expected_checksum }}"
+        timeout: 30
+      register: "__archivematica_src_uv_archive_download"
+      retries: 3
+      delay: 3
+      until: __archivematica_src_uv_archive_download is success
+
+    - name: "Extract uv archive"
+      unarchive:
+        src: "{{ __archivematica_src_uv_archive_path }}"
+        dest: "{{ __archivematica_src_uv_tempdir.path }}"
+        remote_src: yes
+        mode: "0755"
+
+    - name: "Check extracted uv binary"
+      stat:
+        path: "{{ __archivematica_src_uv_extracted_binary_path }}"
+      register: "__archivematica_src_uv_extracted_binary"
+
+    - name: "Ensure uv binary exists in archive"
+      assert:
+        that:
+          - __archivematica_src_uv_extracted_binary.stat.isreg
+          - __archivematica_src_uv_extracted_binary.stat.executable
+        msg: >-
+          An executable uv binary was not found at
+          {{ __archivematica_src_uv_extracted_binary_path }}.
+
+    - name: "Install uv binary"
+      copy:
+        src: "{{ __archivematica_src_uv_extracted_binary_path }}"
+        dest: "{{ archivematica_src_uv }}"
+        remote_src: yes
+        follow: no
+        mode: "0755"
+  always:
+    - name: "Remove temporary uv download directory"
+      file:
+        path: "{{ __archivematica_src_uv_tempdir.path }}"
+        state: "absent"
+      when:
+        - __archivematica_src_uv_tempdir is defined
+        - __archivematica_src_uv_tempdir.path is defined
+  when:
+    - __archivematica_src_uv_install_required
+    - not ansible_check_mode

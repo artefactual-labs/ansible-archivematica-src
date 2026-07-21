@@ -142,6 +142,9 @@
        archivematica_src_install_am|bool or
        archivematica_src_install_am=='rpm'"
 
+- import_tasks: "uv.yml"
+  tags: "always"
+
 
 - name: "Checkout out archivematica-sampledata repository"
   git:
