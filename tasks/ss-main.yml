@@ -60,7 +60,7 @@
 
 
 ###########################################################
-#   2- Python dependencies (pip packages)
+#   2- Python dependencies
 ###########################################################
 
 - name: "Destroy virtualenv if it's using a different python version"
@@ -89,28 +89,6 @@
     recurse: true
   tags: "amsrc-ss-pydep"
 
-- name: "Create virtualenv and install pip-tools"
-  become: "yes"
-  become_user: "archivematica"
-  pip:
-    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
-    virtualenv_command: "{{ archivematica_src_virtualenv }}"
-    name: 
-      - "pip=={{ archivematica_src_pip_version }}"
-      - "pip-tools=={{ archivematica_src_pip_tools_version }}"
-  tags: "amsrc-ss-pydep"
-
-- name: "Synchronize requirements"
-  become: "yes"
-  become_user: "archivematica"
-  command: "{{ archivematica_src_ss_virtualenv }}/bin/pip-sync {{ 'requirements-dev.txt' if is_dev else 'requirements.txt' }}"
-  args:
-    chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-  environment:
-    LC_ALL: "en_US.utf8"
-    LANG: "en_US.utf8"
-  tags: "amsrc-ss-pydep"
-
 - name: "Change archivematica source owner to archivematica"
   file:
     dest: "{{ archivematica_src_dir }}"
@@ -119,15 +97,25 @@
     group: "archivematica"
     recurse: "yes"
 
-- name: "Install archivematica-storage-service Python package"
+- name: "Synchronize locked Storage Service dependencies"
   become: "yes"
   become_user: "archivematica"
-  pip:
-    virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+  command: >-
+    make {{ 'sync' if is_dev else 'sync-runtime' }}
+    UV={{ archivematica_src_uv }}
+  register: "__archivematica_src_ss_sync"
+  changed_when: >-
+    'Installed ' in __archivematica_src_ss_sync.stderr or
+    'Uninstalled ' in __archivematica_src_ss_sync.stderr
+  args:
     chdir: "{{ archivematica_src_dir }}/archivematica-storage-service"
-    name: .
-    editable: yes
-    extra_args: "--no-deps"
+  environment:
+    LC_ALL: "en_US.utf8"
+    LANG: "en_US.utf8"
+    UV_PROJECT_ENVIRONMENT: "{{ archivematica_src_ss_virtualenv }}"
+    UV_PYTHON: "{{ archivematica_src_virtualenv_python }}"
+    UV_PYTHON_DOWNLOADS: "never"
+  tags: "amsrc-ss-pydep"
 
 ###########################################################
 #   3- OS configuration (user/directory/file creation/permissions/ownership)

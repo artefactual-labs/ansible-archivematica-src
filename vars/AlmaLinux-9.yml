@@ -94,6 +94,8 @@ storage_service_osdeps:
   packages:
     - epel-release  # required by unar and nginx
   packages_2:
+    - make
+    - mariadb-connector-c-devel
     - nginx
     - unar
     - rsync

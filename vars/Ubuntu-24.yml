@@ -91,6 +91,7 @@ storage_service_osdeps:
   repokeys: []
   repos: []
   packages:
+    - make
     - nginx
     - unar
     - rsync
