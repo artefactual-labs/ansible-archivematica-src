@@ -32,6 +32,7 @@ dashboard_osdeps:
     - gcc
     - g++
     - gettext
+    - make
     - nginx
     - libffi-dev
     - libxml2-dev

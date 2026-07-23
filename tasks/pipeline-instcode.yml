@@ -4,24 +4,6 @@
 #   4- Code install
 ###########################################################
 
-- name: "Change archivematica-source owner to archivematica"
-  file:
-    dest: "{{ archivematica_src_dir }}"
-    state: "directory"
-    owner: "archivematica"
-    group: "archivematica"
-    recurse: "yes"
-
-- name: "Install archivematica Python package"
-  become: "yes"
-  become_user: "archivematica"
-  pip:
-    virtualenv: "{{ archivematica_src_am_virtualenv }}"
-    chdir: "{{ archivematica_src_dir }}/archivematica"
-    name: .
-    editable: yes
-    extra_args: "--no-deps"
-
 - name: "Copy gunicorn configuration file"
   copy:
     src: "{{ archivematica_src_dir }}/archivematica/src/archivematica/dashboard/install/dashboard.gunicorn-config.py"

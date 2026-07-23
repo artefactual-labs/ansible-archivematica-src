@@ -31,6 +31,7 @@ dashboard_osdeps:
     - gcc
     - gcc-c++
     - gettext    # only required in development environments (used to make string translateable)
+    - make
     - nginx
     - python3-policycoreutils
     - libffi-devel

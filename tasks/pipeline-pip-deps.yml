@@ -24,22 +24,21 @@
     state: "directory"
     recurse: true
 
-- name: "Create virtualenv and install pip-tools"
+- name: "Synchronize locked Archivematica dependencies"
   become: "yes"
   become_user: "archivematica"
-  pip:
-    virtualenv: "{{ archivematica_src_am_virtualenv }}"
-    virtualenv_command: "{{ archivematica_src_virtualenv }}"
-    name: 
-      - "pip=={{ archivematica_src_pip_version }}"
-      - "pip-tools=={{ archivematica_src_pip_tools_version }}"
-
-- name: "Synchronize requirements"
-  become: "yes"
-  become_user: "archivematica"
-  command: "{{ archivematica_src_am_virtualenv }}/bin/pip-sync {{ 'requirements-dev.txt' if is_dev else 'requirements.txt' }}"
+  command: >-
+    make {{ 'sync' if is_dev else 'sync-runtime' }}
+    UV={{ archivematica_src_uv }}
+  register: "__archivematica_src_am_sync"
+  changed_when: >-
+    'Installed ' in __archivematica_src_am_sync.stderr or
+    'Uninstalled ' in __archivematica_src_am_sync.stderr
   args:
     chdir: "{{ archivematica_src_dir }}/archivematica"
   environment:
     LC_ALL: "en_US.utf8"
     LANG: "en_US.utf8"
+    UV_PROJECT_ENVIRONMENT: "{{ archivematica_src_am_virtualenv }}"
+    UV_PYTHON: "{{ archivematica_src_virtualenv_python }}"
+    UV_PYTHON_DOWNLOADS: "never"
