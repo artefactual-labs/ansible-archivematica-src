@@ -215,7 +215,7 @@
 #
 #   0- Clone source repo
 #   1- OS dependencies (debian packages)
-#   2- python dependencies (pip packages)
+#   2- Python dependencies
 #   3- OS configuration (user/directory/file creation/permissions/ownership)
 #   4- Code install
 #   5- Database config
@@ -231,6 +231,30 @@
     tags:
       - "amsrc-pipeline"
       - "amsrc-pipeline-osdeps"
+
+  # Keep this task in the shared pipeline block so dependency synchronization
+  # and code installation can each be run by tag while a full install performs
+  # the recursive ownership change only once.
+  #
+  # TODO: Stop making the runtime service account the owner of the entire
+  # source root. This grants compromised services write access to application
+  # code and Git metadata for every checkout under archivematica_src_dir,
+  # allowing persistent code changes or malicious Git hooks. Later privileged
+  # Git operations or management commands could execute those changes. Replace
+  # this with a dedicated unprivileged deployment user and narrowly scoped
+  # writable build paths, keeping source code and Git metadata read-only to
+  # runtime services.
+  - name: "Change archivematica source owner to archivematica"
+    file:
+      dest: "{{ archivematica_src_dir }}"
+      state: "directory"
+      owner: "archivematica"
+      group: "archivematica"
+      recurse: "yes"
+    tags:
+      - "amsrc-pipeline"
+      - "amsrc-pipeline-pipdeps"
+      - "amsrc-pipeline-instcode"
 
   - import_tasks: "pipeline-pip-deps.yml"
     tags:
