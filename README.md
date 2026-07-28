@@ -12,6 +12,7 @@ Archivematica installation from its source code repositories.
 - [Configure ClamAV](#configure-clamav)
 - [Disable Elasticsearch use](#disable-elasticsearch-use)
 - [Deploy separate SS and pipeline](#deploy-separate-ss-and-pipeline)
+- [Fixity](#fixity)
 - [Tags](#tags)
 - [Dependencies](#dependencies)
 - [Example Playbooks](#example-playbooks)
@@ -124,6 +125,269 @@ deployment is still using SQLite. If that's the case, please know that:
   you have previously backed up the database. The location of the SQLite
   database may be indicated via `archivematica_src_migrate_sqlite3_db_name`, but
   the default value will likely work for you.
+
+
+Fixity
+------
+
+Fixity is not installed or modified by default. To avoid accidental Fixity
+changes during regular Archivematica upgrades, pass the opt-in variable as an
+extra variable when you intentionally want to install or update the role-managed
+Fixity setup:
+
+```bash
+ansible-playbook PLAYBOOK.yml -t amsrc-fixity -e archivematica_src_install_fixity=yes
+```
+
+When enabled, the role installs Fixity, creates a single runner for cron and
+manual use, configures optional cron execution, adds size-based log rotation,
+and removes the legacy `fixity-cron` script after backing it up. Existing legacy
+files are backed up on the VM before replacement.
+
+The role-managed Fixity feature is usually installed on the VM or server running
+Archivematica Storage Service. The runner uses the Storage Service API for scans
+and `SS_DB_URL` for selection and summary queries. It can run from another VM
+when the Storage Service API and MySQL database are reachable from that host.
+
+The new runner requires the Storage Service to use MySQL or MariaDB. SQLite
+Storage Service databases are not supported by the role-managed Fixity runner.
+The role installs a MySQL Python connector in the Fixity virtualenv for these
+queries.
+If `SS_DB_URL` contains special characters in the database user or password,
+they must be URL-encoded in the Storage Service configuration.
+
+Upstream Fixity also keeps its own SQLite database inside the Fixity Python
+package, for example:
+
+```text
+/usr/share/archivematica/virtualenvs/fixity/lib/python3.12/site-packages/fixity/fixity.db
+```
+
+That database belongs to the Fixity application itself and is separate from the
+Storage Service database used by the role-managed runner to select AIPs and
+build summary statistics.
+
+The managed CLI is installed at:
+
+```text
+/usr/local/bin/fixity
+```
+
+When running through `sudo`, use the absolute path because some sudo
+configurations do not include `/usr/local/bin` in `secure_path`:
+
+```bash
+sudo -u archivematica /usr/local/bin/fixity --help
+```
+
+The default Fixity configuration is written to:
+
+```text
+/etc/default/fixity
+```
+
+This file can contain API keys, database URLs, and email credentials. The role
+installs it as `0640` owned by the configured Fixity user and group. The managed
+Fixity scripts are installed as `0755` and re-execute themselves as the
+configured Fixity user before reading the protected config.
+
+The configured Fixity user defaults to `archivematica`. If the script is run as
+root, it re-executes itself as that user with `sudo` or `runuser`. If it is run
+as a different non-root user, it attempts passwordless `sudo`; otherwise it
+fails before reading the protected config file.
+
+### Fixity CLI
+
+Scan all uploaded AIPs:
+
+```bash
+fixity --mode all
+```
+
+Scan random AIPs that have not been scanned recently:
+
+```bash
+fixity --mode random --count 20 --days 365
+```
+
+Scan one or more explicit AIPs:
+
+```bash
+fixity --mode aip --aip 11111111-1111-1111-1111-111111111111
+fixity --mode aip --aips 11111111-1111-1111-1111-111111111111,22222222-2222-2222-2222-222222222222
+fixity --mode aip --aip-file /path/to/aips.txt
+```
+
+Useful manual options:
+
+```bash
+fixity --mode random --count 5 --days 180 --list-only
+fixity --mode aip --aip 11111111-1111-1111-1111-111111111111 --email user@example.com
+fixity --mode all --no-email
+```
+
+For a quick CLI test that does not send email:
+
+```bash
+fixity --mode random --count 1 --days 1 --no-email
+```
+
+For a CLI test that sends only to a temporary recipient list:
+
+```bash
+fixity --mode random --count 1 --days 1 --emails user@example.com
+```
+
+For a CLI test of email notifications against a specific AIP:
+
+```bash
+fixity --mode aip --aip 11111111-1111-1111-1111-111111111111 --email user@example.com
+```
+
+For a CLI test of email notifications without scanning the AIP:
+
+```bash
+fixity --mode aip --aip 11111111-1111-1111-1111-111111111111 --email user@example.com --list-only
+```
+
+Legacy upstream Fixity commands still pass through to the installed Fixity
+virtualenv binary:
+
+```bash
+fixity scan 11111111-1111-1111-1111-111111111111
+fixity scanall
+```
+
+The script must run as `archivematica_src_fixity_user`, which defaults to
+`archivematica`. If it is run as another user, it will try to re-execute itself
+with `sudo`; otherwise it fails with an error.
+
+### Fixity configuration
+
+Cron is enabled when Fixity is installed unless disabled explicitly:
+
+```yaml
+archivematica_src_fixity_config_file: "/etc/default/fixity"
+archivematica_src_fixity_cron_enabled: "yes"
+archivematica_src_fixity_cron_minute: "0"
+archivematica_src_fixity_cron_hour: "3"
+archivematica_src_fixity_cron_day: "1"
+archivematica_src_fixity_cron_month: "*/3"
+archivematica_src_fixity_cron_weekday: "*"
+```
+
+The default cron mode is `all`:
+
+```yaml
+archivematica_src_fixity_default_mode: "all"
+archivematica_src_fixity_random_count: 20
+archivematica_src_fixity_random_days: 365
+```
+
+To send reports to a custom recipient list instead of Storage Service
+administrative users:
+
+```yaml
+archivematica_src_fixity_emails:
+  - "user@example.com"
+  - "admin@example.com"
+```
+
+By default, email is sent through the system local MTA using the `mail`
+command. `archivematica_src_fixity_email_sender` can be used with the local MTA
+or with SMTP. Optional SMTP settings can be configured when the VM should send
+directly through an external mail server:
+
+```yaml
+archivematica_src_fixity_email_sender: "fixity@example.com"
+archivematica_src_fixity_email_server: "smtp.example.com"
+archivematica_src_fixity_email_port: 587
+archivematica_src_fixity_email_username: "smtp-user"
+archivematica_src_fixity_email_password: "smtp-password"
+archivematica_src_fixity_email_use_tls: "yes"
+archivematica_src_fixity_email_use_ssl: "no"
+```
+
+Leave `archivematica_src_fixity_email_server` empty to use the local MTA.
+
+The role also preserves the upstream Fixity reporting-service environment
+variables:
+
+```yaml
+archivematica_src_fixity_report_url: "http://report"
+archivematica_src_fixity_report_username: "test"
+archivematica_src_fixity_report_password: "XXXX"
+```
+
+These variables are exported as `REPORT_URL`, `REPORT_USERNAME`, and
+`REPORT_PASSWORD` for the upstream `fixity` command. They are used when Fixity
+is configured to POST scan reports to an external HTTP reporting service. This
+is separate from the email settings above, which control how the role-managed
+runner sends email notifications.
+
+To exclude AIP stores from scheduled `all` and `random` scans, set Storage
+Service location UUIDs:
+
+```yaml
+archivematica_src_fixity_excluded_aip_stores:
+  - "11111111-1111-1111-1111-111111111111"
+archivematica_src_fixity_respect_exclusions: "yes"
+```
+
+Exclusions are also respected by explicit `aip` mode by default. Use
+`archivematica_src_fixity_respect_exclusions: "no"` to disable that default for
+all runs, or use `--respect-exclusions=no` / `--respect-exclusions no` only when
+an operator intentionally wants to test a known problematic AIP from an excluded
+store.
+
+The runner uses `flock` to prevent concurrent runs:
+
+```yaml
+archivematica_src_fixity_lock_enabled: "yes"
+archivematica_src_fixity_lock_file: "/var/lock/archivematica-fixity.lock"
+```
+
+The lock is released by the operating system when the process exits. The lock
+file may remain on disk, but it does not need to be deleted manually.
+
+### Fixity logs
+
+Fixity writes an operational log and per-run reports under:
+
+```text
+/var/log/archivematica/fixity
+/var/log/archivematica/fixity/reports
+```
+
+The script keeps one persistent report file per run in the reports directory.
+Temporary files used to assemble the summary and email body are removed when the
+run finishes.
+
+The maximum number of persistent per-run report files is managed by the script:
+
+```yaml
+archivematica_src_fixity_report_max_files: 100
+```
+
+Set it to `0` to disable report cleanup. Logrotate is still used for
+size-based rotation of large log files:
+
+```yaml
+archivematica_src_fixity_logrotate_size: "10M"
+archivematica_src_fixity_logrotate_rotate: 10
+archivematica_src_fixity_logrotate_compress: "yes"
+```
+
+### Fixity script checks
+
+Use `shellcheck` when changing the managed Fixity shell scripts:
+
+```bash
+shellcheck templates/bin/fixity
+```
+
+ShellCheck is used here to catch quoting, argument handling, portability, and
+control-flow issues in the runner before it is deployed by Ansible.
 
 Backward-compatible logging
 ---------------------------
