@@ -6,7 +6,7 @@ ansible_deps:
   - "python3-setuptools"
   - "git"
   - "python3-PyMySQL"         # Required for mysql_db module
-  - "sqlite"                  # Required for am-configure and fixity
+  - "sqlite"                  # Required for am-configure
   - "p7zip-plugins"
   - "python3-policycoreutils" # Required by SELinux management
   - "python3-libsemanage"     # Required by SELinux management
@@ -15,7 +15,6 @@ ca_custom_bundle: "/etc/pki/tls/certs/ca-bundle.crt"
 archivematica_src_am_amauat_deps:
   - "make"
 archivematica_src_am_fixity_deps:
-  - "sqlite"
   - "moreutils"
   - "mailx"
 archivematica_src_python_packages:
