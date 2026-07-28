@@ -1,4 +1,783 @@
 #!/bin/bash
+# Managed by ansible-archivematica-src
 
-source {{ systemd_environment_path }}/fixity
-/usr/share/archivematica/virtualenvs/fixity/bin/fixity $*
+set -o pipefail
+
+RUN_USER="{{ archivematica_src_fixity_user }}"
+ENV_FILE="{{ archivematica_src_fixity_config_file }}"
+FIXITY_BIN="{{ archivematica_src_fixity_virtualenv }}/bin/fixity"
+FIXITY_PYTHON="{{ archivematica_src_fixity_virtualenv }}/bin/python"
+HELP_EMAIL_RECIPIENTS="{% if archivematica_src_fixity_emails|length > 0 %}{{ archivematica_src_fixity_emails | join(',') }}{% else %}Storage Service users{% endif %}"
+HELP_EMAIL_SERVER="{{ archivematica_src_fixity_email_server | default('local MTA', true) }}"
+HELP_EXCLUDED_AIP_STORES="{% if archivematica_src_fixity_excluded_aip_stores|length > 0 %}{{ archivematica_src_fixity_excluded_aip_stores | join(',') }}{% else %}none{% endif %}"
+HELP_RESPECT_EXCLUSIONS="{{ archivematica_src_fixity_respect_exclusions }}"
+
+case "${1:-}" in
+    --help|-h)
+        cat <<EOF
+Usage: $(basename "$0") [options]
+
+Modes:
+  --mode all                         Scan all uploaded AIPs.
+  --mode random --count N --days N   Scan random AIPs not scanned in N days.
+  --mode aip --aip UUID              Scan one or more explicit AIPs.
+
+Options:
+  --aip UUID                         Add an AIP UUID for aip mode. No default.
+  --aips UUID1,UUID2                 Add a comma-separated AIP UUID list. No default.
+  --aip-file PATH                    Add AIP UUIDs from a file. No default.
+  --exclude-store UUID               Exclude an AIP store location UUID. Defaults to FIXITY_EXCLUDED_AIP_STORES.
+  --exclude-stores UUID1,UUID2       Exclude comma-separated AIP store UUIDs. Defaults to FIXITY_EXCLUDED_AIP_STORES.
+  --respect-exclusions[=yes|no]      Apply AIP store exclusions in aip mode. Defaults to FIXITY_RESPECT_EXCLUSIONS.
+  --limit N                          Limit selected AIPs in all mode. Default: unlimited.
+  --email ADDRESS                    Add an email recipient. Defaults to FIXITY_EMAILS or Storage Service users.
+  --emails ADDR1,ADDR2               Add comma-separated email recipients. Defaults to FIXITY_EMAILS or Storage Service users.
+  --email-sender ADDRESS             Override the email sender. Defaults to FIXITY_EMAIL_SENDER or local mail default.
+  --no-email                         Do not send email. Default: email enabled when recipients are found.
+  --list-only                        List selected AIPs without scanning. Default: off.
+  --quiet                            Suppress progress output. Default: off.
+  --help                             Show this help.
+
+Configured defaults:
+  Config file                        {{ archivematica_src_fixity_config_file }}
+  Default mode                       {{ archivematica_src_fixity_default_mode }}
+  Random count                       {{ archivematica_src_fixity_random_count }}
+  Random days                        {{ archivematica_src_fixity_random_days }}
+  Email recipients                   $HELP_EMAIL_RECIPIENTS
+  Email server                       $HELP_EMAIL_SERVER
+  Excluded AIP stores                $HELP_EXCLUDED_AIP_STORES
+  Respect exclusions                 $HELP_RESPECT_EXCLUSIONS
+  Lock enabled                       {{ archivematica_src_fixity_lock_enabled }}
+  Lock file                          {{ archivematica_src_fixity_lock_file }}
+  Scan timeout                       {{ archivematica_src_fixity_scan_timeout }} seconds; 0 means no timeout.
+EOF
+        exit 0
+        ;;
+esac
+
+# {% raw %}
+if [ "$(id -un)" != "$RUN_USER" ]; then
+    if [ "$(id -u)" -eq 0 ]; then
+        if command -v sudo >/dev/null 2>&1; then
+            exec sudo -u "$RUN_USER" -E "$0" "$@"
+        elif command -v runuser >/dev/null 2>&1; then
+            exec runuser -u "$RUN_USER" -- "$0" "$@"
+        else
+            echo "ERROR: this script must run as $RUN_USER, and neither sudo nor runuser is available."
+            exit 2
+        fi
+    elif command -v sudo >/dev/null 2>&1 && sudo -n -u "$RUN_USER" true 2>/dev/null; then
+        exec sudo -n -u "$RUN_USER" -E "$0" "$@"
+    else
+        echo "ERROR: this script must run as $RUN_USER, or be run by a user with passwordless sudo to $RUN_USER."
+        exit 2
+    fi
+fi
+
+RUN_HOME="${HOME:-/}"
+cd "$RUN_HOME" 2>/dev/null || cd / || {
+    echo "ERROR: cannot change to a safe working directory"
+    exit 2
+}
+
+if [ ! -r "$ENV_FILE" ]; then
+    echo "ERROR: fixity environment file not readable: $ENV_FILE"
+    exit 2
+fi
+
+set -a
+# shellcheck source=/dev/null
+source "$ENV_FILE"
+set +a
+
+MODE="${FIXITY_DEFAULT_MODE:-all}"
+RANDOM_COUNT="${FIXITY_RANDOM_COUNT:-20}"
+RANDOM_DAYS="${FIXITY_RANDOM_DAYS:-365}"
+EMAILS_CSV="${FIXITY_EMAILS:-}"
+EMAIL_SENDER="${FIXITY_EMAIL_SENDER:-}"
+EMAIL_SERVER="${FIXITY_EMAIL_SERVER:-}"
+EMAIL_PORT="${FIXITY_EMAIL_PORT:-25}"
+EMAIL_USERNAME="${FIXITY_EMAIL_USERNAME:-}"
+EMAIL_PASSWORD="${FIXITY_EMAIL_PASSWORD:-}"
+EMAIL_USE_TLS="${FIXITY_EMAIL_USE_TLS:-no}"
+EMAIL_USE_SSL="${FIXITY_EMAIL_USE_SSL:-no}"
+EXCLUDED_STORES_CSV="${FIXITY_EXCLUDED_AIP_STORES:-}"
+RESPECT_EXCLUSIONS="${FIXITY_RESPECT_EXCLUSIONS:-yes}"
+LOCK_ENABLED="${FIXITY_LOCK_ENABLED:-yes}"
+LOCK_FILE="${FIXITY_LOCK_FILE:-/var/lock/archivematica-fixity.lock}"
+LOG_DIR="${FIXITY_LOG_DIR:-/var/log/archivematica/fixity}"
+REPORT_DIR="${FIXITY_REPORT_DIR:-$LOG_DIR/reports}"
+REPORT_MAX_FILES="${FIXITY_REPORT_MAX_FILES:-100}"
+SCAN_TIMEOUT="${FIXITY_SCAN_TIMEOUT:-0}"
+SEND_EMAIL="yes"
+QUIET="no"
+LIST_ONLY="no"
+LIMIT=""
+declare -a REQUESTED_AIPS
+declare -a SELECTED_AIPS
+declare -a SUCCESS_AIPS
+declare -a FAILED_AIPS
+declare -a SKIPPED_AIPS
+
+case "${1:-}" in
+    scan|scanall)
+        exec "$FIXITY_BIN" "$@"
+        ;;
+esac
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") [options]
+
+Modes:
+  --mode all                         Scan all uploaded AIPs.
+  --mode random --count N --days N   Scan random AIPs not scanned in N days.
+  --mode aip --aip UUID              Scan one or more explicit AIPs.
+
+Options:
+  --aip UUID                         Add an AIP UUID for aip mode. No default.
+  --aips UUID1,UUID2                 Add a comma-separated AIP UUID list. No default.
+  --aip-file PATH                    Add AIP UUIDs from a file. No default.
+  --exclude-store UUID               Exclude an AIP store location UUID. Defaults to FIXITY_EXCLUDED_AIP_STORES.
+  --exclude-stores UUID1,UUID2       Exclude comma-separated AIP store UUIDs. Defaults to FIXITY_EXCLUDED_AIP_STORES.
+  --respect-exclusions[=yes|no]      Apply AIP store exclusions in aip mode. Defaults to FIXITY_RESPECT_EXCLUSIONS.
+  --limit N                          Limit selected AIPs in all mode. Default: unlimited.
+  --email ADDRESS                    Add an email recipient. Defaults to FIXITY_EMAILS or Storage Service users.
+  --emails ADDR1,ADDR2               Add comma-separated email recipients. Defaults to FIXITY_EMAILS or Storage Service users.
+  --email-sender ADDRESS             Override the email sender. Defaults to FIXITY_EMAIL_SENDER or local mail default.
+  --no-email                         Do not send email. Default: email enabled when recipients are found.
+  --list-only                        List selected AIPs without scanning. Default: off.
+  --quiet                            Suppress progress output. Default: off.
+  --help                             Show this help.
+
+Configured defaults:
+  Config file                        $ENV_FILE
+  Default mode                       ${FIXITY_DEFAULT_MODE:-all}
+  Random count                       ${FIXITY_RANDOM_COUNT:-20}
+  Random days                        ${FIXITY_RANDOM_DAYS:-365}
+  Email recipients                   ${FIXITY_EMAILS:-Storage Service users}
+  Email server                       ${FIXITY_EMAIL_SERVER:-local MTA}
+  Excluded AIP stores                ${FIXITY_EXCLUDED_AIP_STORES:-none}
+  Respect exclusions                 ${FIXITY_RESPECT_EXCLUSIONS:-yes}
+  Lock enabled                       ${FIXITY_LOCK_ENABLED:-yes}
+  Lock file                          ${FIXITY_LOCK_FILE:-/var/lock/archivematica-fixity.lock}
+  Scan timeout                       ${FIXITY_SCAN_TIMEOUT:-0} seconds; 0 means no timeout.
+EOF
+}
+
+csv_to_array() {
+    local csv="$1"
+    local item
+    IFS=',' read -ra __items <<< "$csv"
+    for item in "${__items[@]}"; do
+        item="${item#"${item%%[![:space:]]*}"}"
+        item="${item%"${item##*[![:space:]]}"}"
+        [ -n "$item" ] && printf '%s\n' "$item"
+    done
+}
+
+add_csv_to_array() {
+    local csv="$1"
+    local target="$2"
+    local item
+    while IFS= read -r item; do
+        eval "$target+=(\"\$item\")"
+    done < <(csv_to_array "$csv")
+}
+
+is_yes() {
+    case "${1,,}" in
+        yes|true|1|on) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+is_no() {
+    case "${1,,}" in
+        no|false|0|off) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+validate_uuid() {
+    [[ "$1" =~ ^[0-9a-fA-F-]{36}$ ]]
+}
+
+validate_int() {
+    [[ "$1" =~ ^[0-9]+$ ]]
+}
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --mode)
+            MODE="$2"
+            shift 2
+            ;;
+        --count)
+            RANDOM_COUNT="$2"
+            shift 2
+            ;;
+        --days)
+            RANDOM_DAYS="$2"
+            shift 2
+            ;;
+        --aip)
+            REQUESTED_AIPS+=("$2")
+            shift 2
+            ;;
+        --aips)
+            add_csv_to_array "$2" REQUESTED_AIPS
+            shift 2
+            ;;
+        --aip-file)
+            if [ ! -r "$2" ]; then
+                echo "ERROR: AIP file not readable: $2"
+                exit 2
+            fi
+            while IFS= read -r line; do
+                line="${line%%#*}"
+                line="${line#"${line%%[![:space:]]*}"}"
+                line="${line%"${line##*[![:space:]]}"}"
+                [ -n "$line" ] && REQUESTED_AIPS+=("$line")
+            done < "$2"
+            shift 2
+            ;;
+        --exclude-store)
+            EXCLUDED_STORES_CSV="${EXCLUDED_STORES_CSV:+$EXCLUDED_STORES_CSV,}$2"
+            shift 2
+            ;;
+        --exclude-stores)
+            EXCLUDED_STORES_CSV="${EXCLUDED_STORES_CSV:+$EXCLUDED_STORES_CSV,}$2"
+            shift 2
+            ;;
+        --respect-exclusions)
+            RESPECT_EXCLUSIONS="yes"
+            if [ "${2:-}" = "yes" ] || [ "${2:-}" = "no" ]; then
+                RESPECT_EXCLUSIONS="$2"
+                shift 2
+            else
+                shift
+            fi
+            ;;
+        --respect-exclusions=yes)
+            RESPECT_EXCLUSIONS="yes"
+            shift
+            ;;
+        --respect-exclusions=no)
+            RESPECT_EXCLUSIONS="no"
+            shift
+            ;;
+        --limit)
+            LIMIT="$2"
+            shift 2
+            ;;
+        --email)
+            EMAILS_CSV="${EMAILS_CSV:+$EMAILS_CSV,}$2"
+            shift 2
+            ;;
+        --emails)
+            EMAILS_CSV="${EMAILS_CSV:+$EMAILS_CSV,}$2"
+            shift 2
+            ;;
+        --email-sender)
+            EMAIL_SENDER="$2"
+            shift 2
+            ;;
+        --no-email)
+            SEND_EMAIL="no"
+            shift
+            ;;
+        --list-only)
+            LIST_ONLY="yes"
+            shift
+            ;;
+        --quiet)
+            QUIET="yes"
+            shift
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "ERROR: unknown option: $1"
+            usage
+            exit 2
+            ;;
+    esac
+done
+
+case "$MODE" in
+    all|random|aip) ;;
+    *)
+        echo "ERROR: invalid mode: $MODE"
+        exit 2
+        ;;
+esac
+
+if ! validate_int "$RANDOM_COUNT" || [ "$RANDOM_COUNT" -lt 1 ]; then
+    echo "ERROR: --count must be a positive integer"
+    exit 2
+fi
+
+if ! validate_int "$RANDOM_DAYS" || [ "$RANDOM_DAYS" -lt 1 ]; then
+    echo "ERROR: --days must be a positive integer"
+    exit 2
+fi
+
+if [ -n "$LIMIT" ] && { ! validate_int "$LIMIT" || [ "$LIMIT" -lt 1 ]; }; then
+    echo "ERROR: --limit must be a positive integer"
+    exit 2
+fi
+
+if ! validate_int "$SCAN_TIMEOUT"; then
+    echo "ERROR: FIXITY_SCAN_TIMEOUT must be an integer"
+    exit 2
+fi
+
+if ! validate_int "$REPORT_MAX_FILES"; then
+    echo "ERROR: FIXITY_REPORT_MAX_FILES must be an integer"
+    exit 2
+fi
+
+if ! is_yes "$RESPECT_EXCLUSIONS" && ! is_no "$RESPECT_EXCLUSIONS"; then
+    echo "ERROR: FIXITY_RESPECT_EXCLUSIONS must be yes or no"
+    exit 2
+fi
+
+if ! validate_int "$EMAIL_PORT"; then
+    echo "ERROR: FIXITY_EMAIL_PORT must be an integer"
+    exit 2
+fi
+
+mkdir -p "$LOG_DIR" "$REPORT_DIR"
+
+START_EPOCH=$(date +%s)
+START_DATE=$(date +%Y%m%d_%H%M%S)
+RUN_LOG="$REPORT_DIR/fixity-$START_DATE.log"
+MAIN_LOG="$LOG_DIR/fixity.log"
+SUMMARY_FILE=$(mktemp)
+EMAIL_BODY=$(mktemp)
+cleanup() {
+    # shellcheck disable=SC2317
+    rm -f "$SUMMARY_FILE" "$EMAIL_BODY"
+}
+trap cleanup EXIT
+touch "$RUN_LOG" "$MAIN_LOG"
+chmod 0640 "$RUN_LOG" "$MAIN_LOG"
+
+timestamp() {
+    if command -v ts >/dev/null 2>&1; then
+        ts '[%Y-%m-%d %H:%M:%S %Z]'
+    else
+        awk '{ print strftime("[%Y-%m-%d %H:%M:%S %Z]"), $0; fflush(); }'
+    fi
+}
+
+log() {
+    local message="$*"
+    printf '%s\n' "$message" | timestamp >> "$MAIN_LOG"
+    printf '%s\n' "$message" | timestamp >> "$RUN_LOG"
+    if [ "$QUIET" != "yes" ]; then
+        printf '%s\n' "$message" | timestamp
+    fi
+}
+
+die() {
+    log "ERROR: $*"
+    exit 2
+}
+
+cleanup_old_reports() {
+    local old_report
+
+    if [ "$REPORT_MAX_FILES" -eq 0 ]; then
+        return
+    fi
+
+    while IFS= read -r old_report; do
+        [ -n "$old_report" ] || continue
+        rm -f -- "$old_report"
+        log "Removed old fixity report: $old_report"
+    done < <(
+        find "$REPORT_DIR" -maxdepth 1 -type f -name 'fixity-*.log' -printf '%T@ %p\n' \
+            | sort -rn \
+            | awk -v keep="$REPORT_MAX_FILES" 'NR > keep { sub(/^[^ ]+ /, ""); print }'
+    )
+}
+
+if is_yes "$LOCK_ENABLED"; then
+    exec 9>"$LOCK_FILE" || die "cannot open lock file: $LOCK_FILE"
+    if ! flock -n 9; then
+        die "another fixity run is already active"
+    fi
+fi
+
+[ -x "$FIXITY_BIN" ] || die "fixity binary not executable: $FIXITY_BIN"
+[ -x "$FIXITY_PYTHON" ] || die "Fixity Python not executable: $FIXITY_PYTHON"
+if [ -z "$EMAIL_SERVER" ] && ! command -v mail >/dev/null 2>&1; then
+    log "WARNING: mail command not found; local MTA email will not be sent"
+fi
+
+mysql_query() {
+    local sql="$1"
+    FIXITY_SQL="$sql" "$FIXITY_PYTHON" - <<'PY'
+import os
+import sys
+from urllib.parse import parse_qs, unquote, urlparse
+
+import pymysql
+
+
+db_url = os.environ.get("SS_DB_URL", "")
+query = os.environ["FIXITY_SQL"]
+url = urlparse(db_url)
+if not url.scheme.startswith("mysql"):
+    raise SystemExit("SS_DB_URL must use a MySQL/MariaDB database")
+
+query_args = parse_qs(url.query)
+ssl_args = {}
+if query_args.get("ssl_ca"):
+    ssl_args["ca"] = query_args["ssl_ca"][0]
+
+conn = pymysql.connect(
+    host=url.hostname or "localhost",
+    port=url.port or 3306,
+    user=unquote(url.username or ""),
+    password=unquote(url.password or ""),
+    database=unquote((url.path or "").lstrip("/")),
+    charset="utf8mb4",
+    ssl=ssl_args or None,
+)
+
+try:
+    with conn.cursor() as cursor:
+        cursor.execute(query)
+        for row in cursor.fetchall():
+            print("\t".join("" if value is None else str(value) for value in row))
+finally:
+    conn.close()
+PY
+}
+
+filter_uuid_lines() {
+    awk '/^[0-9a-fA-F-]{36}$/ { print }'
+}
+
+if [[ "${SS_DB_URL:-}" != mysql://* ]] && [[ "${SS_DB_URL:-}" != mysql+*://* ]]; then
+    die "SS_DB_URL must use a MySQL/MariaDB database for role-managed fixity"
+fi
+
+declare -a EXCLUDED_STORES
+add_csv_to_array "$EXCLUDED_STORES_CSV" EXCLUDED_STORES
+for store in "${EXCLUDED_STORES[@]}"; do
+    validate_uuid "$store" || die "invalid AIP store location UUID: $store"
+done
+
+sql_uuid_list() {
+    local uuid
+    local out=""
+    for uuid in "$@"; do
+        out="${out:+$out,}'$uuid'"
+    done
+    printf '%s' "$out"
+}
+
+exclusion_sql() {
+    if [ "$#" -eq 0 ]; then
+        return
+    fi
+    printf " AND locations_package.current_location_id NOT IN (%s)" "$(sql_uuid_list "$@")"
+}
+
+dedupe_array() {
+    awk '!seen[$0]++'
+}
+
+load_storage_service_emails() {
+    mysql_query "SELECT email FROM auth_user WHERE is_active = 1 AND is_staff = 1 AND email IS NOT NULL AND email != '' AND email != 'x@x' ORDER BY email;" | grep -v '^email$'
+}
+
+get_stat() {
+    mysql_query "$1" | grep -E '^[0-9]+$' | tail -n 1
+}
+
+get_selected_aips() {
+    local where_exclusions=""
+    local limit_sql=""
+
+    if [ "$MODE" != "aip" ] || is_yes "$RESPECT_EXCLUSIONS"; then
+        where_exclusions="$(exclusion_sql "${EXCLUDED_STORES[@]}")"
+    fi
+
+    case "$MODE" in
+        all)
+            [ -n "$LIMIT" ] && limit_sql=" LIMIT $LIMIT"
+            mysql_query "SELECT locations_package.uuid FROM locations_package WHERE package_type = 'AIP' AND status = 'UPLOADED'${where_exclusions} ORDER BY locations_package.uuid${limit_sql};" | filter_uuid_lines
+            ;;
+        random)
+            mysql_query "SELECT locations_package.uuid FROM locations_package WHERE package_type = 'AIP' AND status = 'UPLOADED'${where_exclusions} AND NOT EXISTS (SELECT 1 FROM locations_fixitylog WHERE locations_fixitylog.package_id = locations_package.uuid AND datetime_reported > SUBDATE(CURRENT_DATE, INTERVAL $RANDOM_DAYS DAY)) ORDER BY RAND() LIMIT $RANDOM_COUNT;" | filter_uuid_lines
+            ;;
+        aip)
+            if [ "${#REQUESTED_AIPS[@]}" -eq 0 ]; then
+                die "aip mode requires --aip, --aips, or --aip-file"
+            fi
+            for uuid in "${REQUESTED_AIPS[@]}"; do
+                validate_uuid "$uuid" || die "invalid AIP UUID: $uuid"
+            done
+            printf '%s\n' "${REQUESTED_AIPS[@]}" | dedupe_array
+            ;;
+    esac
+}
+
+filter_existing_aips() {
+    local uuid
+    local where_exclusions=""
+    local count
+
+    if [ "$MODE" = "aip" ] && is_yes "$RESPECT_EXCLUSIONS"; then
+        where_exclusions="$(exclusion_sql "${EXCLUDED_STORES[@]}")"
+    fi
+
+    while IFS= read -r uuid; do
+        [ -n "$uuid" ] || continue
+        count=$(get_stat "SELECT COUNT(*) FROM locations_package WHERE uuid = '$uuid' AND package_type = 'AIP' AND status = 'UPLOADED'${where_exclusions};")
+        if [ "$count" = "1" ]; then
+            SELECTED_AIPS+=("$uuid")
+        else
+            SKIPPED_AIPS+=("$uuid")
+        fi
+    done
+}
+
+scan_aip() {
+    local uuid="$1"
+    local index="$2"
+    local total="$3"
+    local rc
+
+    log "Scanning AIP $index/$total: $uuid"
+    if [ "$SCAN_TIMEOUT" -gt 0 ]; then
+        timeout "$SCAN_TIMEOUT" "$FIXITY_BIN" scan "$uuid" 2>&1 | timestamp >> "$RUN_LOG"
+        rc=${PIPESTATUS[0]}
+    else
+        "$FIXITY_BIN" scan "$uuid" 2>&1 | timestamp >> "$RUN_LOG"
+        rc=${PIPESTATUS[0]}
+    fi
+
+    if [ "$rc" -eq 0 ]; then
+        SUCCESS_AIPS+=("$uuid")
+        log "OK: $uuid"
+    else
+        FAILED_AIPS+=("$uuid")
+        log "ERROR: $uuid exited with status $rc"
+    fi
+}
+
+send_email() {
+    local subject="$1"
+    local recipient="$2"
+    local body_file="$3"
+
+    if [ -n "$EMAIL_SERVER" ]; then
+        FIXITY_EMAIL_SENDER="$EMAIL_SENDER" \
+        FIXITY_EMAIL_SERVER="$EMAIL_SERVER" \
+        FIXITY_EMAIL_PORT="$EMAIL_PORT" \
+        FIXITY_EMAIL_USERNAME="$EMAIL_USERNAME" \
+        FIXITY_EMAIL_PASSWORD="$EMAIL_PASSWORD" \
+        FIXITY_EMAIL_USE_TLS="$EMAIL_USE_TLS" \
+        FIXITY_EMAIL_USE_SSL="$EMAIL_USE_SSL" \
+        "$FIXITY_PYTHON" - "$subject" "$recipient" "$body_file" <<'PY'
+import os
+import smtplib
+import socket
+import sys
+from email.message import EmailMessage
+
+
+def is_yes(value):
+    return value.lower() in ("yes", "true", "1", "on")
+
+
+subject, recipient, body_file = sys.argv[1:4]
+sender = os.environ.get("FIXITY_EMAIL_SENDER") or f"fixity@{socket.getfqdn()}"
+server = os.environ["FIXITY_EMAIL_SERVER"]
+port = int(os.environ.get("FIXITY_EMAIL_PORT", "25"))
+username = os.environ.get("FIXITY_EMAIL_USERNAME", "")
+password = os.environ.get("FIXITY_EMAIL_PASSWORD", "")
+use_tls = is_yes(os.environ.get("FIXITY_EMAIL_USE_TLS", "no"))
+use_ssl = is_yes(os.environ.get("FIXITY_EMAIL_USE_SSL", "no"))
+
+msg = EmailMessage()
+msg["From"] = sender
+msg["To"] = recipient
+msg["Subject"] = subject
+with open(body_file, encoding="utf-8", errors="replace") as f:
+    msg.set_content(f.read())
+
+smtp_class = smtplib.SMTP_SSL if use_ssl else smtplib.SMTP
+with smtp_class(server, port, timeout=60) as smtp:
+    if use_tls and not use_ssl:
+        smtp.starttls()
+    if username:
+        smtp.login(username, password)
+    smtp.send_message(msg)
+PY
+        return
+    fi
+
+    if [ -n "$EMAIL_SENDER" ]; then
+        mail -r "$EMAIL_SENDER" -s "$subject" "$recipient" < "$body_file"
+    else
+        mail -s "$subject" "$recipient" < "$body_file"
+    fi
+}
+
+declare -a EMAIL_RECIPIENTS
+if [ -n "$EMAILS_CSV" ]; then
+    add_csv_to_array "$EMAILS_CSV" EMAIL_RECIPIENTS
+else
+    while IFS= read -r email; do
+        [ -n "$email" ] && EMAIL_RECIPIENTS+=("$email")
+    done < <(load_storage_service_emails)
+fi
+
+ALREADY_SCANNED_START=$(get_stat "SELECT COUNT(DISTINCT(package_id)) FROM locations_fixitylog;")
+TOTAL_ERRORS_START=$(get_stat "SELECT COUNT(DISTINCT(package_id)) FROM locations_fixitylog WHERE success != 1;")
+TOTAL_UPLOADED_AIPS=$(get_stat "SELECT COUNT(DISTINCT(uuid)) FROM locations_package WHERE status = 'UPLOADED' AND package_type = 'AIP';")
+
+log "Fixity scan started on $HOSTNAME"
+log "Mode: $MODE"
+[ "$MODE" = "random" ] && log "Random selection: count=$RANDOM_COUNT days=$RANDOM_DAYS"
+[ "$MODE" = "all" ] && [ -n "$LIMIT" ] && log "All mode limit: $LIMIT"
+[ "${#EXCLUDED_STORES[@]}" -gt 0 ] && log "Excluded AIP stores: ${EXCLUDED_STORES[*]}"
+log "Total uploaded AIPs: $TOTAL_UPLOADED_AIPS"
+log "AIPs already scanned with fixity: $ALREADY_SCANNED_START"
+log "Fixity errors before run: $TOTAL_ERRORS_START"
+
+if ! validate_int "$ALREADY_SCANNED_START" || ! validate_int "$TOTAL_ERRORS_START" || ! validate_int "$TOTAL_UPLOADED_AIPS"; then
+    die "could not read initial fixity statistics from the Storage Service database"
+fi
+
+if ! SELECTED_OUTPUT=$(get_selected_aips); then
+    die "could not select AIPs for fixity scan"
+fi
+
+if [ "$MODE" = "aip" ]; then
+    filter_existing_aips <<< "$SELECTED_OUTPUT"
+else
+    while IFS= read -r uuid; do
+        [ -n "$uuid" ] && SELECTED_AIPS+=("$uuid")
+    done <<< "$SELECTED_OUTPUT"
+fi
+
+log "AIPs selected: ${#SELECTED_AIPS[@]}"
+if [ "${#SKIPPED_AIPS[@]}" -gt 0 ]; then
+    log "AIPs skipped: ${#SKIPPED_AIPS[@]}"
+fi
+
+if [ "$LIST_ONLY" = "yes" ]; then
+    printf '%s\n' "${SELECTED_AIPS[@]}" | tee -a "$RUN_LOG"
+else
+    total="${#SELECTED_AIPS[@]}"
+    for i in "${!SELECTED_AIPS[@]}"; do
+        scan_aip "${SELECTED_AIPS[$i]}" "$((i + 1))" "$total"
+    done
+fi
+
+ALREADY_SCANNED_END=$(get_stat "SELECT COUNT(DISTINCT(package_id)) FROM locations_fixitylog;")
+TOTAL_ERRORS_END=$(get_stat "SELECT COUNT(DISTINCT(package_id)) FROM locations_fixitylog WHERE success != 1;")
+if ! validate_int "$ALREADY_SCANNED_END" || ! validate_int "$TOTAL_ERRORS_END"; then
+    die "could not read final fixity statistics from the Storage Service database"
+fi
+END_EPOCH=$(date +%s)
+DURATION=$((END_EPOCH - START_EPOCH))
+NEW_ERRORS=$((TOTAL_ERRORS_END - TOTAL_ERRORS_START))
+[ "$NEW_ERRORS" -lt 0 ] && NEW_ERRORS=0
+
+{
+    echo "Fixity report"
+    echo "Host: $HOSTNAME"
+    echo "Mode: $MODE"
+    echo "Started: $(date -d "@$START_EPOCH" '+%Y-%m-%d %H:%M:%S %Z')"
+    echo "Finished: $(date -d "@$END_EPOCH" '+%Y-%m-%d %H:%M:%S %Z')"
+    echo "Duration: ${DURATION}s"
+    echo
+    echo "AIPs selected: ${#SELECTED_AIPS[@]}"
+    echo "AIPs scanned: ${#SUCCESS_AIPS[@]} successful, ${#FAILED_AIPS[@]} failed"
+    echo "AIPs skipped: ${#SKIPPED_AIPS[@]}"
+    echo
+    echo "Fixity errors before run: $TOTAL_ERRORS_START"
+    echo "Fixity errors after run: $TOTAL_ERRORS_END"
+    echo "New fixity errors: $NEW_ERRORS"
+    echo "AIPs already scanned before run: $ALREADY_SCANNED_START"
+    echo "AIPs already scanned after run: $ALREADY_SCANNED_END"
+    echo
+    echo "Report log: $RUN_LOG"
+    if [ "${#FAILED_AIPS[@]}" -gt 0 ]; then
+        echo
+        echo "Failed AIPs:"
+        printf '%s\n' "${FAILED_AIPS[@]}"
+    fi
+    if [ "${#SKIPPED_AIPS[@]}" -gt 0 ]; then
+        echo
+        echo "Skipped AIPs:"
+        printf '%s\n' "${SKIPPED_AIPS[@]}"
+    fi
+} > "$SUMMARY_FILE"
+
+timestamp < "$SUMMARY_FILE" >> "$MAIN_LOG"
+timestamp < "$SUMMARY_FILE" >> "$RUN_LOG"
+if [ "$QUIET" != "yes" ]; then
+    cat "$SUMMARY_FILE"
+fi
+
+EMAIL_FAILED="no"
+{
+    cat "$SUMMARY_FILE"
+    echo
+    echo "Detailed log"
+    cat "$RUN_LOG"
+} > "$EMAIL_BODY"
+
+if [ "$SEND_EMAIL" = "yes" ] && [ "${#EMAIL_RECIPIENTS[@]}" -gt 0 ] && { [ -n "$EMAIL_SERVER" ] || command -v mail >/dev/null 2>&1; }; then
+    if [ "${#FAILED_AIPS[@]}" -eq 0 ] && [ "$NEW_ERRORS" -eq 0 ]; then
+        SUBJECT="Success: fixity report from $HOSTNAME - scanned ${#SUCCESS_AIPS[@]} AIPs, 0 errors"
+    else
+        SUBJECT="Error: fixity report from $HOSTNAME - scanned ${#SELECTED_AIPS[@]} AIPs, ${#FAILED_AIPS[@]} failed, $NEW_ERRORS new errors"
+    fi
+    if [ -n "$EMAIL_SERVER" ]; then
+        log "Sending email report to ${#EMAIL_RECIPIENTS[@]} recipient(s) using SMTP server $EMAIL_SERVER"
+    else
+        log "Sending email report to ${#EMAIL_RECIPIENTS[@]} recipient(s) using local MTA"
+    fi
+    for email in "${EMAIL_RECIPIENTS[@]}"; do
+        send_email "$SUBJECT" "$email" "$EMAIL_BODY" || {
+            EMAIL_FAILED="yes"
+            log "ERROR: failed to send email to $email"
+            continue
+        }
+        log "Email report sent to $email"
+    done
+elif [ "$SEND_EMAIL" = "yes" ] && [ "${#EMAIL_RECIPIENTS[@]}" -gt 0 ]; then
+    EMAIL_FAILED="yes"
+    log "ERROR: no email sent because mail command is unavailable and FIXITY_EMAIL_SERVER is not configured"
+elif [ "$SEND_EMAIL" = "yes" ]; then
+    log "No email sent: no recipients found"
+else
+    log "Email disabled by --no-email"
+fi
+
+cleanup_old_reports
+log "Fixity scan finished on $HOSTNAME"
+
+if [ "$EMAIL_FAILED" = "yes" ]; then
+    exit 2
+fi
+
+if [ "${#FAILED_AIPS[@]}" -gt 0 ] || [ "$NEW_ERRORS" -gt 0 ]; then
+    exit 1
+fi
+
+exit 0
+# {% endraw %}

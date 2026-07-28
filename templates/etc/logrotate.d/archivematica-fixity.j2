@@ -1,0 +1,13 @@
+{{ archivematica_src_fixity_log_dir }}/*.log
+{{ archivematica_src_fixity_report_dir }}/*.log {
+    size {{ archivematica_src_fixity_logrotate_size }}
+    rotate {{ archivematica_src_fixity_logrotate_rotate }}
+    missingok
+    notifempty
+{% if archivematica_src_fixity_logrotate_compress|bool %}
+    compress
+    delaycompress
+{% endif %}
+    copytruncate
+    create 0640 {{ archivematica_src_fixity_user }} {{ archivematica_src_fixity_group }}
+}

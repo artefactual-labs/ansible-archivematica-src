@@ -7,7 +7,7 @@ ansible_deps:
   - "{{ __python_packages_prefix }}-setuptools"
   - "git"
   - "{{ __python_packages_prefix }}-mysqldb"  # Required for mysql_db module
-  - "sqlite3"                                 # Required for am-configure and fixity
+  - "sqlite3"                                 # Required for am-configure
   - "ca-certificates"                         # Required for apt-get
 ca_custom_bundle: "/etc/ssl/certs/ca-certificates.crt"
 archivematica_src_am_amauat_deps:
@@ -15,7 +15,6 @@ archivematica_src_am_amauat_deps:
   - "icewm"
   - "make"
 archivematica_src_am_fixity_deps:
-  - "sqlite3"
   - "moreutils"
   - "mailutils"
 archivematica_src_python_packages:
