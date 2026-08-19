@@ -44,3 +44,6 @@
   environment:
     LC_ALL: "en_US.utf8"
     LANG: "en_US.utf8"
+    # bagit-python's legacy setup_requires breaks with setuptools_scm >= 10;
+    # PEP 517 builds install the build backend with its dependencies.
+    PIP_USE_PEP517: "1"
