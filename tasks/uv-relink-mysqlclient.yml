@@ -1,0 +1,69 @@
+---
+# Rebuild mysqlclient when its compiled extension no longer loads.
+#
+# mysqlclient is distributed as a source distribution on Linux, so uv compiles
+# it on the host and links it against the MySQL/MariaDB client library that is
+# available at build time. A major upgrade of that library (for example MySQL
+# 8.0 to 8.4, which moves from libmysqlclient.so.21 to libmysqlclient.so.24)
+# breaks the existing build, and a plain `uv sync` does not notice because the
+# locked version is already installed. Reinstalling the package is not enough
+# either: uv would reuse the stale build stored in its cache, so the cached
+# build has to be dropped before the dependencies are synchronized again.
+#
+# Requires:
+# - __archivematica_src_mysqlclient_virtualenv: Path to the virtualenv
+# - __archivematica_src_mysqlclient_project_dir: Path to the uv project
+#
+# Import this file after the OS dependencies are installed and before the
+# dependency synchronization task, which reinstalls mysqlclient from source.
+
+- name: "Check for existing virtualenv Python"
+  stat:
+    path: "{{ __archivematica_src_mysqlclient_virtualenv }}/bin/python"
+    get_checksum: no
+    get_mime: no
+    get_attributes: no
+  register: "__archivematica_src_mysqlclient_python"
+
+- name: "Check that mysqlclient loads in the virtualenv"
+  command: >-
+    {{ __archivematica_src_mysqlclient_virtualenv }}/bin/python
+    -c 'import MySQLdb'
+  register: "__archivematica_src_mysqlclient_check"
+  failed_when: false
+  changed_when: false
+  check_mode: false
+  when: __archivematica_src_mysqlclient_python.stat.exists
+
+- name: "Remove mysqlclient build that no longer loads"
+  block:
+    - name: "Report mysqlclient import error"
+      debug:
+        msg: >-
+          Rebuilding mysqlclient in {{ __archivematica_src_mysqlclient_virtualenv }}:
+          {{ __archivematica_src_mysqlclient_check.stderr_lines | last | default('unknown error') }}
+
+    - name: "Drop cached mysqlclient build"
+      command: "{{ archivematica_src_uv }} cache clean mysqlclient"
+      args:
+        chdir: "{{ __archivematica_src_mysqlclient_project_dir }}"
+
+    - name: "Uninstall mysqlclient from the virtualenv"
+      command: >-
+        {{ archivematica_src_uv }} pip uninstall
+        --python {{ __archivematica_src_mysqlclient_virtualenv }}/bin/python
+        mysqlclient
+      args:
+        chdir: "{{ __archivematica_src_mysqlclient_project_dir }}"
+  become: "yes"
+  become_user: "archivematica"
+  environment:
+    LC_ALL: "en_US.utf8"
+    LANG: "en_US.utf8"
+    UV_PROJECT_ENVIRONMENT: "{{ __archivematica_src_mysqlclient_virtualenv }}"
+    UV_PYTHON: "{{ archivematica_src_virtualenv_python }}"
+    UV_PYTHON_DOWNLOADS: "never"
+  when:
+    - __archivematica_src_mysqlclient_python.stat.exists
+    - __archivematica_src_mysqlclient_check.rc is defined
+    - __archivematica_src_mysqlclient_check.rc != 0

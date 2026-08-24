@@ -24,6 +24,12 @@
     state: "directory"
     recurse: true
 
+- name: "Rebuild Archivematica mysqlclient when it no longer loads"
+  import_tasks: "uv-relink-mysqlclient.yml"
+  vars:
+    __archivematica_src_mysqlclient_virtualenv: "{{ archivematica_src_am_virtualenv }}"
+    __archivematica_src_mysqlclient_project_dir: "{{ archivematica_src_dir }}/archivematica"
+
 - name: "Synchronize locked Archivematica dependencies"
   become: "yes"
   become_user: "archivematica"
