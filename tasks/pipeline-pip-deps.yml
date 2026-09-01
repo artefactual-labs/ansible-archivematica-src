@@ -48,3 +48,8 @@
     UV_PROJECT_ENVIRONMENT: "{{ archivematica_src_am_virtualenv }}"
     UV_PYTHON: "{{ archivematica_src_virtualenv_python }}"
     UV_PYTHON_DOWNLOADS: "never"
+
+- name: "Verify Archivematica mysqlclient after synchronization"
+  import_tasks: "uv-verify-mysqlclient.yml"
+  vars:
+    __archivematica_src_mysqlclient_virtualenv: "{{ archivematica_src_am_virtualenv }}"

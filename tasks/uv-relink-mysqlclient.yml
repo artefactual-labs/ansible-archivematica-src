@@ -16,6 +16,7 @@
 #
 # Import this file after the OS dependencies are installed and before the
 # dependency synchronization task, which reinstalls mysqlclient from source.
+# Import uv-verify-mysqlclient.yml after that task to confirm the result.
 
 - name: "Check for existing virtualenv Python"
   stat:
@@ -33,6 +34,8 @@
   failed_when: false
   changed_when: false
   check_mode: false
+  become: "yes"
+  become_user: "archivematica"
   when: __archivematica_src_mysqlclient_python.stat.exists
 
 - name: "Remove mysqlclient build that no longer loads"

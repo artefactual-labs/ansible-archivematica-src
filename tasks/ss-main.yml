@@ -124,6 +124,12 @@
     UV_PYTHON_DOWNLOADS: "never"
   tags: "amsrc-ss-pydep"
 
+- name: "Verify Storage Service mysqlclient after synchronization"
+  import_tasks: "uv-verify-mysqlclient.yml"
+  vars:
+    __archivematica_src_mysqlclient_virtualenv: "{{ archivematica_src_ss_virtualenv }}"
+  tags: "amsrc-ss-pydep"
+
 ###########################################################
 #   3- OS configuration (user/directory/file creation/permissions/ownership)
 ###########################################################
