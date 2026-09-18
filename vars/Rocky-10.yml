@@ -1,0 +1,130 @@
+---
+# Rocky Linux 10. Differences from EL9 worth knowing:
+# - Python 3.12 is the platform interpreter, so the python3* packages replace
+#   the python3.12* ones.
+# - RHEL 10 only ships OpenJDK 21 (no Java 8/11/17).
+# - p7zip is gone; EPEL 10 ships 7zip (provides /usr/bin/7z).
+# - Not available from EL10 or EPEL 10, so they must come from the
+#   archivematica-extras repository: atool, gearmand, inkscape, mediaconch,
+#   unar (besides bulk_extractor, ffmpeg, jhove and siegfried as in EL9).
+systemd_environment_path: "/etc/sysconfig"
+ansible_deps:
+#  - "epel-release"
+  - "acl"                     # Required to avoid using allow_world_readable_tmpfiles=True
+  - "python3-setuptools"
+  - "git"
+  - "python3-PyMySQL"         # Required for mysql_db module
+  - "sqlite"                  # Required for am-configure and fixity
+  - "7zip"                    # Replaces p7zip-plugins (EPEL)
+  - "python3-policycoreutils" # Required by SELinux management
+  - "python3-libsemanage"     # Required by SELinux management
+  - "gnupg2"                  # Required by rpm_key (uses gpg on ansible-core < 2.18 and 2.19)
+  - "ca-certificates"         # Required for yum
+ca_custom_bundle: "/etc/pki/tls/certs/ca-bundle.crt"
+archivematica_src_am_amauat_deps:
+  - "make"
+archivematica_src_am_fixity_deps:
+  - "sqlite"
+  - "moreutils"
+  - "s-nail"                  # Replaces mailx
+archivematica_src_python_packages:
+  - "python3"                 # Python 3.12 is the platform interpreter in EL10
+  - "python3-devel"
+  - "python3-setuptools"
+  - "pkgconfig"
+
+dashboard_osdeps:
+  repokeys: []
+  repos: []
+  packages:
+    - gcc
+    - gcc-c++
+    - gettext    # only required in development environments (used to make string translateable)
+    - make
+    - nginx
+    - python3-policycoreutils
+    - libffi-devel
+    - libxml2-devel
+    - libxslt-devel
+    - openssl-devel
+    - python3-devel
+    - openldap-devel
+    - unar       # Not in EL10/EPEL 10, provided by archivematica-extras
+    - coreutils
+
+MCPClient_osdeps:
+  repokeys:
+    - "https://packages.archivematica.org/GPG-KEY-archivematica-sha512"
+  repos:
+    - baseurl: "https://packages.archivematica.org/1.19.x/rocky10-extras"
+      description: "archivematica extras"
+      enabled: "yes"
+      gpgcheck: "no"
+      name: "archivematica-extras"
+  packages:
+    - atool      # Not in EL10/EPEL 10, provided by archivematica-extras
+    - bulk_extractor
+    - ffmpeg
+    - gearmand   # Not in EL10/EPEL 10, provided by archivematica-extras
+    - ghostscript
+    - ImageMagick
+    - inkscape   # Not in EL10/EPEL 10, provided by archivematica-extras
+    - jhove
+    - libewf
+    - libxml2
+    - libpst
+    - libraw1394
+    - libvpx
+    - md5deep
+    - mediainfo
+    - mediaconch # Not in EL10/EPEL 10, provided by archivematica-extras
+    - nfs-utils
+    - java-21-openjdk-headless # Required by jhove; EL10 has no Java 8
+    - openjpeg2
+    - 7zip       # Replaces p7zip and p7zip-plugins (EPEL)
+    - pbzip2
+    - perl-Image-ExifTool
+    - postfix
+    - rsync
+    - siegfried
+    - sleuthkit
+    - tesseract
+    - tree
+    - uuid
+
+MCPServer_osdeps:
+  repokeys: []
+  repos: []
+  packages: []
+
+storage_service_osdeps:
+  repokeys:
+    - "https://packages.archivematica.org/GPG-KEY-archivematica-sha512"
+  repos:
+    - baseurl: "https://packages.archivematica.org/1.19.x/rocky10-extras"
+      description: "archivematica extras"
+      enabled: "yes"
+      gpgcheck: "no"
+      name: "archivematica-extras"
+  packages:
+    - epel-release  # required by 7zip and rclone
+  packages_2:
+    - make
+    - mariadb-connector-c-devel
+    - nginx
+    - unar          # Not in EL10/EPEL 10, provided by archivematica-extras
+    - rsync
+    - python3-devel
+    - libxml2-devel
+    - libxslt-devel
+    - zlib-devel    # Provided by zlib-ng-compat-devel in EL10
+    - libffi-devel
+    - openssl-devel
+    - gcc           # required to build some pip dependencies
+    - gcc-c++
+    - gettext
+    - 7zip          # Replaces p7zip and p7zip-plugins (EPEL)
+    - gnupg2
+    - rng-tools
+    - openldap-devel
+    - rclone
