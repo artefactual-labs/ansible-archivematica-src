@@ -35,13 +35,15 @@
       when:
         - "ansible_distribution_version is version('20.04', '>=')"
 
+    # apt-key is gone since Ubuntu 26.04 (apt 3.2), so download the armored key
+    # into trusted.gpg.d, which apt reads directly.
     - name: "Install External dependency repo keys (Ubuntu)"
-      apt_key:
-        id: "{{ item.id }}"
+      get_url:
         url: "{{ item.url }}"
-        state: "present"
+        dest: "/etc/apt/trusted.gpg.d/archivematica-{{ item.id | regex_replace('^0x', '') }}.asc"
+        mode: "0644"
         validate_certs: "{{ item.validate_certs }}"
-      with_items: 
+      with_items:
         - "{{ dashboard_osdeps.repokeys + MCPServer_osdeps.repokeys + MCPClient_osdeps.repokeys }}"
       when:
         - (dashboard_osdeps.repokeys + MCPServer_osdeps.repokeys + MCPClient_osdeps.repokeys) | length > 0

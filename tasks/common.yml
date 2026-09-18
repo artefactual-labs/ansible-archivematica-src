@@ -31,9 +31,20 @@
       - ansible_os_family in ['RedHat','Rocky']
       - ansible_distribution_major_version|int == 7
 
+  # apt-key is gone since Ubuntu 26.04 (apt 3.2) and apt_repository cannot fetch
+  # the signing key of a "ppa:" repository without it, so add the key and the
+  # repository line explicitly.
+  - name: "Add Deadsnakes PPA signing key (Ubuntu)"
+    get_url:
+      url: "https://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search=0xF23C5A6CF475977595C89F51BA6932366A755776"
+      dest: "/etc/apt/trusted.gpg.d/deadsnakes.asc"
+      mode: "0644"
+    when:
+      - ansible_os_family == "Debian"
+
   - name: "Add Deadsnakes APT repository (Ubuntu)"
     apt_repository:
-      repo: "ppa:deadsnakes"
+      repo: "deb https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu {{ ansible_distribution_release }} main"
     when:
       - ansible_os_family == "Debian"
 

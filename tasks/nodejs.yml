@@ -17,11 +17,13 @@
         - gnupg2
       state: present
 
+  # apt-key is gone since Ubuntu 26.04 (apt 3.2), so download the armored key
+  # into trusted.gpg.d, which apt reads directly.
   - name: "Nodejs: Add Nodesource apt key"
-    apt_key:
+    get_url:
       url: https://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search=0x6F71F525282841EEDAF851B42F59B5F99B1BE0B4
-      id: "2F59B5F99B1BE0B4"
-      state: present
+      dest: "/etc/apt/trusted.gpg.d/nodesource.asc"
+      mode: "0644"
 
   - name: "Nodejs: Add NodeSource repositories for Node.js"
     apt_repository:
