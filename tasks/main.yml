@@ -18,14 +18,6 @@
   tags:
     - "always" # inocuous to use always here
 
-- import_tasks: "nodejs.yml"
-  tags:
-    - "amsrc-ss"
-    - "amsrc-ss-websrv"
-    - "amsrc-pipeline"
-    - "amsrc-pipeline-websrv"
-    - "amsrc-nodejs"
-
 - name: "Load default environment strings"
   include_vars: "envs.yml"
   tags: "always"
@@ -141,6 +133,16 @@
        archivematica_src_install_ss=='rpm' or
        archivematica_src_install_am|bool or
        archivematica_src_install_am=='rpm'"
+
+# Node.js is set up after the Ansible dependencies from the OS vars so that
+# packages its tasks rely on, such as gnupg2 for rpm_key, can be declared there.
+- import_tasks: "nodejs.yml"
+  tags:
+    - "amsrc-ss"
+    - "amsrc-ss-websrv"
+    - "amsrc-pipeline"
+    - "amsrc-pipeline-websrv"
+    - "amsrc-nodejs"
 
 - import_tasks: "uv.yml"
   tags: "always"

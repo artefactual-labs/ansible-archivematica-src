@@ -56,29 +56,30 @@
         name: "nodejs*"
         state: absent
 
-    - name: "Get Nodesource script"
-      get_url:
-        url: "https://rpm.nodesource.com/nsolid_setup_rpm.sh"
-        dest: "/tmp/nsolid_setup_rpm.sh"
+    - name: "Import NodeSource RPM signing key"
+      rpm_key:
+        key: "https://rpm.nodesource.com/gpgkey/ns-operations-public.key"
+        state: present
+      when: install_rpm_repositories|bool
 
-    - name: "Update Nodesource script permission"
-      file:
-        path: "/tmp/nsolid_setup_rpm.sh"
-        mode: "+x"
-
-    - name: "Install Node.js version {{ nodejs_version | regex_replace('.x', '')}} rpm package"
-      command: "sh /tmp/nsolid_setup_rpm.sh {{ nodejs_version | regex_replace('.x', '')}}"
+    # The nodejs module stream in AppStream (EL8/EL9) hides non-modular packages
+    # with the same name; module_hotfixes disables that filtering for this repo.
+    # EL10 has no module system and ignores the option.
+    - name: "Add NodeSource repository for Node.js {{ nodejs_version }}"
+      yum_repository:
+        name: "nodesource-nodejs"
+        description: "Node.js {{ nodejs_version }} packages from NodeSource - $basearch"
+        baseurl: "https://rpm.nodesource.com/pub_{{ nodejs_version }}/nodistro/nodejs/$basearch"
+        gpgcheck: yes
+        gpgkey: "https://rpm.nodesource.com/gpgkey/ns-operations-public.key"
+        module_hotfixes: yes
+        enabled: yes
+      when: install_rpm_repositories|bool
 
     - name: "Ensure Node.js and npm are installed"
       dnf:
-        name: "@nodejs:{{ nodejs_version | regex_replace('.x', '') }}/common"
+        name: "nodejs-{{ nodejs_version | regex_replace('x', '') }}*"
         state: present
-        enablerepo: nodesource
-
-    - name: "Remove Nodesource script"
-      file:
-        path: "/tmp/nsolid_setup_rpm.sh"
-        state: absent
 
   when:
    - ansible_os_family in ['RedHat','Rocky']
