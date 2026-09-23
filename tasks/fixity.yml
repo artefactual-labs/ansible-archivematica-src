@@ -22,14 +22,14 @@
 - name: "Ensure archivematica user can create virtualenv"
   file:
     path: "{{ archivematica_src_fixity_virtualenv | dirname }}"
-    owner: "archivematica"
-    group: "archivematica"
+    owner: "{{ archivematica_src_fixity_user }}"
+    group: "{{ archivematica_src_fixity_group }}"
     state: "directory"
     recurse: true
 
 - name: "Install pip dependencies in virtualenv"
   become: "yes"
-  become_user: "archivematica"
+  become_user: "{{ archivematica_src_fixity_user }}"
   pip:
     chdir: "{{ archivematica_src_dir }}/fixity"
     requirements: "requirements.txt"
@@ -39,7 +39,7 @@
 
 - name: "Install fixity using pip"
   become: "yes"
-  become_user: "archivematica"
+  become_user: "{{ archivematica_src_fixity_user }}"
   pip:
     name: "fixity"
     chdir: "{{ archivematica_src_dir }}/fixity"
@@ -47,57 +47,221 @@
     virtualenv_command: "{{ archivematica_src_virtualenv }}"
     state: "latest"
 
+- name: "Install fixity MySQL Python dependency"
+  become: "yes"
+  become_user: "{{ archivematica_src_fixity_user }}"
+  pip:
+    name: "{{ archivematica_src_fixity_mysql_python_package }}"
+    virtualenv: "{{ archivematica_src_fixity_virtualenv }}"
+    virtualenv_command: "{{ archivematica_src_virtualenv }}"
+    state: "present"
+
 - name: "Change virtualenv owner to archivematica"
   file:
      path: "{{ archivematica_src_fixity_virtualenv }}"
      state: "directory"
-     owner: "archivematica"
-     group: "archivematica"
+     owner: "{{ archivematica_src_fixity_user }}"
+     group: "{{ archivematica_src_fixity_group }}"
      recurse: "yes"
+
+- name: "Create fixity config dir"
+  file:
+     path: "{{ archivematica_src_fixity_config_file | dirname }}"
+     state: "directory"
+     mode: 0755
+     owner: "root"
+     group: "root"
 
 - name: "Create config file"
   template:
      src: "etc/sysconfig/fixity.j2"
-     dest: "{{ systemd_environment_path }}/fixity"
+     dest: "{{ archivematica_src_fixity_config_file }}"
      mode: 0640
-     owner: "archivematica"
-     group: "archivematica"
+     owner: "{{ archivematica_src_fixity_user }}"
+     group: "{{ archivematica_src_fixity_group }}"
+     backup: "yes"
 
 - name: "Create log dir"
   file:
-     path: "/var/log/archivematica/fixity/"
+     path: "{{ item }}"
      state: "directory"
      mode: 0750
-     owner: "archivematica"
-     group: "archivematica"
+     owner: "{{ archivematica_src_fixity_user }}"
+     group: "{{ archivematica_src_fixity_group }}"
+  with_items:
+    - "{{ archivematica_src_fixity_log_dir }}"
+    - "{{ archivematica_src_fixity_report_dir }}"
 
-- name: "Create fixity script"
+- name: "Check fixity lock file"
+  stat:
+     path: "{{ archivematica_src_fixity_lock_file }}"
+  register: "__fixity_lock_file"
+  when: "archivematica_src_fixity_lock_enabled|bool"
+
+- name: "Create fixity lock file"
+  file:
+     path: "{{ archivematica_src_fixity_lock_file }}"
+     state: "touch"
+     mode: 0640
+     owner: "{{ archivematica_src_fixity_user }}"
+     group: "{{ archivematica_src_fixity_group }}"
+  when:
+    - "archivematica_src_fixity_lock_enabled|bool"
+    - "not __fixity_lock_file.stat.exists"
+
+- name: "Configure fixity lock file"
+  file:
+     path: "{{ archivematica_src_fixity_lock_file }}"
+     state: "file"
+     mode: 0640
+     owner: "{{ archivematica_src_fixity_user }}"
+     group: "{{ archivematica_src_fixity_group }}"
+  when: "archivematica_src_fixity_lock_enabled|bool"
+
+- name: "Create legacy fixity backup dir"
+  file:
+     path: "{{ archivematica_src_fixity_backup_dir }}"
+     state: "directory"
+     mode: 0750
+     owner: "root"
+     group: "root"
+
+- name: "Get fixity backup timestamp"
+  command: "date +%Y%m%d_%H%M%S"
+  register: "__fixity_backup_timestamp"
+  changed_when: "False"
+
+- name: "Check legacy fixity-cron script"
+  stat:
+     path: "/usr/local/bin/fixity-cron"
+  register: "__fixity_cron_script"
+
+- name: "Read legacy fixity-cron script"
+  slurp:
+     src: "/usr/local/bin/fixity-cron"
+  register: "__fixity_cron_script_content"
+  when: "__fixity_cron_script.stat.exists"
+
+- name: "Backup legacy fixity-cron script"
+  command: "cp /usr/local/bin/fixity-cron {{ archivematica_src_fixity_backup_dir }}/fixity-cron-{{ __fixity_backup_timestamp.stdout | default('backup-old-fixity') }}"
+  args:
+     creates: "{{ archivematica_src_fixity_backup_dir }}/fixity-cron-{{ __fixity_backup_timestamp.stdout | default('backup-old-fixity') }}"
+  when:
+    - "__fixity_cron_script.stat.exists"
+    - "'Managed by ansible-archivematica-src' not in (__fixity_cron_script_content.content | default('') | b64decode)"
+
+- name: "Remove legacy fixity-cron script"
+  file:
+     path: "/usr/local/bin/fixity-cron"
+     state: "absent"
+
+- name: "Check legacy fixity cron file"
+  stat:
+     path: "/etc/cron.d/fixity"
+  register: "__fixity_cron_file"
+
+- name: "Read legacy fixity cron file"
+  slurp:
+     src: "/etc/cron.d/fixity"
+  register: "__fixity_cron_file_content"
+  when: "__fixity_cron_file.stat.exists"
+
+- name: "Backup legacy fixity cron file"
+  command: "cp /etc/cron.d/fixity {{ archivematica_src_fixity_backup_dir }}/cron.d-fixity-{{ __fixity_backup_timestamp.stdout | default('backup-old-fixity') }}"
+  args:
+     creates: "{{ archivematica_src_fixity_backup_dir }}/cron.d-fixity-{{ __fixity_backup_timestamp.stdout | default('backup-old-fixity') }}"
+  when:
+    - "__fixity_cron_file.stat.exists"
+    - "archivematica_src_fixity_script_path not in (__fixity_cron_file_content.content | default('') | b64decode)"
+
+- name: "Check legacy fixity script"
+  stat:
+     path: "/usr/local/bin/fixity"
+  register: "__fixity_script"
+
+- name: "Read legacy fixity script"
+  slurp:
+     src: "/usr/local/bin/fixity"
+  register: "__fixity_script_content"
+  when: "__fixity_script.stat.exists"
+
+- name: "Backup legacy fixity script"
+  command: "cp /usr/local/bin/fixity {{ archivematica_src_fixity_backup_dir }}/fixity-{{ __fixity_backup_timestamp.stdout | default('backup-old-fixity') }}"
+  args:
+     creates: "{{ archivematica_src_fixity_backup_dir }}/fixity-{{ __fixity_backup_timestamp.stdout | default('backup-old-fixity') }}"
+  when:
+    - "__fixity_script.stat.exists"
+    - "'Managed by ansible-archivematica-src' not in (__fixity_script_content.content | default('') | b64decode)"
+
+- name: "Check legacy fixity config file"
+  stat:
+     path: "{{ systemd_environment_path }}/fixity"
+  register: "__fixity_config_file"
+  when: "systemd_environment_path + '/fixity' != archivematica_src_fixity_config_file"
+
+- name: "Backup legacy fixity config file"
+  command: "cp {{ systemd_environment_path }}/fixity {{ archivematica_src_fixity_backup_dir }}/config-fixity-{{ __fixity_backup_timestamp.stdout | default('backup-old-fixity') }}"
+  args:
+     creates: "{{ archivematica_src_fixity_backup_dir }}/config-fixity-{{ __fixity_backup_timestamp.stdout | default('backup-old-fixity') }}"
+  when:
+    - "systemd_environment_path + '/fixity' != archivematica_src_fixity_config_file"
+    - "__fixity_config_file.stat.exists | default(false)"
+
+- name: "Create fixity scripts"
   template:
-     src: "bin/{{ item }}"
-     dest: "/usr/local/bin/{{ item }}"
+     src: "bin/{{ item.src }}"
+     dest: "{{ item.dest }}"
      mode: 0755
      owner: "root"
+     group: "root"
   with_items:
-    - "fixity"
-    - "fixity-cron"
+    - { src: "fixity", dest: "/usr/local/bin/fixity" }
 
-- name: "Create cron job"
+- name: "Create logrotate config"
+  template:
+     src: "etc/logrotate.d/archivematica-fixity.j2"
+     dest: "/etc/logrotate.d/archivematica-fixity"
+     mode: 0644
+     owner: "root"
+     group: "root"
+
+- name: "Create fixity cron job"
   cron:
      name: "Run fixity"
-     job: "/usr/local/bin/fixity-cron"
-     minute: "0"
-     hour: "3"
-     day: "1"
-     month: "*/3"
-     user: "archivematica"
+     job: "{{ archivematica_src_fixity_script_path }} --mode {{ archivematica_src_fixity_default_mode }} --quiet"
+     minute: "{{ archivematica_src_fixity_cron_minute }}"
+     hour: "{{ archivematica_src_fixity_cron_hour }}"
+     day: "{{ archivematica_src_fixity_cron_day }}"
+     month: "{{ archivematica_src_fixity_cron_month }}"
+     weekday: "{{ archivematica_src_fixity_cron_weekday }}"
+     user: "{{ archivematica_src_fixity_user }}"
      cron_file: "fixity"
      state: "present"
+  when: "archivematica_src_fixity_cron_enabled|bool"
 
-- name: "Create cron job"
+- name: "Remove fixity cron job"
+  cron:
+     name: "Run fixity"
+     user: "{{ archivematica_src_fixity_user }}"
+     cron_file: "fixity"
+     state: "absent"
+  when: "not archivematica_src_fixity_cron_enabled|bool"
+
+- name: "Create fixity cron shell env"
   cron:
      name: "SHELL"
      env: yes
      value: "/bin/bash"
      cron_file: "fixity"
-     user: "archivematica"
+     user: "{{ archivematica_src_fixity_user }}"
      state: "present"
+  when: "archivematica_src_fixity_cron_enabled|bool"
+
+- name: "Remove fixity cron shell env"
+  cron:
+     name: "SHELL"
+     env: yes
+     cron_file: "fixity"
+     user: "{{ archivematica_src_fixity_user }}"
+     state: "absent"
+  when: "not archivematica_src_fixity_cron_enabled|bool"
