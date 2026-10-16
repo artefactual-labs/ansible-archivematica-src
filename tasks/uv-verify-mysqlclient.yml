@@ -1,0 +1,32 @@
+---
+# Verify that mysqlclient loads after the dependencies are synchronized.
+#
+# The synchronization task installs mysqlclient from source, either on a fresh
+# installation or after uv-relink-mysqlclient.yml removed a build that no
+# longer loaded, so this is where a broken build surfaces. Failing here is
+# preferable to finding out later, when the services do not start.
+#
+# Requires:
+# - __archivematica_src_mysqlclient_virtualenv: Path to the virtualenv
+#
+# Import this file after the dependency synchronization task.
+
+- name: "Check that mysqlclient loads after synchronization"
+  command: >-
+    {{ __archivematica_src_mysqlclient_virtualenv }}/bin/python
+    -c 'import MySQLdb'
+  register: "__archivematica_src_mysqlclient_verify"
+  failed_when: false
+  changed_when: false
+  become: "yes"
+  become_user: "archivematica"
+
+- name: "Fail when mysqlclient does not load"
+  fail:
+    msg: >-
+      mysqlclient does not load in {{ __archivematica_src_mysqlclient_virtualenv }}
+      after synchronizing the dependencies:
+      {{ __archivematica_src_mysqlclient_verify.stderr_lines | last | default('unknown error') }}
+  when:
+    - __archivematica_src_mysqlclient_verify.rc is defined
+    - __archivematica_src_mysqlclient_verify.rc != 0
