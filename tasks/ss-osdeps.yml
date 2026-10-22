@@ -7,11 +7,12 @@
 # ubuntu block
 - block:
     - name: "Install External dependency repo keys (Ubuntu)"
-      apt_key:
-        id: "{{ item.id }}"
-        url: "{{ item.url }}"
-        state: "present"
-        validate_certs: "{{ item.validate_certs }}"
+      include_tasks: "install-apt-key.yml"
+      vars:
+        __archivematica_src_apt_key_url: "{{ item.url }}"
+        __archivematica_src_apt_key_file: "/etc/apt/trusted.gpg.d/archivematica-{{ item.id | regex_replace('^0x', '') }}.asc"
+        __archivematica_src_apt_key_id: "{{ item.id }}"
+        __archivematica_src_apt_key_validate_certs: "{{ item.validate_certs }}"
       with_items:
         - "{{ storage_service_osdeps.repokeys }}"
       when:
