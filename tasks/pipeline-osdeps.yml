@@ -36,12 +36,13 @@
         - "ansible_distribution_version is version('20.04', '>=')"
 
     - name: "Install External dependency repo keys (Ubuntu)"
-      apt_key:
-        id: "{{ item.id }}"
-        url: "{{ item.url }}"
-        state: "present"
-        validate_certs: "{{ item.validate_certs }}"
-      with_items: 
+      include_tasks: "install-apt-key.yml"
+      vars:
+        __archivematica_src_apt_key_url: "{{ item.url }}"
+        __archivematica_src_apt_key_file: "/etc/apt/trusted.gpg.d/archivematica-{{ item.id | regex_replace('^0x', '') }}.asc"
+        __archivematica_src_apt_key_id: "{{ item.id }}"
+        __archivematica_src_apt_key_validate_certs: "{{ item.validate_certs }}"
+      with_items:
         - "{{ dashboard_osdeps.repokeys + MCPServer_osdeps.repokeys + MCPClient_osdeps.repokeys }}"
       when:
         - (dashboard_osdeps.repokeys + MCPServer_osdeps.repokeys + MCPClient_osdeps.repokeys) | length > 0

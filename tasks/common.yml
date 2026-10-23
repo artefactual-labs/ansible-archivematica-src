@@ -31,6 +31,17 @@
       - ansible_os_family in ['RedHat','Rocky']
       - ansible_distribution_major_version|int == 7
 
+  # The PPA signing key is installed first, so apt_repository finds it and does
+  # not try to fetch it, which fails on hosts without apt-key.
+  - name: "Add Deadsnakes APT key (Ubuntu)"
+    include_tasks: "install-apt-key.yml"
+    vars:
+      __archivematica_src_apt_key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&search=0x{{ __archivematica_src_apt_key_id }}"
+      __archivematica_src_apt_key_file: "/etc/apt/trusted.gpg.d/deadsnakes.asc"
+      __archivematica_src_apt_key_id: "F23C5A6CF475977595C89F51BA6932366A755776"
+    when:
+      - ansible_os_family == "Debian"
+
   - name: "Add Deadsnakes APT repository (Ubuntu)"
     apt_repository:
       repo: "ppa:deadsnakes"

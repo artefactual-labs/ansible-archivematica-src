@@ -1,0 +1,130 @@
+---
+# Install an APT repository signing key as a file in /etc/apt/trusted.gpg.d.
+#
+# If the file already exists, gpg lists the keys in it. When the file holds
+# the expected key, nothing is downloaded, so later runs do not contact the
+# key server. Otherwise, for example when the file is missing or empty, holds
+# another key, or the expected id changed because the key was rotated, the
+# key is downloaded, gpg lists the keys in the download, and the download
+# replaces the file. gpg runs with a temporary home directory, so that it does
+# not create one in the home directory of the user it runs as. Its
+# machine-readable output has a pub line for each key, then the key's fpr
+# (fingerprint) line; rvk lines (designated revokers) can come in between.
+#
+# A file or a download holds the expected key when it holds exactly one key
+# and that key's fingerprint ends with the expected id. A download that does
+# not is never saved: the run fails and the file is left as it is. This
+# matters because apt trusts every key in /etc/apt/trusted.gpg.d for all
+# repositories. The keys are counted by their pub lines, so that a key is
+# counted even if its fpr line is not found. Each key's fingerprint is read
+# from the first fpr line after its pub line. Subkey fingerprints are not
+# compared with the id: anyone can attach a copy of a public key to their own
+# key as a subkey.
+#
+# On every run the key file is set to be owned by root with mode 0644, because
+# apt ignores key files that the _apt user cannot read. Listing, downloading
+# and checking the keys change nothing on the host, so they also run in check
+# mode.
+#
+# Requires:
+# - __archivematica_src_apt_key_url: URL to download the key from. It must
+#   serve an ASCII-armored key; binary keys are not supported
+# - __archivematica_src_apt_key_file: path of the key file, for example
+#   /etc/apt/trusted.gpg.d/nodesource.asc
+# - __archivematica_src_apt_key_id: the key's full fingerprint, or only its
+#   last 8 or more hex digits (a key id). A leading 0x is ignored
+# - __archivematica_src_apt_key_validate_certs: whether to validate the
+#   server's TLS certificate when downloading. Optional, default: true
+
+- name: "Check for existing APT key file {{ __archivematica_src_apt_key_file }}"
+  stat:
+    path: "{{ __archivematica_src_apt_key_file }}"
+  register: "__archivematica_src_apt_key_file_stat"
+
+- name: "List the keys in existing APT key file {{ __archivematica_src_apt_key_file }}"
+  shell: |
+    set -e
+    GNUPGHOME="$(mktemp -d)"
+    export GNUPGHOME
+    trap 'rm -rf "$GNUPGHOME"' EXIT
+    gpg --batch --show-keys --with-colons < {{ __archivematica_src_apt_key_file | quote }}
+  register: "__archivematica_src_apt_key_existing_listing"
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  when: __archivematica_src_apt_key_file_stat.stat.exists
+
+- block:
+    - name: "Download APT key for {{ __archivematica_src_apt_key_file }}"
+      uri:
+        url: "{{ __archivematica_src_apt_key_url }}"
+        return_content: true
+        validate_certs: "{{ __archivematica_src_apt_key_validate_certs | default(true) }}"
+      register: "__archivematica_src_apt_key_download"
+      check_mode: false
+
+    - name: "List the keys downloaded for {{ __archivematica_src_apt_key_file }}"
+      shell: |
+        set -e
+        GNUPGHOME="$(mktemp -d)"
+        export GNUPGHOME
+        trap 'rm -rf "$GNUPGHOME"' EXIT
+        gpg --batch --show-keys --with-colons
+      args:
+        stdin: "{{ __archivematica_src_apt_key_download.content }}"
+      register: "__archivematica_src_apt_key_listing"
+      changed_when: false
+      check_mode: false
+
+    - name: "Verify the key downloaded for {{ __archivematica_src_apt_key_file }}"
+      assert:
+        that:
+          - __archivematica_src_apt_key_expected_id is match('[0-9A-F]{8,}$')
+          - __archivematica_src_apt_key_count | int == 1
+          - __archivematica_src_apt_key_fingerprints | length == 1
+          - __archivematica_src_apt_key_fingerprints[0].endswith(__archivematica_src_apt_key_expected_id)
+        fail_msg: >-
+          The key was not saved: {{ __archivematica_src_apt_key_url }} must
+          serve a single key whose fingerprint ends with the key id
+          "{{ __archivematica_src_apt_key_expected_id }}" (at least 8
+          hexadecimal digits). It served {{ __archivematica_src_apt_key_count }}
+          key(s); fingerprints found:
+          {{ __archivematica_src_apt_key_fingerprints | join(', ') or 'none' }}.
+        quiet: true
+      vars:
+        __archivematica_src_apt_key_count: "{{ __archivematica_src_apt_key_listing.stdout | regex_findall('^pub:', multiline=True) | length }}"
+        __archivematica_src_apt_key_fingerprints: >-
+          {{ __archivematica_src_apt_key_listing.stdout
+             | regex_findall(__archivematica_src_apt_key_fingerprint_regex, multiline=True) }}
+
+    - name: "Save APT key file {{ __archivematica_src_apt_key_file }}"
+      copy:
+        content: "{{ __archivematica_src_apt_key_download.content }}"
+        dest: "{{ __archivematica_src_apt_key_file }}"
+        owner: "root"
+        group: "root"
+        mode: "0644"
+
+  vars:
+    __archivematica_src_apt_key_expected_id: "{{ __archivematica_src_apt_key_id | regex_replace('^0x', '') | upper }}"
+    __archivematica_src_apt_key_fingerprint_regex: '^pub:.*\n(?:rvk:.*\n)*fpr:{9}([0-9A-F]+):'
+    __archivematica_src_apt_key_existing_count: "{{ __archivematica_src_apt_key_existing_listing.stdout | default('') | regex_findall('^pub:', multiline=True) | length }}"
+    __archivematica_src_apt_key_existing_fingerprints: >-
+      {{ __archivematica_src_apt_key_existing_listing.stdout | default('')
+         | regex_findall(__archivematica_src_apt_key_fingerprint_regex, multiline=True) }}
+    __archivematica_src_apt_key_existing_valid: >-
+      {{ __archivematica_src_apt_key_file_stat.stat.exists
+         and __archivematica_src_apt_key_existing_listing.rc == 0
+         and __archivematica_src_apt_key_expected_id is match('[0-9A-F]{8,}$')
+         and __archivematica_src_apt_key_existing_count | int == 1
+         and __archivematica_src_apt_key_existing_fingerprints | length == 1
+         and __archivematica_src_apt_key_existing_fingerprints[0].endswith(__archivematica_src_apt_key_expected_id) }}
+  when: not __archivematica_src_apt_key_existing_valid | bool
+
+- name: "Set the owner and mode of APT key file {{ __archivematica_src_apt_key_file }}"
+  file:
+    path: "{{ __archivematica_src_apt_key_file }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  when: __archivematica_src_apt_key_file_stat.stat.exists
