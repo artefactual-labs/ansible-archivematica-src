@@ -18,10 +18,11 @@
       state: present
 
   - name: "Nodejs: Add Nodesource apt key"
-    apt_key:
-      url: https://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search=0x6F71F525282841EEDAF851B42F59B5F99B1BE0B4
-      id: "2F59B5F99B1BE0B4"
-      state: present
+    include_tasks: "install-apt-key.yml"
+    vars:
+      __archivematica_src_apt_key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search=0x6F71F525282841EEDAF851B42F59B5F99B1BE0B4"
+      __archivematica_src_apt_key_file: "/etc/apt/trusted.gpg.d/nodesource.asc"
+      __archivematica_src_apt_key_id: "6F71F525282841EEDAF851B42F59B5F99B1BE0B4"
 
   - name: "Nodejs: Add NodeSource repositories for Node.js"
     apt_repository:
