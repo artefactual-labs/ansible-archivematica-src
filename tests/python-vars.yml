@@ -1,0 +1,25 @@
+---
+# Run with:
+# ANSIBLE_LOCAL_TEMP=/tmp/ansible-local ansible-playbook -i localhost, tests/python-vars.yml
+- name: Check Python package selection without installing anything
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+    - ../defaults/main.yml
+    - ../vars/main.yml
+  tasks:
+    - name: Check Python 3.12 packages for each OS
+      include_tasks: python-vars-case.yml
+      loop:
+        - {os: Ubuntu-22, package: python3.12-dev}
+        - {os: Ubuntu-24, package: python3.12-dev}
+        - {os: Rocky-8, package: python3.12-devel}
+        - {os: Rocky-9, package: python3.12-devel}
+        - {os: AlmaLinux-8, package: python3.12-devel}
+        - {os: AlmaLinux-9, package: python3.12-devel}
+        - {os: RedHat-8, package: python3.12-devel}
+        - {os: RedHat-9, package: python3.12-devel}
+        - {os: OracleLinux-9, package: python3.12-devel}
+      loop_control:
+        loop_var: python_case

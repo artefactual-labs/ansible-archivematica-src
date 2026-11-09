@@ -1,0 +1,16 @@
+---
+- name: Load OS variables
+  include_vars:
+    file: "../vars/{{ python_case.os }}.yml"
+
+- name: Verify Python 3.12 settings
+  assert:
+    that:
+      - archivematica_src_python_version == '3.12'
+      - archivematica_src_virtualenv_python == 'python3.12'
+      - archivematica_src_virtualenv == 'python3.12 -m venv'
+      - python_case.package in archivematica_src_python_packages
+      - python_case.package in dashboard_osdeps.packages
+      - python_case.package in (storage_service_osdeps.packages | default([])) + (storage_service_osdeps.packages_2 | default([]))
+      - archivematica_src_pip_version == '24.3.1'
+      - archivematica_src_pip_tools_version == '7.4.1'

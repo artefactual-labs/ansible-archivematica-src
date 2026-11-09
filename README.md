@@ -6,6 +6,7 @@ Archivematica installation from its source code repositories.
 **Table of Contents**
 
 - [Role Variables](#role-variables)
+- [Python version](#python-version)
 - [Environment variables](#environment-variables)
 - [Database requirements](#database-requirements)
 - [Backward-compatible logging](#backward-compatible-logging)
@@ -24,6 +25,41 @@ Role Variables
 --------------
 
 See [`defaults/main.yml`](defaults/main.yml) for a comprehensive list of variables.
+
+
+Python version
+--------------
+
+Set the Python version for source installs of AM and Storage Service:
+
+```yaml
+archivematica_src_python_version: "3.12"
+```
+
+The default is `"3.12"`. Each OS vars file lists the packages for the selected
+version. Ubuntu uses `ppa:deadsnakes/ppa`; Rocky Linux, AlmaLinux and RHEL use
+configured OS repositories. The version must be available for the host's OS
+release and supported by the AM/SS dependencies. This change targets Python 3.12
+on Ubuntu 22.04/24.04 and EL8/EL9. Other Python versions require validation before
+deployment.
+
+The role creates application environments with Python's built-in `venv` module
+and installs dependencies with pip and pip-tools.
+Changing the version recreates AM/SS virtualenvs on the next full role run,
+so plan for an application restart. System Python and Ansible's interpreter
+are unchanged.
+
+For existing deployments, run the full role during a maintenance window after
+active transfers have finished and the AM/SS services have been stopped. The
+role checks the selected Python before removing an existing virtualenv, rebuilds
+environments that use another Python or have a broken interpreter, and restarts
+services later in the full deployment. A failed deployment can leave services
+stopped until it is corrected and rerun.
+
+The default source branches are `stable/1.18.x` for AM and `stable/0.24.x` for SS.
+Keep any release tags or commit IDs pinned in inventory when upgrading Python;
+review those pins separately when installing a new AM/SS release. Existing data
+must be backed up before a deployment that runs database migrations.
 
 
 Environment variables

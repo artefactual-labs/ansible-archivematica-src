@@ -1,20 +1,34 @@
 ---
 
-- name: "Destroy virtualenv when it's using a different version"
+- name: "Check Python before replacing the application virtualenv"
   block:
-    - name: "Capture current Python version"
-      command: |-
+    - name: "Check that the selected Python can create virtualenvs"
+      command: "{{ archivematica_src_virtualenv_python }} -c 'import ensurepip, venv'"
+      changed_when: false
+      check_mode: false
+
+    - name: "Check for an existing virtualenv"
+      stat:
+        path: "{{ archivematica_src_am_virtualenv }}"
+      register: "virtualenv_check"
+
+    - name: "Capture current virtualenv Python version"
+      command: >-
         {{ archivematica_src_am_virtualenv }}/bin/python -c
-          'import sys; print("python"+str(sys.version_info[0])+"."+str(sys.version_info[1]))'
+        'import sys; print("python" + str(sys.version_info[0]) + "." + str(sys.version_info[1]))'
       failed_when: false
       changed_when: false
       check_mode: false
       register: "pyver_check"
-    - name: "Destroy Python virtualenv when it's using a different version"
+      when: virtualenv_check.stat.exists
+
+    - name: "Remove virtualenv when Python changed or the interpreter is broken"
       file:
         path: "{{ archivematica_src_am_virtualenv }}"
         state: "absent"
-      when: "pyver_check.rc == 0 and pyver_check.stdout != archivematica_src_virtualenv_python"
+      when:
+        - virtualenv_check.stat.exists
+        - pyver_check.rc != 0 or pyver_check.stdout != archivematica_src_virtualenv_python
 
 - name: "Ensure archivematica user can create virtualenv"
   file:
@@ -30,7 +44,6 @@
   pip:
     virtualenv: "{{ archivematica_src_am_virtualenv }}"
     virtualenv_command: "{{ archivematica_src_virtualenv }}"
-    virtualenv_python: "{{ archivematica_src_virtualenv_python }}"
     name: 
       - "pip=={{ archivematica_src_pip_version }}"
       - "pip-tools=={{ archivematica_src_pip_tools_version }}"
