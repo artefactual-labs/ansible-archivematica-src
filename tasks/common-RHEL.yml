@@ -11,21 +11,6 @@
   when:
     - install_rpm_repositories|bool
 
-#
-# Install optional and extras repositories because EPEL packages may depend on
-# packages from these repositories. 
-# See: https://github.com/artefactual-labs/ansible-archivematica-src/issues/209
-#      https://github.com/artefactual-labs/ansible-archivematica-src/issues/244
-#
-
-- name: "Add rhel-*-optional-rpms repo on RHEL"
-  command: subscription-manager repos --enable "rhel-*-optional-rpms" --enable "rhel-*-extras-rpms"
-  failed_when: false
-  changed_when: false
-  check_mode: false
-  when:
-    - install_rpm_repositories|bool
-
 - name: "Enable crb repo on CentOS/Rocky/Almalinux >= 9"
   command: "dnf config-manager --set-enabled crb"
   when:

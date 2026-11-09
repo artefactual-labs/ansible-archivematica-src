@@ -1,28 +1,28 @@
 ---
 systemd_environment_path: "/etc/sysconfig"
 ansible_deps:
+  - "python36"                # System Python for Ansible, independent of application Python
+  - "python3-dnf"             # Required for Ansible package management
   - "acl"                     # Required to avoid using allow_world_readable_tmpfiles=True
   - "epel-release"
-  - "python-setuptools"
+  - "python3-setuptools"
   - "git"
-  - "MySQL-python"            # Required for mysql_db module
-  - "sqlite"                  # Required for am-configure and fixity
+  - "python3-PyMySQL"         # Required for mysql_db module
+  - "sqlite"                  # Required for am-configure
   - "p7zip-plugins"
-  - "libsemanage-python"      # Required by SELinux management
-  - "policycoreutils-python"  # Required by SELinux management
+  - "python3-policycoreutils" # Required by SELinux management
+  - "python3-libsemanage"     # Required by SELinux management
   - "ca-certificates"         # Required for yum
 ca_custom_bundle: "/etc/pki/tls/certs/ca-bundle.crt"
 archivematica_src_am_amauat_deps: []
 archivematica_src_am_fixity_deps:
-  - "sqlite"
   - "moreutils"
   - "mailx"
 archivematica_src_python_packages:
-  - "rh-python38-scldevel"
-  - "rh-python38-python-devel"
+  - "python{{ archivematica_src_python_version }}"
+  - "python{{ archivematica_src_python_version }}-devel"
+  - "python{{ archivematica_src_python_version }}-pip"
   - "pkgconfig"
-# Distutils-extra?
-  - "rh-python38-python-setuptools"
 
 dashboard_osdeps:
   repokeys: []
@@ -32,21 +32,21 @@ dashboard_osdeps:
     - gcc-c++
     - gettext    # only required in development environments (used to make string translateable)
     - nginx
-    - policycoreutils-python
+    - python3-policycoreutils
     - libffi-devel
     - libxml2-devel
     - libxslt-devel
     - openssl-devel
-    - python3-devel
+    - "python{{ archivematica_src_python_version }}-devel"
     - openldap-devel
     - unar
     - coreutils
 
 MCPClient_osdeps:
   repokeys:
-    - "https://packages.archivematica.org/GPG-KEY-archivematica"
+    - "https://packages.archivematica.org/GPG-KEY-archivematica-sha512"
   repos:
-    - baseurl: "https://packages.archivematica.org/1.18.x/centos-extras"
+    - baseurl: "https://packages.archivematica.org/1.18.x/rocky8-extras"
       description: "archivematica extras"
       enabled: "yes"
       gpgcheck: "no"
@@ -71,8 +71,8 @@ MCPClient_osdeps:
     - mediainfo
     - mediaconch
     - nfs-utils
-    - java-1.7.0-openjdk-headless
-    - openjpeg
+    - java-1.8.0-openjdk-headless
+    - openjpeg2
     - p7zip
     - p7zip-plugins
     - pbzip2
@@ -83,7 +83,6 @@ MCPClient_osdeps:
     - sleuthkit
     - tesseract
     - tree
-    - ufraw
     - uuid 
 
 MCPServer_osdeps:
@@ -92,15 +91,21 @@ MCPServer_osdeps:
   packages: []
 
 storage_service_osdeps:
-  repokeys: []
-  repos: []
+  repokeys:
+    - "https://packages.archivematica.org/GPG-KEY-archivematica-sha512"
+  repos:
+    - baseurl: "https://packages.archivematica.org/1.18.x/rocky8-extras"
+      description: "archivematica extras"
+      enabled: "yes"
+      gpgcheck: "no"
+      name: "archivematica-extras"
   packages:
     - epel-release  # required by unar and nginx
   packages_2:
     - nginx
     - unar
     - rsync
-    - python3-devel
+    - "python{{ archivematica_src_python_version }}-devel"
     - libxml2-devel
     - libxslt-devel
     - zlib-devel
@@ -111,7 +116,7 @@ storage_service_osdeps:
     - gettext
     - p7zip
     - p7zip-plugins
-    - gnupg
+    - gnupg1
     - rng-tools
     - openldap-devel
     - rclone

@@ -35,8 +35,8 @@ archivematica_src_automation_tools_repo: "https://github.com/artefactual/automat
 install_rpm_repositories: "true"
 
 # Branches
-archivematica_src_am_version: "qa/1.x"
-archivematica_src_ss_version: "qa/0.x"
+archivematica_src_am_version: "stable/1.18.x"
+archivematica_src_ss_version: "stable/0.24.x"
 archivematica_src_automationtools_version: "master"
 archivematica_src_acceptance_tests_version: "master"
 
@@ -149,10 +149,16 @@ archivematica_src_ssl_include_acme_chlg_loc: "false"
 # Other components
 #
 
-# Pip version
+# Python version and packaging tools
 
-archivematica_src_pip_version: "21.3.1"
-archivematica_src_pip_tools_version: "6.4.0"
+# Python used by source installs (AM and SS share this setting).
+# Quote major.minor values in inventory.
+archivematica_src_python_version: "3.12"
+archivematica_src_virtualenv_python: "python{{ archivematica_src_python_version }}"
+# Ansible's pip module creates application environments with Python's venv module.
+archivematica_src_virtualenv: "{{ archivematica_src_virtualenv_python }} -m venv"
+archivematica_src_pip_version: "26.3"
+archivematica_src_pip_tools_version: "7.6.2"
 
 #
 # Ubuntu mediainfo package
