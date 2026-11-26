@@ -15,15 +15,15 @@
 - name: "Add GPG space and locations"
   block:
 
-    - name: "Set gpg binary name (Bionic)"
+    - name: "Set gpg binary name (Ubuntu)"
       set_fact:
         gpg_binary: "gpg1"
-      when: "ansible_distribution_version is version('18.04', '>=')"
+      when: ansible_distribution == "Ubuntu"
 
-    - name: "Set gpg binary name (Distribution!=Bionic)"
+    - name: "Set gpg binary name (RPM systems)"
       set_fact:
         gpg_binary: "gpg"
-      when: "ansible_distribution_version is version('18.04', '<')"
+      when: ansible_os_family in ['RedHat', 'Rocky']
 
     - name: "Check whether GPG already exists"
       shell: >
